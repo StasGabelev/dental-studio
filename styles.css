@@ -578,9 +578,8 @@ button { font-family: var(--font-sans); }
    ============================================================ */
 .hero__features-section {
     padding: 0;
-    margin-top: -1px; /* Stitch to hero info bar */
-    background: #000; /* Dark like reference */
-    border-top: 1px solid rgba(184, 146, 74, 0.2);
+    margin-top: 0;
+    background: transparent;
 }
 
 .features-grid {
@@ -591,8 +590,10 @@ button { font-family: var(--font-sans); }
 }
 
 .feature-card {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle outline */
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--gold);
     padding: 24px 15px;
     text-align: center;
     height: 70px;
@@ -606,20 +607,19 @@ button { font-family: var(--font-sans); }
 
 .feature-card span {
     font-size: 11px;
-    font-weight: 400;
+    font-weight: 500;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #fff;
+    color: var(--text-dark);
     transition: var(--transition-fast);
 }
 
 .feature-card:hover {
-    border-color: var(--gold);
-    background: rgba(184, 146, 74, 0.05);
+    background: var(--gold);
 }
 
 .feature-card:hover span {
-    color: var(--gold);
+    color: #fff;
 }
 
 /* ============================================================
@@ -2414,16 +2414,17 @@ button { font-family: var(--font-sans); }
         gap: 12px; 
     }
     .feature-card {
+        background: rgba(255, 255, 255, 0.85);
         border: 1px solid var(--gold);
         border-radius: 4px;
         padding: 18px 10px;
-        background: rgba(255, 255, 255, 0.9);
         box-shadow: 0 4px 15px rgba(0,0,0,0.03);
     }
     .feature-card span {
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 500;
-        letter-spacing: 1.5px;
+        letter-spacing: 1.2px;
+        color: var(--text-dark);
     }
 
     /* ── Hide FAB — sticky button covers it ─── */
