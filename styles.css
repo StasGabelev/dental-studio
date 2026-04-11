@@ -441,17 +441,20 @@ button { font-family: var(--font-sans); }
 /* Hero info bar at bottom */
 .hero__info-bar {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 30px;
+    left: 60px;
+    right: 60px;
     z-index: 3;
-    border-top: 1px solid var(--gold-line);
     display: flex;
     align-items: center;
-    padding: 22px 100px;
+    padding: 18px 40px;
     gap: 60px;
-    background: rgba(255,255,255,0.7);
+    /* Same style as feature cards */
+    background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
 }
 
 .hero__info-item {
@@ -2391,12 +2394,22 @@ button { font-family: var(--font-sans); }
 
     /* Stack info bar elements neatly */
     .hero__info-bar { 
-        padding: 16px 24px; 
-        gap: 16px; 
-        flex-direction: column; 
-        align-items: flex-start; 
-        background: rgba(255,255,255,0.85); 
+        bottom: 10px;
+        left: 20px;
+        right: 20px;
+        padding: 12px 15px; 
+        gap: 12px; 
+        flex-direction: row; /* One line as requested */
+        align-items: center; 
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid var(--gold);
+        border-radius: 4px;
     }
+    
+    .hero__info-label { display: none; } /* Hide labels on mobile to fit one line */
+    .hero__info-value { font-size: 11px; }
+    .hero__social-links { display: none; } /* Hide social line block on small screen */
     
     /* Hide corner accents on mobile — too clunky */
     .hero__corner-tl, .hero__corner-br { display: none; }
