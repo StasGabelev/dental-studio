@@ -366,21 +366,20 @@ button { font-family: var(--font-sans); }
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: right center; /* Смещаем акцент вправо */
-    transform: scale(1.15); /* Чуть растягиваем (зумируем) */
-    opacity: 0.5; /* Делаем видимым (было 0.18) */
-    filter: saturate(0.2) brightness(0.85); /* Делаем кадр темнее и возвращаем каплю цвета */
+    object-position: right center;
+    transform: scale(1.05); /* Slight zoom */
+    opacity: 0.8; /* Make video more visible */
 }
 
 .hero__overlay {
     position: absolute;
     inset: 0;
-    /* Градиент: слева густой белый (для текста), справа легкое затемнение (чтобы видео было "темнее") */
+    /* Dark gradient like Tokar: black on the left for text readability, fading to transparent right */
     background: linear-gradient(
-        105deg,
-        rgba(255,255,255,1) 40%,
-        rgba(255,255,255,0.4) 70%,
-        rgba(0,0,0,0.25) 100%
+        90deg,
+        rgba(0, 0, 0, 0.9) 0%,
+        rgba(0, 0, 0, 0.6) 40%,
+        rgba(0, 0, 0, 0.1) 100%
     );
     z-index: 1;
 }
@@ -423,7 +422,7 @@ button { font-family: var(--font-sans); }
     font-weight: 400;
     line-height: 1.0;
     letter-spacing: -1px;
-    color: var(--text-dark);
+    color: #ffffff; /* White text for dark background */
     max-width: 680px;
     margin-bottom: 36px;
 }
@@ -434,7 +433,7 @@ button { font-family: var(--font-sans); }
     max-width: 480px;
     margin-bottom: 50px;
     line-height: 1.7;
-    color: var(--text-mid);
+    color: rgba(255, 255, 255, 0.8); /* Light text for dark background */
     letter-spacing: 0.3px;
 }
 
