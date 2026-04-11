@@ -1,0 +1,34 @@
+name: Deploy Dental Studio
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create Backup on Server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          script: |
+            mkdir -p ${{ secrets.BACKUP_PATH }}
+            tar -czf ${{ secrets.BACKUP_PATH }}/dental_studio_$(date +%Y%m%d_%H%M%S).tar.gz -C ${{ secrets.REMOTE_PATH }} . || true
+
+      - name: Deploy to Server
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          source: "."
+          target: ${{ secrets.REMOTE_PATH }}
+          strip_components: 0
