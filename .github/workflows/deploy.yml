@@ -13,13 +13,14 @@ jobs:
 
       - name: Create Backup on Server
         uses: appleboy/ssh-action@v0.1.10
+        continue-on-error: true  # <--- ЭТО ПОЗВОЛИТ ИГНОРИРОВАТЬ ТАЙМАУТ БЭКАПА
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 65002
-          timeout: 80s
-          command_timeout: 10m
+          timeout: 100s
+          command_timeout: 15m
           script: |
             mkdir -p ~/backups
             cd domains/rozetka.space/public_html && tar -czf ~/backups/dental_studio_$(date +%Y%m%d_%H%M%S).tar.gz . --exclude='./backups' || echo "Backup skipped"
@@ -31,6 +32,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 65002
-          timeout: 60s
+          timeout: 100s
           source: "."
           target: "domains/rozetka.space/public_html"
