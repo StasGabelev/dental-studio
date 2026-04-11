@@ -196,7 +196,7 @@ window.toggleMobileMenu = function() {
         <div class="mobile-overlay__logo">
             <a href="index.html" class="logo-link" style="align-items: center;">
                 <span class="logo-top" style="font-size:20px; color:#1a1a1a;">DENTAL</span>
-                <span class="logo-bottom" style="font-size:10px; color:#B8924A;">Studio Che</span>
+                <span class="logo-bottom" style="font-size:10px; color:#B8924A;">Studio</span>
             </a>
         </div>
         <nav class="mobile-overlay__nav">
