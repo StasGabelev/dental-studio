@@ -438,22 +438,26 @@ button { font-family: var(--font-sans); }
     letter-spacing: 0.3px;
 }
 
-/* Hero info bar at bottom */
-.hero__info-bar {
+/* Wrapper section to ensure the info bar sits BELOW the hero and doesn't get pushed off-screen */
+.hero-info-section {
+    width: 100%;
+    background: #ffffff; /* Solid white background — NO transparency */
+    padding: 0;
     position: relative;
-    max-width: 1440px;
-    margin: 30px auto; /* Sits completely below the hero video */
     z-index: 10;
+    border-bottom: 1px solid var(--gold-line);
+}
+
+.hero__info-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 40px;
-    gap: 60px;
-    /* Same style as feature cards */
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid var(--gold);
-    border-radius: 4px;
-    width: calc(100% - 120px); /* accounting for left/right margins on desktop */
+    padding: 22px 60px;
+    gap: 40px;
+    background: #ffffff;
+    width: 100%;
+    margin: 0 auto;
+    max-width: 1600px;
 }
 
 .hero__info-item {
@@ -2391,26 +2395,31 @@ button { font-family: var(--font-sans); }
         box-sizing: border-box;
     }
 
-    /* Info bar below hero */
+    /* Info bar below hero mobile fixes */
+    .hero-info-section {
+        padding: 0;
+    }
     .hero__info-bar { 
         position: relative;
-        width: 100%;
         margin: 0;
+        width: 100%;
         padding: 16px 20px; 
-        gap: 12px; 
-        flex-direction: row; /* One line as requested */
+        gap: 10px; 
+        flex-direction: row; 
         align-items: center; 
         justify-content: space-between;
         background: #fff;
         border: none;
         border-bottom: 1px solid var(--gold-line);
-        border-top: 1px solid var(--gold-line);
         border-radius: 0;
     }
     
-    .hero__info-label { display: none; } /* Hide labels on mobile to fit one line */
-    .hero__info-value { font-size: 11px; }
-    .hero__social-links { display: none; } /* Hide social line block on small screen */
+    .hero__info-label { display: none; }
+    .hero__info-value { 
+        font-size: 10px; /* Smallest size to fit one line */
+        white-space: nowrap;
+    }
+    .hero__social-links { display: none; }
     
     /* Hide corner accents on mobile — too clunky */
     .hero__corner-tl, .hero__corner-br { display: none; }
