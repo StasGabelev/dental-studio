@@ -186,19 +186,20 @@ button { font-family: var(--font-sans); }
     margin-top: 3px;
 }
 
-/* Left nav */
 .nav--left {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end; /* Push items closer to center logo */
+    padding-right: 40px; /* Space between nav and logo */
 }
 
 /* Right group: nav + lang + icons + burger — ONE row, never wraps */
 .header__right {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start; /* Push items closer to center logo */
     gap: 24px;
+    padding-left: 40px; /* Space from logo */
     flex-wrap: nowrap;
     white-space: nowrap;
 }
@@ -213,8 +214,8 @@ button { font-family: var(--font-sans); }
 }
 
 .nav__list a {
-    font-size: 11px;
-    font-weight: 400;
+    font-size: 13px; /* INCREASED FONT SIZE for readability */
+    font-weight: 500;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--text-mid);
@@ -374,12 +375,12 @@ button { font-family: var(--font-sans); }
 .hero__overlay {
     position: absolute;
     inset: 0;
-    /* Dark gradient like Tokar: black on the left for text readability, fading to transparent right */
+    /* Soft white gradient: opaque on the left for text, gently fading to transparent on the right */
     background: linear-gradient(
-        90deg,
-        rgba(0, 0, 0, 0.9) 0%,
-        rgba(0, 0, 0, 0.6) 40%,
-        rgba(0, 0, 0, 0.1) 100%
+        105deg,
+        rgba(255, 255, 255, 1) 40%,
+        rgba(255, 255, 255, 0.45) 70%,
+        rgba(255, 255, 255, 0) 100%
     );
     z-index: 1;
 }
@@ -422,18 +423,18 @@ button { font-family: var(--font-sans); }
     font-weight: 400;
     line-height: 1.0;
     letter-spacing: -1px;
-    color: #ffffff; /* White text for dark background */
+    color: var(--text-dark); /* Dark text for light background */
     max-width: 680px;
     margin-bottom: 36px;
 }
 
 .hero-subtitle {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 300;
     max-width: 480px;
     margin-bottom: 50px;
     line-height: 1.7;
-    color: rgba(255, 255, 255, 0.8); /* Light text for dark background */
+    color: var(--text-mid); /* Dark subtitle */
     letter-spacing: 0.3px;
 }
 
