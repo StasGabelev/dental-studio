@@ -584,8 +584,7 @@ button { font-family: var(--font-sans); }
    FEATURES UNDER HERO
    ============================================================ */
 .hero__features-section {
-    padding: 0;
-    margin-top: 0;
+    padding: 60px 0;
     background: transparent;
 }
 
