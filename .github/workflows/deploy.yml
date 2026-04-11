@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 65002
-          timeout: 40s
+          timeout: 80s
           command_timeout: 10m
           script: |
             mkdir -p ~/backups
@@ -31,5 +31,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 65002
+          timeout: 60s
           source: "."
           target: "domains/rozetka.space/public_html"
