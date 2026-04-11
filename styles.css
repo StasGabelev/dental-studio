@@ -2325,18 +2325,17 @@ button { font-family: var(--font-sans); }
         display: flex;
         justify-content: space-between;
         align-items: center;
-        position: relative;     /* needed for absolute logo centering */
     }
 
-    /* Logo always perfectly centered on mobile */
+    /* Logo stays on the left */
     .logo {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        position: static;
+        transform: none;
+        text-align: left;
     }
 
-    /* Right side: only show burger, collapse gap */
-    .header__right { gap: 8px; }
+    /* Right side: flex end for icons and burger */
+    .header__right { gap: 12px; }
 
     .mobile-menu-btn {
         display: flex !important;
@@ -2344,8 +2343,8 @@ button { font-family: var(--font-sans); }
         justify-content: center;
         align-items: center;
         gap: 5px;
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
         background: none;
         border: none;
         cursor: pointer;
