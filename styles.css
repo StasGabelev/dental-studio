@@ -3217,6 +3217,10 @@ main {
 
 .mobile-overlay__logo {
     margin-bottom: 48px;
+    margin-top: 40px; /* Space from top */
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 .mobile-overlay__nav {

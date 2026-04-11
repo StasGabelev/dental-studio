@@ -192,20 +192,18 @@ window.toggleMobileMenu = function() {
     overlay.id = 'mobileMenuOverlay';
     overlay.className = 'mobile-menu-overlay'; // Use class for styles
     overlay.innerHTML = `
-        <div class="mobile-overlay__header" style="display:flex; justify-content:space-between; align-items:center; width:100%; padding: 20px 25px;">
-             <div class="mobile-overlay__logo">
-                <a href="index.html" style="text-decoration:none; display:flex; flex-direction:column; align-items:flex-start;">
-                    <span style="font-family:'Bodoni Moda',serif; font-size:18px; letter-spacing:4px; color:#1a1a1a;">DENTAL</span>
-                    <span style="font-family:'Montserrat',sans-serif; font-size:8px; letter-spacing:3px; color:#B8924A;">Studio Che</span>
-                </a>
-            </div>
-            <button class="mobile-overlay__close" onclick="window.toggleMobileMenu()">&times;</button>
+        <button class="mobile-overlay__close" onclick="window.toggleMobileMenu()">&times;</button>
+        <div class="mobile-overlay__logo">
+            <a href="index.html" class="logo-link" style="align-items: center;">
+                <span class="logo-top" style="font-size:20px; color:#1a1a1a;">DENTAL</span>
+                <span class="logo-bottom" style="font-size:10px; color:#B8924A;">Studio Che</span>
+            </a>
         </div>
         <nav class="mobile-overlay__nav">
             ${links.map(l => `<a href="${l.href}">${l.label}</a>`).join('')}
         </nav>
         <div class="mobile-overlay__footer">
-            <a href="tel:+380776007800" style="font-family:var(--font-serif); font-size:20px;">(077) 600 7 800</a>
+            <a href="tel:+380776007800" style="font-family:var(--font-serif); font-size:24px; color:#B8924A;">(077) 600 7 800</a>
         </div>
     `;
     document.body.appendChild(overlay);
