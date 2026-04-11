@@ -2433,8 +2433,9 @@ button { font-family: var(--font-sans); }
 
     /* ── Feature Cards ───────────────────────── */
     .features-grid { 
-        grid-template-columns: 1fr 1fr !important; 
-        gap: 12px; 
+        grid-template-columns: 1fr !important; 
+        gap: 15px; 
+        padding: 0 20px;
     }
     .feature-card {
         background: rgba(255, 255, 255, 0.85);
