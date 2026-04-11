@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Керамічні вініри — Dental Studio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white">
+    <div id="header-placeholder"></div>
+
+    <main class="page-container">
+        <!-- Hero Case -->
+        <section class="case-hero">
+            <div class="case-hero__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/ShmakovaTania/preview.jpg')"></div>
+            <div class="case-hero__content">
+                <h1 class="case-title-main">КЕРАМІЧНІ ВІНІРИ</h1>
+                <a href="#form" class="btn btn--cta btn--xl">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</a>
+            </div>
+        </section>
+
+        <!-- Treatment Plan -->
+        <section class="treatment-plan">
+            <div class="container-full">
+                <h2 class="section-heading reveal" style="text-align: center; margin-bottom: 60px;">ЕТАПИ ЛІКУВАННЯ</h2>
+                
+                <div class="plan-tabs reveal">
+                    <button class="plan-tab-btn active" data-stage="ortho">ОРТОДОНТІЯ</button>
+                    <button class="plan-tab-btn" data-stage="surgery">ХІРУРГІЯ</button>
+                    <button class="plan-tab-btn" data-stage="orthopedic">ОРТОПЕДІЯ</button>
+                </div>
+
+                <div class="plan-content-wrap reveal">
+                    <div class="plan-stage active" id="ortho">
+                        <div class="plan-stage__img">
+                            <img src="https://storage.googleapis.com/tokar_clinic_site/patients/ShmakovaTania/ortho_process.jpg" alt="Ортодонтія">
+                        </div>
+                        <div class="plan-stage__text">
+                            <span class="plan-stage__cat">ЕТАП 1 — ОРТОДОНТІЯ</span>
+                            <h3 class="plan-stage__doctor">АНДРІЙ САВЧУК</h3>
+                            <p class="plan-stage__desc">Вирівнювання зубного ряду для створення оптимальної позиції зубів перед встановленням керамічних реставрацій.</p>
+                        </div>
+                    </div>
+
+                    <div class="plan-stage" id="surgery">
+                        <div class="plan-stage__img">
+                            <img src="https://storage.googleapis.com/tokar_clinic_site/patients/ShmakovaTania/surgery_process.jpg" alt="Хірургія">
+                        </div>
+                        <div class="plan-stage__text">
+                            <span class="plan-stage__cat">ЕТАП 2 — ХІРУРГІЯ</span>
+                            <h3 class="plan-stage__doctor">АНАТОЛІЙ ТОКАР</h3>
+                            <p class="plan-stage__desc">Корекція ясенного краю (пластика ясен) для симетрії та естетичного контуру посмішки.</p>
+                        </div>
+                    </div>
+
+                    <div class="plan-stage" id="orthopedic">
+                        <div class="plan-stage__img">
+                            <img src="https://storage.googleapis.com/tokar_clinic_site/patients/ShmakovaTania/preview.jpg" alt="Ортопедія">
+                        </div>
+                        <div class="plan-stage__text">
+                            <span class="plan-stage__cat">ЕТАП 3 — ОРТОПЕДІЯ</span>
+                            <h3 class="plan-stage__doctor">АНДРІЙ САВЧУК</h3>
+                            <p class="plan-stage__desc">Встановлення високоякісних керамічних вінірів. Створення нової яскравої посмішки з урахуванням побажань пацієнта.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Before / After -->
+        <section class="case-results">
+            <div class="container-full">
+                <h2 class="section-heading reveal">РЕЗУЛЬТАТ ЛІКУВАННЯ</h2>
+                <div class="results-grid">
+                    <div class="result-img-box">
+                        <img src="https://storage.googleapis.com/tokar_clinic_site/patients/ShmakovaTania/before.jpg" alt="До">
+                        <span class="label">ДО</span>
+                    </div>
+                    <div class="result-img-box">
+                        <img src="https://storage.googleapis.com/tokar_clinic_site/patients/ShmakovaTania/after.jpg" alt="ПІСЛЯ">
+                        <span class="label">ПІСЛЯ</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+    <script src="translations.js"></script>
+    <script src="components.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

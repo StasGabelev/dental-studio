@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лікування військовослужбовців — Dental Studio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white">
+    <div id="header-placeholder"></div>
+
+    <main class="page-container">
+        <section class="case-hero">
+            <div class="case-hero__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/DenysovaOlena/preview.jpg'); filter: brightness(0.7) contrast(1.1);"></div>
+            <div class="case-hero__content">
+                <h1 class="case-title-main">ДЛЯ ВІЙСЬКОВИХ</h1>
+                <a href="#form" class="btn btn--cta btn--xl">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</a>
+            </div>
+        </section>
+
+        <section class="treatment-plan">
+            <div class="container-full">
+                <h2 class="section-heading reveal" style="text-align: center; margin-bottom: 60px;">ЕТАПИ ЛІКУВАННЯ</h2>
+                
+                <div class="plan-tabs reveal">
+                    <button class="plan-tab-btn active" data-stage="rehab">РЕАБІЛІТАЦІЯ</button>
+                    <button class="plan-tab-btn" data-stage="result">РЕЗУЛЬТАТ</button>
+                </div>
+
+                <div class="plan-content-wrap reveal">
+                    <div class="plan-stage active" id="rehab">
+                        <div class="plan-stage__img">
+                            <img src="https://storage.googleapis.com/tokar_clinic_site/patients/DenysovaOlena/before.jpg" alt="Реабілітація">
+                        </div>
+                        <div class="plan-stage__text">
+                            <span class="plan-stage__cat">ЕТАП 1 — РЕАБІЛІТАЦІЯ</span>
+                            <h3 class="plan-stage__doctor">АНАТОЛІЙ ТОКАР</h3>
+                            <p class="plan-stage__desc">Комплексна санація ротової порожнини та відновлення функціональності зубного ряду після травм або тривалої відсутності гігієни.</p>
+                        </div>
+                    </div>
+
+                    <div class="plan-stage" id="result">
+                        <div class="plan-stage__img">
+                            <img src="https://storage.googleapis.com/tokar_clinic_site/patients/DenysovaOlena/after.jpg" alt="Результат">
+                        </div>
+                        <div class="plan-stage__text">
+                            <span class="plan-stage__cat">ЕТАП 2 — РЕЗУЛЬТАТ</span>
+                            <h3 class="plan-stage__doctor">АНАТОЛІЙ ТОКАР</h3>
+                            <p class="plan-stage__desc">Повернення здорової посмішки захисникам. Використання міцних та довговічних матеріалів для надійної експлуатації.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="case-results">
+            <div class="container-full">
+                <h2 class="section-heading reveal">РЕЗУЛЬТАТ ЛІКУВАННЯ</h2>
+                <div class="results-grid">
+                    <div class="result-img-box">
+                        <img src="https://storage.googleapis.com/tokar_clinic_site/patients/DenysovaOlena/before.jpg" alt="До">
+                        <span class="label">ДО</span>
+                    </div>
+                    <div class="result-img-box">
+                        <img src="https://storage.googleapis.com/tokar_clinic_site/patients/DenysovaOlena/after.jpg" alt="ПІСЛЯ">
+                        <span class="label">ПІСЛЯ</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+    <script src="translations.js"></script>
+    <script src="components.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
