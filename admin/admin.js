@@ -1062,7 +1062,8 @@ async function loadPageEditor(pageSlug) {
     if (sb) {
         const { data } = await sb.from('site_content')
             .select('section_key, value_uk, media_url, content_type')
-            .eq('page_slug', pageSlug);
+            .eq('page_slug', pageSlug)
+            .order('updated_at', { ascending: true });
         if (data) {
             data.forEach(row => {
                 existing[row.section_key] = row.media_url || row.value_uk || '';
@@ -1141,19 +1142,27 @@ async function savePageContent(pageSlug) {
             section_key: f.dataset.key,
             content_type: 'text',
             value_uk: f.value,
+            media_url: null,
             updated_at: new Date().toISOString(),
         });
     });
 
     if (sb) {
-        for (const u of updates) {
-            await sb.from('site_content').upsert(u, {
-                onConflict: 'page_slug,section_key'
-            });
+        try {
+            for (const u of updates) {
+                const { error } = await sb.from('site_content').upsert(u, {
+                    onConflict: 'page_slug,section_key'
+                });
+                if (error) throw error;
+            }
+            showToast('✅ Зміни збережено');
+            // Refresh to confirm
+            setTimeout(() => loadPageEditor(pageSlug), 500);
+        } catch (err) {
+            console.error('Save error:', err);
+            showToast(`❌ Помилка: ${err.message || 'невідома помилка'}`);
         }
     }
-
-    showToast('✅ Зміни збережено');
 }
 
 async function triggerMediaUpload(key, type) {
