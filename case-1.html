@@ -7,8 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body class="bg-white">
     <div id="header-placeholder"></div>
@@ -26,21 +25,49 @@
         <!-- Treatment Plan -->
         <section class="treatment-plan">
             <div class="container-full">
-                <h2 class="section-title">ЕТАПИ ЛІКУВАННЯ</h2>
-                <div class="plan-grid">
-                    <div class="plan-item">
-                        <span class="plan-cat">ОРТОДОНТІЯ</span>
-                        <p class="plan-desc">Лікування брекет-системою</p>
+                <h2 class="section-heading reveal" style="text-align: center; margin-bottom: 60px;">ЕТАПИ ЛІКУВАННЯ</h2>
+                
+                <div class="plan-tabs reveal">
+                    <button class="plan-tab-btn active" data-stage="ortho">ОРТОДОНТІЯ</button>
+                    <button class="plan-tab-btn" data-stage="surgery">ХІРУРГІЯ</button>
+                    <button class="plan-tab-btn" data-stage="orthopedic">ОРТОПЕДІЯ</button>
+                </div>
+
+                <div class="plan-content-wrap reveal">
+                    <!-- Ortho Stage -->
+                    <div class="plan-stage active" id="ortho">
+                        <div class="plan-stage__img">
+                            <img src="https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/ortho_process.jpg" alt="Ортодонтія">
+                        </div>
+                        <div class="plan-stage__text">
+                            <span class="plan-stage__cat">ЕТАП 1 — ОРТОДОНТІЯ</span>
+                            <h3 class="plan-stage__doctor">МАРІЯ ТОКАР</h3>
+                            <p class="plan-stage__desc">Попередня підготовка зубних рядів за допомогою брекет-системи для створення правильного оклюзійного простору під майбутні вініри.</p>
+                        </div>
                     </div>
-                    <div class="plan-item">
-                        <span class="plan-cat">ХІРУРГІЯ</span>
-                        <p class="plan-doctor">АНАТОЛІЙ ТОКАР</p>
-                        <p class="plan-desc">Видовження ясен</p>
+
+                    <!-- Surgery Stage -->
+                    <div class="plan-stage" id="surgery">
+                        <div class="plan-stage__img">
+                            <img src="https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/surgery_process.jpg" alt="Хірургія">
+                        </div>
+                        <div class="plan-stage__text">
+                            <span class="plan-stage__cat">ЕТАП 2 — ХІРУРГІЯ</span>
+                            <h3 class="plan-stage__doctor">АНАТОЛІЙ ТОКАР</h3>
+                            <p class="plan-stage__desc">Хірургічне видовження клінічної коронки зуба для створення ідеального ясенного контуру та гармонійної посмішки.</p>
+                        </div>
                     </div>
-                    <div class="plan-item">
-                        <span class="plan-cat">ОРТОПЕДІЯ</span>
-                        <p class="plan-doctor">АНАТОЛІЙ ТОКАР</p>
-                        <p class="plan-desc">Керамічні вініри</p>
+
+                    <!-- Orthopedic Stage -->
+                    <div class="plan-stage" id="orthopedic">
+                        <div class="plan-stage__img">
+                            <img src="https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/preview.jpg" alt="Ортопедія">
+                        </div>
+                        <div class="plan-stage__text">
+                            <span class="plan-stage__cat">ЕТАП 3 — ОРТОПЕДІЯ</span>
+                            <h3 class="plan-stage__doctor">АНАТОЛІЙ ТОКАР</h3>
+                            <p class="plan-stage__desc">Фінальний етап: встановлення 20 керамічних вінірів преміум-класу. Відновлення естетики та функціональності посмішки.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -49,7 +76,7 @@
         <!-- Before / After -->
         <section class="case-results">
             <div class="container-full">
-                <h2 class="section-title">РЕЗУЛЬТАТ ЛІКУВАННЯ</h2>
+                <h2 class="section-heading reveal">РЕЗУЛЬТАТ ЛІКУВАННЯ</h2>
                 <div class="results-grid">
                     <div class="result-img-box">
                         <img src="https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/before.jpg" alt="До">
@@ -75,9 +102,15 @@
 
     <div id="footer-placeholder"></div>
 
+    <script src="translations.js"></script>
     <script src="components.js"></script>
+    <script src="main.js"></script>
+
+    <!-- Supabase & Dynamic Content Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="dynamic-content.js"></script>
     <script src="chat-widget.js"></script>
 </body>
 </html>
+
 

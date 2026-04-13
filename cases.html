@@ -7,8 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body class="bg-white">
     <div id="header-placeholder"></div>
@@ -16,62 +15,142 @@
     <main class="page-container">
         <section class="cases-page">
             <div class="container-full">
-                <h1 class="page-title" data-i18n="cases-hero-title">НАШІ РОБОТИ</h1>
+                <h1 class="page-title reveal" data-i18n="cases-hero-title">НАШІ РОБОТИ</h1>
                 
                 <div class="filters-wrap">
                     <div class="filters-scroll">
-                        <button class="filter-btn active" data-filter="all" data-i18n="filter-all">Всі роботи</button>
+                        <button class="filter-btn active" data-filter="all" data-i18n="filter-all">Усі роботи</button>
                         <button class="filter-btn" data-filter="veneers" data-i18n="filter-veneers">Керамічні вініри</button>
-                        <button class="filter-btn" data-filter="composite" data-i18n="filter-composite">Композитні вініри</button>
-                        <button class="filter-btn" data-filter="restoration" data-i18n="filter-restoration">Композитні реставрації</button>
+                        <button class="filter-btn" data-filter="composite-veneers" data-i18n="filter-composite-veneers">Композитні вініри</button>
+                        <button class="filter-btn" data-filter="restorations" data-i18n="filter-restorations">Композитні реставрації</button>
+                        <button class="filter-btn" data-filter="caries" data-i18n="filter-caries">Лікування карієсу</button>
+                        <button class="filter-btn" data-filter="endo" data-i18n="filter-endo">Лікування кореневих каналів</button>
+                        <button class="filter-btn" data-filter="periodontal" data-i18n="filter-periodontal">Пародонтологічне лікування</button>
                         <button class="filter-btn" data-filter="implants" data-i18n="filter-implants">Імплантація</button>
-                        <button class="filter-btn" data-filter="ortho" data-i18n="filter-ortho">Ортодонтія</button>
+                        <button class="filter-btn" data-filter="recessions" data-i18n="filter-recessions">Закриття рецесій</button>
+                        <button class="filter-btn" data-filter="gum-extension" data-i18n="filter-gum-extension">Видовження ясен</button>
+                        <button class="filter-btn" data-filter="braces" data-i18n="filter-braces">Лікування брекет-системою</button>
+                        <button class="filter-btn" data-filter="aligners" data-i18n="filter-aligners">Лікування елайнерами</button>
                         <button class="filter-btn" data-filter="whitening" data-i18n="filter-whitening">Відбілювання зубів</button>
+                        <button class="filter-btn" data-filter="military" data-i18n="filter-military">Лікування військовослужбовців</button>
                     </div>
                 </div>
 
                 <div class="cases-grid">
-                    <!-- Case 1 -->
+                    <!-- Case 1 (Veneers) -->
                     <div class="case-card" data-category="veneers" onclick="location.href='case-1.html'">
                         <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/preview.jpg')"></div>
                         <div class="case-card__overlay">
                             <span data-i18n="filter-veneers">Керамічні вініри</span>
                         </div>
                     </div>
-                    <!-- Case 2 -->
+                    <!-- Case 2 (Veneers) -->
                     <div class="case-card" data-category="veneers" onclick="location.href='case-2.html'">
                         <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/ShmakovaTania/preview.jpg')"></div>
                         <div class="case-card__overlay">
                             <span data-i18n="filter-veneers">Керамічні вініри</span>
                         </div>
                     </div>
-                    <!-- Case 3 -->
-                    <div class="case-card" data-category="veneers" onclick="location.href='case-3.html'">
-                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/FlurkoSergiy/preview.jpg')"></div>
-                        <div class="case-card__overlay">
-                            <span data-i18n="filter-veneers">Керамічні вініри</span>
-                        </div>
-                    </div>
-                    <!-- Case 4 -->
-                    <div class="case-card" data-category="composite" onclick="location.href='case-4.html'">
+                    <!-- Case 3 (Composite Veneers) -->
+                    <div class="case-card" data-category="composite-veneers" onclick="location.href='case-3.html'">
                         <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/PavlykIra/preview.jpg')"></div>
                         <div class="case-card__overlay">
-                            <span data-i18n="filter-composite">Композитні вініри</span>
+                            <span data-i18n="filter-composite-veneers">Композитні вініри</span>
                         </div>
                     </div>
-                    <!-- Case 5 -->
-                    <div class="case-card" data-category="ortho" onclick="location.href='case-5.html'">
-                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/TokarMaria/preview.jpg')"></div>
-                        <div class="case-card__overlay">
-                            <span data-i18n="filter-ortho">Ортодонтія</span>
-                        </div>
-                    </div>
-                    <!-- Case 6 -->
-                    <div class="case-card" data-category="restoration" onclick="location.href='case-6.html'">
+                    <!-- Case 4 (Restorations) -->
+                    <div class="case-card" data-category="restorations" onclick="location.href='case-4.html'">
                         <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/DenysovaOlena/preview.jpg')"></div>
                         <div class="case-card__overlay">
-                            <span data-i18n="filter-restoration">Композитні реставрації</span>
+                            <span data-i18n="filter-restorations">Композитні реставрації</span>
                         </div>
+                    </div>
+                    <!-- Case 5 (Caries) -->
+                    <div class="case-card" data-category="caries" onclick="location.href='case-5.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/preview.jpg'); filter: grayscale(1);"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-caries">Лікування карієсу</span>
+                        </div>
+                    </div>
+                    <!-- Case 6 (Endo) -->
+                    <div class="case-card" data-category="endo" onclick="location.href='case-6.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/FlurkoSergiy/preview.jpg'); filter: sepia(0.3);"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-endo">Лікування кореневих каналів</span>
+                        </div>
+                    </div>
+                    <!-- Case 7 (Periodontal) -->
+                    <div class="case-card" data-category="periodontal" onclick="location.href='case-7.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/TokarMaria/preview.jpg'); filter: contrast(1.2);"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-periodontal">Пародонтологічне лікування</span>
+                        </div>
+                    </div>
+                    <!-- Case 8 (Implants) -->
+                    <div class="case-card" data-category="implants" onclick="location.href='case-8.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/ShmakovaTania/preview.jpg');"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-implants">Імплантація</span>
+                        </div>
+                    </div>
+                    <!-- Case 9 (Recessions) -->
+                    <div class="case-card" data-category="recessions" onclick="location.href='case-9.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/PavlykIra/preview.jpg');"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-recessions">Закриття рецесій</span>
+                        </div>
+                    </div>
+                    <!-- Case 10 (Gum Extension) -->
+                    <div class="case-card" data-category="gum-extension" onclick="location.href='case-10.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/DenysovaOlena/preview.jpg');"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-gum-extension">Видовження ясен</span>
+                        </div>
+                    </div>
+                    <!-- Case 11 (Braces) -->
+                    <div class="case-card" data-category="braces" onclick="location.href='case-11.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/TokarMaria/preview.jpg');"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-braces">Лікування брекет-системою</span>
+                        </div>
+                    </div>
+                    <!-- Case 12 (Aligners) -->
+                    <div class="case-card" data-category="aligners" onclick="location.href='case-12.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/preview.jpg');"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-aligners">Лікування елайнерами</span>
+                        </div>
+                    </div>
+                    <!-- Case 13 (Whitening) -->
+                    <div class="case-card" data-category="whitening" onclick="location.href='case-13.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/FlurkoSergiy/preview.jpg')"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-whitening">Відбілювання зубів</span>
+                        </div>
+                    </div>
+                    <!-- Case 14 (Military) -->
+                    <div class="case-card" data-category="military" onclick="location.href='case-14.html'">
+                        <div class="case-card__img" style="background-image: url('https://storage.googleapis.com/tokar_clinic_site/patients/DenysovaOlena/preview.jpg'); filter: brightness(0.8);"></div>
+                        <div class="case-card__overlay">
+                            <span data-i18n="filter-military">Лікування військовослужбовців</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ═══════════════════════════════════════
+             CONTACT CHOICE SECTION
+        ═══════════════════════════════════════ -->
+        <section id="contact-choice" class="appointment" style="padding: 100px 0; background: #fff; border-top: 1px solid rgba(0,0,0,0.03);">
+            <div class="container--narrow">
+                <div class="appointment__inner reveal" style="text-align: center;">
+                    <h2 class="section-title-alt" style="margin-bottom: 24px;">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</h2>
+                    <p class="appointment-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;">
+                        Виберіть онлайн-запис для миттєвого бронювання часу,<br>або напишіть нам у месенджер для консультації.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto;">
+                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase; cursor: pointer;">ОНЛАЙН ЗАПИС</button>
+                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; cursor: pointer; font-family: var(--font-sans); transition: all 0.3s ease;">ЗВ'ЯЗАТИСЯ З НАМИ</button>
                     </div>
                 </div>
             </div>
@@ -82,26 +161,14 @@
 
     <script src="translations.js"></script>
     <script src="components.js"></script>
-    <script>
-        // Simple filter logic
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelector('.filter-btn.active').classList.remove('active');
-                btn.classList.add('active');
-                
-                const filter = btn.getAttribute('data-filter');
-                document.querySelectorAll('.case-card').forEach(card => {
-                    if (filter === 'all' || card.getAttribute('data-category') === filter) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="main.js"></script>
+    <!-- Filters and Case filtering is now handled in main.js -->
+
+    <!-- Supabase & Dynamic Content Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="dynamic-content.js"></script>
     <script src="chat-widget.js"></script>
 </body>
 </html>
+
 

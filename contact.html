@@ -7,8 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body class="bg-white">
     <div id="header-placeholder"></div>
@@ -16,28 +15,21 @@
     <main class="page-container">
         <section class="contact-hero">
             <div class="container--narrow">
-                <div class="contact-form-wrap">
-                    <h1 class="section-title-alt" data-i18n="form-title">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</h1>
-                    <p class="contact-subtitle" data-i18n="form-subtitle">Залишіть заявку й адміністратор зв'яжеться з Вами, або зателефонуйте нам особисто</p>
+                <div class="contact-form-wrap reveal" style="text-align: center;">
+                    <h1 class="section-title-alt" style="margin-bottom: 24px;">КОНТАКТИ ТА ЗАПИС</h1>
+                    <p class="contact-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;">
+                        Виберіть онлайн-запис для миттєвого бронювання часу,<br>або зв'яжіться з нами напряму.
+                    </p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto 60px;">
+                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase; cursor: pointer;">ОНЛАЙН ЗАПИС</button>
+                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; cursor: pointer; font-family: var(--font-sans); transition: all 0.3s ease;">ЗВ'ЯЗАТИСЯ З НАМИ</button>
+                    </div>
+
                     <div class="contact-direct-call">
                         <span data-i18n="form-phone-label">Зв'язатися з нами для консультації:</span>
                         <a href="tel:+380776007800" class="btn--call">(077) 600 7 800 ЗАТЕЛЕФОНУВАТИ</a>
                     </div>
-
-                    <form class="appointment-form contact-page-form">
-                        <div class="form-cols">
-                            <input type="text" placeholder="Прізвище та ім'я" data-i18n="form-name-placeholder" required>
-                            <textarea placeholder="Коментар" data-i18n="form-comment-placeholder"></textarea>
-                        </div>
-                        <div class="form-cols">
-                            <input type="tel" placeholder="Номер телефону" data-i18n="form-phone-placeholder" required>
-                        </div>
-                        <div class="form-checkbox">
-                            <input type="checkbox" id="privacy-contact" checked required>
-                            <label for="privacy-contact" data-i18n="form-privacy">Погоджуюся на обробку персональних даних та з умовами політики конфіденційності</label>
-                        </div>
-                        <button type="submit" class="btn btn--cta btn--xl btn--submit-contact" data-i18n="form-btn">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</button>
-                    </form>
                 </div>
             </div>
         </section>
@@ -48,7 +40,7 @@
                     <div class="contact-info-box">
                         <h3 class="box-title" data-i18n="footer-find-us">ДЕ НАС ЗНАЙТИ</h3>
                         <p class="box-address" data-i18n="map-address">ВУЛИЦЯ НЕЗАЛЕЖНОСТІ, 21, ЧЕРНІГІВ, УКРАЇНА</p>
-                        <a href="https://goo.gl/maps/..." target="_blank" class="btn--map-link" data-i18n="footer-map-btn">ЗНАЙТИ НАС НА КАРТІ</a>
+                        <a href="https://maps.google.com/?q=Chernihiv,+Nezalezhnosti+21" target="_blank" class="btn--map-pin" data-i18n="footer-map-btn">ЗНАЙТИ НАС НА КАРТІ</a>
                     </div>
                     <div class="contact-info-box">
                         <h3 class="box-title" data-i18n="footer-hours-title">ГРАФІК РОБОТИ</h3>
@@ -58,11 +50,14 @@
             </div>
         </section>
 
-        <section class="contact-map-full">
-            <div class="map-wrap">
-                <!-- Map Placeholder -->
-                <div class="map-mask"></div>
-            </div>
+        <section style="height:460px; overflow:hidden; border-top: 1px solid rgba(184,146,74,0.2);">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2500.0!2d31.285!3d51.498!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46d5495aa1a47275%3A0x5f0e26c7aa39f8cf!2z0JLRg9C70LjRhtGPINCd0LXQt9Cw0LvQtdC20L3QvtGB0YLRliAyMSwg0KfQtdGA0L3RltCz0ZbQsiwg0KfQtdGA0L3RltCz0ZbQstGB0YzQutCwINC-0LHQu9Cw0YHRgtGM!5e0!3m2!1suk!2sua!4v1234567890"
+                width="100%" height="460" style="border:0; display:block;"
+                filter="saturate(0.3)"
+                allowfullscreen="" loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
         </section>
     </main>
 
@@ -70,8 +65,13 @@
 
     <script src="translations.js"></script>
     <script src="components.js"></script>
+    <script src="main.js"></script>
+
+    <!-- Supabase & Dynamic Content Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="dynamic-content.js"></script>
     <script src="chat-widget.js"></script>
 </body>
 </html>
+
 

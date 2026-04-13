@@ -8,8 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
     <script src="translations.js"></script>
     <style>
         /* 1:1 Original Hero Replica */
@@ -50,34 +49,35 @@
         }
 
         .service-huge-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 54px;
-            font-weight: 200;
-            color: #111;
-            line-height: 1.1;
-            margin-bottom: 40px;
+            font-family: 'Bodoni Moda', serif;
+            font-size: 64px;
+            font-weight: 400;
+            color: #1A1A1A;
+            line-height: 1.0;
+            margin-bottom: 36px;
             letter-spacing: -0.5px;
         }
 
         .btn-nude {
-            background-color: var(--accent);
+            background: linear-gradient(135deg, #D4AF72 0%, #B8924A 50%, #9A7A3E 100%);
             color: #fff;
             font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 400;
+            font-size: 11px;
+            font-weight: 500;
             text-transform: uppercase;
-            padding: 18px 42px;
+            letter-spacing: 2px;
+            padding: 16px 40px;
             border: none;
-            border-radius: 4px;
+            border-radius: 2px;
             cursor: pointer;
             width: max-content;
             text-decoration: none;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
+            transition: all 0.34s ease;
+            box-shadow: 0 4px 20px rgba(184, 146, 74, 0.25);
         }
-
         .btn-nude:hover {
-            background-color: #e5cbbe;
+            box-shadow: 0 6px 30px rgba(184, 146, 74, 0.4);
+            transform: translateY(-1px);
         }
 
         @media (max-width: 900px) {
@@ -107,7 +107,6 @@
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body class="bg-white">
@@ -988,30 +987,20 @@
         </section>
     </main>
 
-        <section id="form" class="appointment">
+        <!-- ═══════════════════════════════════════
+             CONTACT CHOICE SECTION
+        ═══════════════════════════════════════ -->
+        <section id="contact-choice" class="appointment" style="padding: 100px 0; background: #fff; border-top: 1px solid rgba(0,0,0,0.03);">
             <div class="container--narrow">
-                <div class="appointment__inner">
-                    <h2 class="section-title-alt">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</h2>
-                    <p class="appointment-subtitle">Залиште заявку і адміністратор зв’яжеться з Вами, або зателефонуйте нам особисто</p>
-                    <p class="appointment-phone">Зв’язатися з нами для консультації: <a href="tel:+380505550027">+380 50 555 00 27</a></p>
-                    <form class="appointment-form">
-                        <div class="form-cols">
-                            <input type="text" placeholder="Прізвище та ім'я" required>
-                            <textarea placeholder="Коментар"></textarea>
-                        </div>
-                        <div class="form-cols">
-                            <input type="text" placeholder="Прізвище та ім'я" data-i18n="form-name-placeholder" required>
-                            <textarea placeholder="Коментар" data-i18n="form-comment-placeholder"></textarea>
-                        </div>
-                        <div class="form-cols">
-                            <input type="tel" placeholder="Номер телефону" data-i18n="form-phone-placeholder" required>
-                        </div>
-                        <div class="form-checkbox">
-                            <input type="checkbox" id="privacy" checked required>
-                            <label for="privacy" data-i18n="form-privacy">Погоджуюся на обробку персональних даних та з умовами політики конфіденційності</label>
-                        </div>
-                        <button type="submit" class="btn btn--cta btn--xl" data-i18n="form-btn">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</button>
-                    </form>
+                <div class="appointment__inner reveal" style="text-align: center;">
+                    <h2 class="section-title-alt" style="margin-bottom: 24px;">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</h2>
+                    <p class="appointment-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;">
+                        Виберіть онлайн-запис для миттєвого бронювання часу,<br>або напишіть нам у месенджер для консультації.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto;">
+                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase; cursor: pointer;">ОНЛАЙН ЗАПИС</button>
+                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; cursor: pointer; font-family: var(--font-sans); transition: all 0.3s ease;">ЗВ'ЯЗАТИСЯ З НАМИ</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1055,8 +1044,13 @@
             });
         });
     </script>
+    <script src="main.js"></script>
+
+    <!-- Supabase & Dynamic Content Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="dynamic-content.js"></script>
     <script src="chat-widget.js"></script>
 </body>
 
 </html>
+

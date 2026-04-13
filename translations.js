@@ -23,7 +23,7 @@ const translations = {
         
         // Hero
         "hero-title": "ІННОВАЦІЇ, ЕСТЕТИКА, КОМФОРТ🤍",
-        "hero-subtitle": "Від ідеальної гігієни до імплантів 'під ключ'. Онлайн-запис за посиланням ⬇️",
+        "hero-subtitle": "Від ідеальної гігієни до імплантів 'під ключ'.",
         "services-hero-title": "Послуги",
         "services-hero-subtitle": "Ми пропонуємо повний спектр стоматологіческих послуг для вашого здоров'я та краси.",
         
@@ -155,13 +155,20 @@ const translations = {
         // Cases Page
         "cases-page-title": "Наші роботи — Dental Studio",
         "cases-hero-title": "НАШІ РОБОТИ",
-        "filter-all": "Всі роботи",
+        "filter-all": "Усі роботи",
         "filter-veneers": "Керамічні вініри",
-        "filter-composite": "Композитні вініри",
-        "filter-restoration": "Композитні реставрації",
+        "filter-composite-veneers": "Композитні вініри",
+        "filter-restorations": "Композитні реставрації",
+        "filter-caries": "Лікування карієсу",
+        "filter-endo": "Лікування кореневих каналів",
+        "filter-periodontal": "Пародонтологічне лікування",
         "filter-implants": "Імплантація",
-        "filter-ortho": "Ортодонтія",
+        "filter-recessions": "Закриття рецесій",
+        "filter-gum-extension": "Видовження ясен",
+        "filter-braces": "Лікування брекет-системою",
+        "filter-aligners": "Лікування елайнерами",
         "filter-whitening": "Відбілювання зубів",
+        "filter-military": "Лікування військовослужбовців",
 
         // Contacts Page
         "contacts-page-title": "Контакти — Dental Studio"
@@ -190,7 +197,7 @@ const translations = {
         
         // Hero
         "hero-title": "INNOVATION, AESTHETICS, COMFORT🤍",
-        "hero-subtitle": "From ideal hygiene to 'turnkey' implants. Online booking via link ⬇️",
+        "hero-subtitle": "From ideal hygiene to 'turnkey' implants.",
         "services-hero-title": "Services",
         "services-hero-subtitle": "We offer a full range of dental services for your health and beauty.",
         
@@ -324,11 +331,18 @@ const translations = {
         "cases-hero-title": "OUR SUCCESS CASES",
         "filter-all": "All Works",
         "filter-veneers": "Ceramic Veneers",
-        "filter-composite": "Composite Veneers",
-        "filter-restoration": "Composite Restorations",
+        "filter-composite-veneers": "Composite Veneers",
+        "filter-restorations": "Composite Restorations",
+        "filter-caries": "Caries Treatment",
+        "filter-endo": "Root Canal Treatment",
+        "filter-periodontal": "Periodontal Treatment",
         "filter-implants": "Implantation",
-        "filter-ortho": "Orthodontics",
+        "filter-recessions": "Recession Closure",
+        "filter-gum-extension": "Gingival Extension",
+        "filter-braces": "Braces System Treatment",
+        "filter-aligners": "Aligner Treatment",
         "filter-whitening": "Teeth Whitening",
+        "filter-military": "Military Treatment",
 
         // Contacts Page
         "contacts-page-title": "Contact Us — Dental Studio"

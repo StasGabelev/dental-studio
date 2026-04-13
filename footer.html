@@ -1,26 +1,44 @@
 <footer class="footer">
     <div class="container-full">
         <div class="footer__inner">
+
+            <!-- LEFT: ADDRESS -->
             <div class="footer__col">
                 <p class="col-title" data-i18n="footer-find-us">ДЕ НАС ЗНАЙТИ</p>
-                <p data-i18n="footer-location">Київ, Україна</p>
-                <p data-i18n="footer-address-street">Проспект Берестейський, 5В</p>
-                <p class="footer-phone">(077) 600 7 800</p>
+                <p data-i18n="footer-location">Чернігів, Україна</p>
+                <p data-i18n="footer-address-street">вулиця Незалежності, 21</p>
+                <a href="tel:+380776007800" class="footer-phone" style="text-decoration: none; color: inherit; display: inline-block;">(077) 600 7 800</a>
                 <p class="footer-phone">(073) 600 7 800</p>
-                <a href="https://goo.gl/maps/..." target="_blank" class="footer-map-link" data-i18n="footer-map-btn">ЗНАЙТИ НАС НА КАРТІ</a>
+                <a href="https://maps.google.com/?q=Chernihiv,+Nezalezhnosti+21"
+                   target="_blank"
+                   class="footer-map-link"
+                   data-i18n="footer-map-btn">ЗНАЙТИ НАС НА КАРТІ</a>
             </div>
-            <div class="footer__col footer__col--center">
-                <div class="logo">Dental Studio</div>
-                <p class="tagline" data-i18n="footer-tagline">ІННОВАЦІЇ, ЕСТЕТИКА, КОМФОРТ🤍</p>
+
+            <!-- CENTER: LOGO + TAGLINE -->
+            <div class="footer__col footer__col--center" style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                <div class="logo" style="position: relative; left: auto; transform: none;">
+                    <a href="index.html" class="logo-link">
+                        <span class="logo-top">DENTAL</span>
+                        <span class="logo-bottom">Studio</span>
+                    </a>
+                </div>
+                <p class="tagline" data-i18n="footer-tagline" style="position: relative; z-index: 1;">ІННОВАЦІЇ, ЕСТЕТИКА, КОМФОРТ 🤍</p>
             </div>
+
+            <!-- RIGHT: HOURS -->
             <div class="footer__col">
                 <p class="col-title" data-i18n="footer-hours-title">ГРАФІК РОБОТИ</p>
                 <p data-i18n="footer-hours-days">Пн — Пт, 10:00 — 18:00</p>
             </div>
+
         </div>
+
         <div class="footer__bottom">
             <p data-i18n="footer-copyright">Copyright © 2026. Dental Studio. Всі права захищені.</p>
         </div>
     </div>
 </footer>
-<a href="#form" class="mobile-sticky-btn" data-i18n="btn-book">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</a>
+
+<!-- Mobile sticky CTA -->
+<button onclick="openOnlineBooking()" class="mobile-sticky-btn" data-i18n="btn-book">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</button>
