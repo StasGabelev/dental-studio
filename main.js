@@ -47,9 +47,8 @@ const contactHubHTML = `
         </div>
     </div>
 
-    <div class="float-contact" onclick="window.openContactHub()">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M11.5 22L10.3 15.7C10.05 14.4 9.05 13.4 7.7 13.15L1.5 12L7.7 10.85C9.05 10.6 10.05 9.6 10.3 8.3L11.5 2L12.7 8.3C12.95 9.6 13.95 10.6 15.3 10.85L21.5 12L15.3 13.15C13.95 13.4 12.95 14.4 12.7 15.7L11.5 22Z" /></svg>
-    </div>
+
+
 
     <div id="scrollTopBtn" class="scroll-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
