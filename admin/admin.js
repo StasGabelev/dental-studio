@@ -1065,9 +1065,7 @@ async function loadPageEditor(pageSlug) {
             .eq('page_slug', pageSlug);
         if (data) {
             data.forEach(row => {
-                existing[row.section_key] = row.content_type === 'text'
-                    ? (row.value_uk || '')
-                    : (row.media_url || '');
+                existing[row.section_key] = row.media_url || row.value_uk || '';
             });
         }
     }
