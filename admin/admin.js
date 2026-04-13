@@ -1149,14 +1149,16 @@ async function savePageContent(pageSlug) {
 
     if (sb) {
         try {
-            for (const u of updates) {
-                const { error } = await sb.from('site_content').upsert(u, {
-                    onConflict: 'page_slug,section_key'
-                });
-                if (error) throw error;
-            }
+            // Bulk upsert for all text fields on the page at once
+            const { error } = await sb.from('site_content').upsert(updates, {
+                onConflict: 'page_slug,section_key'
+            });
+            
+            if (error) throw error;
+            
             showToast('✅ Зміни збережено');
-            // Refresh to confirm
+            
+            // Refresh editor with a small delay to ensure DB consistency
             setTimeout(() => loadPageEditor(pageSlug), 500);
         } catch (err) {
             console.error('Save error:', err);
