@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // DENTAL STUDIO вЂ” AI CHAT WIDGET
 // Connects to any LLM provider configured in Admin Panel
 // ============================================================
@@ -109,7 +109,7 @@ async function getKnowledgeBase() {
 // --- Toggle Chat Window ---
 function toggleAIChat() {
     const chatWindow = document.getElementById('aiChatWindow');
-    if (chatWindow) chatWindow.classList.toggle('active');
+    if (chatWindow) chatWindow.classList.toggle('ai-chat-open');
 }
 
 // --- Handle Enter Key ---
