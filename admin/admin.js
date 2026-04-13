@@ -3,7 +3,15 @@
 // ============================================================
 
 // --- Supabase Client ---
-let sb = null; // will be initialized after connection
+let sb = null; 
+
+// Global Error Handler for debugging
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error('Global JS Error:', msg, lineNo);
+    if (typeof showToast === 'function') {
+        showToast(`❌ JS Error: ${msg} (line ${lineNo})`);
+    }
+};
 
 function getSupabaseConfig() {
     try {
@@ -1128,7 +1136,9 @@ async function loadPageEditor(pageSlug) {
         html += `</div>`;
     });
 
-    html += `<div style="margin-top:25px;"><button class="btn-primary" onclick="savePageContent('${pageSlug}')">💾 Зберегти зміни</button></div>`;
+    html += `<div style="margin-top:25px;">
+        <button id="saveBtn-${pageSlug}" class="btn-primary" onclick="this.innerHTML='⏳ Зберігаємо...'; savePageContent('${pageSlug}')">💾 Зберегти зміни</button>
+    </div>`;
     area.innerHTML = html;
 }
 
@@ -1164,6 +1174,9 @@ async function savePageContent(pageSlug) {
         } catch (err) {
             console.error('Save error:', err);
             showToast(`❌ Помилка: ${err.message || 'невідома помилка'}`);
+        } finally {
+            const btn = document.getElementById(`saveBtn-${pageSlug}`);
+            if (btn) btn.innerHTML = '💾 Зберегти зміни';
         }
     } else {
         console.warn('Supabase not initialized!');
