@@ -26,6 +26,7 @@
             .select('section_key, value_uk, value_ru, value_en, content_type, media_url')
             .eq('page_slug', page);
 
+        console.log(`Loading ${content.length} items for ${page} page`);
         if (content && content.length > 0) {
             content.forEach(item => {
                 if (item.content_type === 'text' && item.value_uk) {
