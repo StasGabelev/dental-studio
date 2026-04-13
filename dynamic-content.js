@@ -34,7 +34,7 @@
                         `[data-i18n="${item.section_key}"], [data-cms="${item.section_key}"]`
                     );
                     elements.forEach(el => {
-                        el.textContent = item.value_uk;
+                        el.innerHTML = item.value_uk;
                     });
                 } else if ((item.content_type === 'image' || item.content_type === 'video') && item.media_url) {
                     // Update media sources

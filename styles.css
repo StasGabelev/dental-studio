@@ -419,13 +419,28 @@ button { font-family: var(--font-sans); }
 
 .hero__content h1 {
     font-family: var(--font-serif);
-    font-size: 72px;
+    font-size: 76px;
     font-weight: 400;
-    line-height: 1.0;
-    letter-spacing: -1px;
-    color: var(--text-dark); /* Dark text for light background */
-    max-width: 680px;
+    line-height: 0.95;
+    letter-spacing: -2px;
+    color: var(--text-dark);
+    max-width: 800px;
     margin-bottom: 36px;
+    position: relative;
+}
+
+.heart-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 20px;
+    color: var(--gold);
+    filter: drop-shadow(0 0 8px rgba(184, 146, 74, 0.3));
+    animation: pulseHeart 3s ease-in-out infinite;
+}
+
+@keyframes pulseHeart {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 12px rgba(184, 146, 74, 0.5)); }
 }
 
 .hero-subtitle {

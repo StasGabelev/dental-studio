@@ -81,7 +81,7 @@ const PAGE_SCHEMA = {
         {
             "key": "hero-title",
             "label": "\u0413\u043E\u043B\u043E\u0432\u043D\u0438\u0439 \u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A",
-            "type": "text"
+            "type": "textarea"
         },
         {
             "key": "hero-subtitle",
