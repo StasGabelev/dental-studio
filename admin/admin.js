@@ -1148,22 +1148,26 @@ async function savePageContent(pageSlug) {
     });
 
     if (sb) {
+        console.log('Attempting to save updates:', updates);
         try {
-            // Bulk upsert for all text fields on the page at once
             const { error } = await sb.from('site_content').upsert(updates, {
                 onConflict: 'page_slug,section_key'
             });
             
-            if (error) throw error;
+            if (error) {
+                console.error('Database error details:', error);
+                throw error;
+            }
             
             showToast('✅ Зміни збережено');
-            
-            // Refresh editor with a small delay to ensure DB consistency
             setTimeout(() => loadPageEditor(pageSlug), 500);
         } catch (err) {
             console.error('Save error:', err);
             showToast(`❌ Помилка: ${err.message || 'невідома помилка'}`);
         }
+    } else {
+        console.warn('Supabase not initialized!');
+        showToast('⚠️ Supabase не підключено! Перейдіть у вкладку "Setup".');
     }
 }
 
