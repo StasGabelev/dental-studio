@@ -1,5 +1,5 @@
-// ============================================================
-// DENTAL STUDIO ADMIN PANEL — JavaScript Logic + Supabase
+﻿// ============================================================
+// DENTAL STUDIO ADMIN PANEL вЂ” JavaScript Logic + Supabase
 // ============================================================
 
 // --- Supabase Client ---
@@ -34,20 +34,20 @@ let doctors = [];
 // --- Model options per provider ---
 const MODEL_OPTIONS = {
     openai: [
-        { value: 'gpt-4o-mini', label: 'GPT-4o-mini (дешево, швидко)' },
-        { value: 'gpt-4o', label: 'GPT-4o (потужний)' },
-        { value: 'gpt-4.1', label: 'GPT-4.1 (новітній)' },
+        { value: 'gpt-4o-mini', label: 'GPT-4o-mini (РґРµС€РµРІРѕ, С€РІРёРґРєРѕ)' },
+        { value: 'gpt-4o', label: 'GPT-4o (РїРѕС‚СѓР¶РЅРёР№)' },
+        { value: 'gpt-4.1', label: 'GPT-4.1 (РЅРѕРІС–С‚РЅС–Р№)' },
         { value: 'gpt-4.1-mini', label: 'GPT-4.1-mini' },
         { value: 'o4-mini', label: 'o4-mini (reasoning)' },
     ],
     anthropic: [
-        { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4 (рекомендовано)' },
-        { value: 'claude-opus-4-20250514', label: 'Claude Opus 4 (найпотужніший)' },
-        { value: 'claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku (швидкий)' },
+        { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4 (СЂРµРєРѕРјРµРЅРґРѕРІР°РЅРѕ)' },
+        { value: 'claude-opus-4-20250514', label: 'Claude Opus 4 (РЅР°Р№РїРѕС‚СѓР¶РЅС–С€РёР№)' },
+        { value: 'claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku (С€РІРёРґРєРёР№)' },
     ],
     google: [
         { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
-        { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (швидкий)' },
+        { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (С€РІРёРґРєРёР№)' },
         { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
     ],
     deepseek: [
@@ -55,7 +55,7 @@ const MODEL_OPTIONS = {
         { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner (R1)' },
     ],
     openrouter: [
-        { value: 'auto', label: 'Auto (OpenRouter обере найкращу)' },
+        { value: 'auto', label: 'Auto (OpenRouter РѕР±РµСЂРµ РЅР°Р№РєСЂР°С‰Сѓ)' },
         { value: 'anthropic/claude-sonnet-4', label: 'Claude Sonnet 4' },
         { value: 'openai/gpt-4o', label: 'GPT-4o' },
         { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
@@ -830,7 +830,7 @@ async function handleLogin(e) {
     const errorEl = document.getElementById('loginError');
 
     btn.disabled = true;
-    btn.textContent = 'Завантаження...';
+    btn.textContent = 'Р—Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ...';
     errorEl.style.display = 'none';
 
     // Try Supabase Auth first
@@ -839,16 +839,16 @@ async function handleLogin(e) {
         if (error) {
             // If user doesn't exist yet, try sign up (first admin)
             if (error.message.includes('Invalid login')) {
-                errorEl.textContent = 'Невірний email або пароль';
+                errorEl.textContent = 'РќРµРІС–СЂРЅРёР№ email Р°Р±Рѕ РїР°СЂРѕР»СЊ';
                 errorEl.style.display = 'block';
                 btn.disabled = false;
-                btn.textContent = 'Увійти';
+                btn.textContent = 'РЈРІС–Р№С‚Рё';
                 return;
             }
             errorEl.textContent = error.message;
             errorEl.style.display = 'block';
             btn.disabled = false;
-            btn.textContent = 'Увійти';
+            btn.textContent = 'РЈРІС–Р№С‚Рё';
             return;
         }
         currentUser = data.user;
@@ -869,10 +869,10 @@ async function handleLogin(e) {
             localStorage.setItem('ds_admin_email', email);
             loadDashboardData();
         } else {
-            errorEl.textContent = 'Невірний email або пароль';
+            errorEl.textContent = 'РќРµРІС–СЂРЅРёР№ email Р°Р±Рѕ РїР°СЂРѕР»СЊ';
             errorEl.style.display = 'block';
             btn.disabled = false;
-            btn.textContent = 'Увійти';
+            btn.textContent = 'РЈРІС–Р№С‚Рё';
         }
     }, 600);
 }
@@ -921,42 +921,42 @@ function connectSupabase() {
     const status = document.getElementById('sbStatus');
 
     if (!url || !key) {
-        status.innerHTML = '<span style="color:var(--danger);">❌ Введіть URL та Anon Key</span>';
+        status.innerHTML = '<span style="color:var(--danger);">вќЊ Р’РІРµРґС–С‚СЊ URL С‚Р° Anon Key</span>';
         return;
     }
 
     localStorage.setItem('ds_supabase', JSON.stringify({ url, key }));
     sb = supabase.createClient(url, key);
-    status.innerHTML = '<span style="color:var(--success);">✅ Підключено! Тепер перевірте з\'єднання.</span>';
-    showToast('✅ Supabase підключено');
+    status.innerHTML = '<span style="color:var(--success);">вњ… РџС–РґРєР»СЋС‡РµРЅРѕ! РўРµРїРµСЂ РїРµСЂРµРІС–СЂС‚Рµ Р·\'С”РґРЅР°РЅРЅСЏ.</span>';
+    showToast('вњ… Supabase РїС–РґРєР»СЋС‡РµРЅРѕ');
 }
 
 async function testSupabase() {
     const status = document.getElementById('sbStatus');
     if (!sb) {
-        status.innerHTML = '<span style="color:var(--danger);">❌ Спочатку підключіть Supabase</span>';
+        status.innerHTML = '<span style="color:var(--danger);">вќЊ РЎРїРѕС‡Р°С‚РєСѓ РїС–РґРєР»СЋС‡С–С‚СЊ Supabase</span>';
         return;
     }
 
-    status.innerHTML = '<span style="color:var(--text-muted);">⏳ Перевірка...</span>';
+    status.innerHTML = '<span style="color:var(--text-muted);">вЏі РџРµСЂРµРІС–СЂРєР°...</span>';
 
     try {
         const { data, error } = await sb.from('price_list').select('id').limit(1);
         if (error) {
             if (error.message.includes('relation') || error.code === '42P01') {
-                status.innerHTML = '<span style="color:#f39c12;">⚠️ З\'єднання ОК, але таблиці не створені. Виконайте SQL з файлу supabase-setup.sql</span>';
+                status.innerHTML = '<span style="color:#f39c12;">вљ пёЏ Р—\'С”РґРЅР°РЅРЅСЏ РћРљ, Р°Р»Рµ С‚Р°Р±Р»РёС†С– РЅРµ СЃС‚РІРѕСЂРµРЅС–. Р’РёРєРѕРЅР°Р№С‚Рµ SQL Р· С„Р°Р№Р»Сѓ supabase-setup.sql</span>';
             } else {
-                status.innerHTML = `<span style="color:var(--danger);">❌ Помилка: ${error.message}</span>`;
+                status.innerHTML = `<span style="color:var(--danger);">вќЊ РџРѕРјРёР»РєР°: ${error.message}</span>`;
             }
         } else {
-            status.innerHTML = '<span style="color:var(--success);">✅ З\'єднання успішне! Таблиці знайдені.</span>';
+            status.innerHTML = '<span style="color:var(--success);">вњ… Р—\'С”РґРЅР°РЅРЅСЏ СѓСЃРїС–С€РЅРµ! РўР°Р±Р»РёС†С– Р·РЅР°Р№РґРµРЅС–.</span>';
 
             // Load data from Supabase into local state
             await loadAllFromSupabase();
-            showToast('✅ Дані завантажені з Supabase');
+            showToast('вњ… Р”Р°РЅС– Р·Р°РІР°РЅС‚Р°Р¶РµРЅС– Р· Supabase');
         }
     } catch(e) {
-        status.innerHTML = `<span style="color:var(--danger);">❌ Помилка мережі: ${e.message}</span>`;
+        status.innerHTML = `<span style="color:var(--danger);">вќЊ РџРѕРјРёР»РєР° РјРµСЂРµР¶С–: ${e.message}</span>`;
     }
 }
 
@@ -975,13 +975,13 @@ function loadSetupForm() {
 // ============================================================
 
 const SECTION_TITLES = {
-    'dashboard': 'Дашборд',
-    'pages': 'Редагування сторінок',
-    'prices': 'Прайс-лист',
-    'doctors': 'Лікарі',
-    'cases': 'Кейси',
-    'ai-settings': 'Налаштування ІІ',
-    'chat-logs': 'Чат-логи',
+    'dashboard': 'Р”Р°С€Р±РѕСЂРґ',
+    'pages': 'Р РµРґР°РіСѓРІР°РЅРЅСЏ СЃС‚РѕСЂС–РЅРѕРє',
+    'prices': 'РџСЂР°Р№СЃ-Р»РёСЃС‚',
+    'doctors': 'Р›С–РєР°СЂС–',
+    'cases': 'РљРµР№СЃРё',
+    'ai-settings': 'РќР°Р»Р°С€С‚СѓРІР°РЅРЅСЏ Р†Р†',
+    'chat-logs': 'Р§Р°С‚-Р»РѕРіРё',
     'setup': 'Supabase',
 };
 
@@ -1053,7 +1053,7 @@ async function loadPageEditor(pageSlug) {
     const area = document.getElementById('pageEditorArea');
     const schema = PAGE_SCHEMA[pageSlug];
     if (!schema) {
-        area.innerHTML = '<p class="editor-placeholder">Схема сторінки не знайдена</p>';
+        area.innerHTML = '<p class="editor-placeholder">РЎС…РµРјР° СЃС‚РѕСЂС–РЅРєРё РЅРµ Р·РЅР°Р№РґРµРЅР°</p>';
         return;
     }
 
@@ -1083,19 +1083,19 @@ async function loadPageEditor(pageSlug) {
         } else if (field.type === 'image') {
             html += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'image')" id="media-${field.key}">
                 ${val ? `<img src="${val}" style="max-width:100%;max-height:200px;border-radius:4px;">` : ''}
-                <div class="media-upload-hint">📷 Натисніть щоб завантажити зображення</div>
+                <div class="media-upload-hint">рџ“· РќР°С‚РёСЃРЅС–С‚СЊ С‰РѕР± Р·Р°РІР°РЅС‚Р°Р¶РёС‚Рё Р·РѕР±СЂР°Р¶РµРЅРЅСЏ</div>
             </div>`;
         } else if (field.type === 'video') {
             html += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'video')" id="media-${field.key}">
                 ${val ? `<video src="${val}" style="max-width:100%;max-height:200px;" controls></video>` : ''}
-                <div class="media-upload-hint">🎥 Натисніть щоб завантажити відео</div>
+                <div class="media-upload-hint">рџЋҐ РќР°С‚РёСЃРЅС–С‚СЊ С‰РѕР± Р·Р°РІР°РЅС‚Р°Р¶РёС‚Рё РІС–РґРµРѕ</div>
             </div>`;
         }
 
         html += `</div>`;
     });
 
-    html += `<div style="margin-top:25px;"><button class="btn-primary" onclick="savePageContent('${pageSlug}')">💾 Зберегти зміни</button></div>`;
+    html += `<div style="margin-top:25px;"><button class="btn-primary" onclick="savePageContent('${pageSlug}')">рџ’ѕ Р—Р±РµСЂРµРіС‚Рё Р·РјС–РЅРё</button></div>`;
     area.innerHTML = html;
 }
 
@@ -1121,7 +1121,7 @@ async function savePageContent(pageSlug) {
         }
     }
 
-    showToast('✅ Зміни збережено');
+    showToast('вњ… Р—РјС–РЅРё Р·Р±РµСЂРµР¶РµРЅРѕ');
 }
 
 async function triggerMediaUpload(key, type) {
@@ -1132,7 +1132,7 @@ async function triggerMediaUpload(key, type) {
         const file = e.target.files[0];
         if (!file) return;
 
-        showToast(`📤 Завантажується "${file.name}"...`);
+        showToast(`рџ“¤ Р—Р°РІР°РЅС‚Р°Р¶СѓС”С‚СЊСЃСЏ "${file.name}"...`);
 
         if (sb) {
             // Upload to Supabase Storage
@@ -1142,7 +1142,7 @@ async function triggerMediaUpload(key, type) {
                 .upload(filePath, file, { upsert: true });
 
             if (error) {
-                showToast(`❌ Помилка: ${error.message}`);
+                showToast(`вќЊ РџРѕРјРёР»РєР°: ${error.message}`);
                 return;
             }
 
@@ -1165,15 +1165,15 @@ async function triggerMediaUpload(key, type) {
             const box = document.getElementById(`media-${key}`);
             if (box) {
                 if (type === 'image') {
-                    box.innerHTML = `<img src="${publicUrl}" style="max-width:100%;max-height:200px;border-radius:4px;"><div class="media-upload-hint">📷 Натисніть щоб замінити</div>`;
+                    box.innerHTML = `<img src="${publicUrl}" style="max-width:100%;max-height:200px;border-radius:4px;"><div class="media-upload-hint">рџ“· РќР°С‚РёСЃРЅС–С‚СЊ С‰РѕР± Р·Р°РјС–РЅРёС‚Рё</div>`;
                 } else {
-                    box.innerHTML = `<video src="${publicUrl}" style="max-width:100%;max-height:200px;" controls></video><div class="media-upload-hint">🎥 Натисніть щоб замінити</div>`;
+                    box.innerHTML = `<video src="${publicUrl}" style="max-width:100%;max-height:200px;" controls></video><div class="media-upload-hint">рџЋҐ РќР°С‚РёСЃРЅС–С‚СЊ С‰РѕР± Р·Р°РјС–РЅРёС‚Рё</div>`;
                 }
             }
 
-            showToast('✅ Файл завантажено');
+            showToast('вњ… Р¤Р°Р№Р» Р·Р°РІР°РЅС‚Р°Р¶РµРЅРѕ');
         } else {
-            showToast(`⚠️ Підключіть Supabase для збереження файлів`);
+            showToast(`вљ пёЏ РџС–РґРєР»СЋС‡С–С‚СЊ Supabase РґР»СЏ Р·Р±РµСЂРµР¶РµРЅРЅСЏ С„Р°Р№Р»С–РІ`);
         }
     };
     input.click();
@@ -1203,12 +1203,12 @@ async function loadPriceList() {
     // Fallback defaults if empty
     if (priceItems.length === 0 && !sb) {
         priceItems = [
-            { id: 'l1', category: 'Терапія', name: 'Консультація лікаря', price: '500 грн' },
-            { id: 'l2', category: 'Терапія', name: 'Пломбування зуба', price: 'від 1200 грн' },
-            { id: 'l3', category: 'Хірургія', name: 'Видалення зуба', price: 'від 800 грн' },
-            { id: 'l4', category: 'Хірургія', name: 'Імплантація', price: 'від 15000 грн' },
-            { id: 'l5', category: 'Естетика', name: 'Професійне відбілювання', price: 'від 4500 грн' },
-            { id: 'l6', category: 'Ортодонтія', name: 'Брекет-система', price: 'від 25000 грн' },
+            { id: 'l1', category: 'РўРµСЂР°РїС–СЏ', name: 'РљРѕРЅСЃСѓР»СЊС‚Р°С†С–СЏ Р»С–РєР°СЂСЏ', price: '500 РіСЂРЅ' },
+            { id: 'l2', category: 'РўРµСЂР°РїС–СЏ', name: 'РџР»РѕРјР±СѓРІР°РЅРЅСЏ Р·СѓР±Р°', price: 'РІС–Рґ 1200 РіСЂРЅ' },
+            { id: 'l3', category: 'РҐС–СЂСѓСЂРіС–СЏ', name: 'Р’РёРґР°Р»РµРЅРЅСЏ Р·СѓР±Р°', price: 'РІС–Рґ 800 РіСЂРЅ' },
+            { id: 'l4', category: 'РҐС–СЂСѓСЂРіС–СЏ', name: 'Р†РјРїР»Р°РЅС‚Р°С†С–СЏ', price: 'РІС–Рґ 15000 РіСЂРЅ' },
+            { id: 'l5', category: 'Р•СЃС‚РµС‚РёРєР°', name: 'РџСЂРѕС„РµСЃС–Р№РЅРµ РІС–РґР±С–Р»СЋРІР°РЅРЅСЏ', price: 'РІС–Рґ 4500 РіСЂРЅ' },
+            { id: 'l6', category: 'РћСЂС‚РѕРґРѕРЅС‚С–СЏ', name: 'Р‘СЂРµРєРµС‚-СЃРёСЃС‚РµРјР°', price: 'РІС–Рґ 25000 РіСЂРЅ' },
         ];
     }
 
@@ -1218,21 +1218,21 @@ async function loadPriceList() {
 function renderPriceList() {
     const area = document.getElementById('priceListArea');
     if (priceItems.length === 0) {
-        area.innerHTML = '<p class="editor-placeholder">Прайс-лист порожній</p>';
+        area.innerHTML = '<p class="editor-placeholder">РџСЂР°Р№СЃ-Р»РёСЃС‚ РїРѕСЂРѕР¶РЅС–Р№</p>';
         return;
     }
 
     let html = '';
     priceItems.forEach((item, i) => {
         html += `<div class="price-row" data-id="${item.id}">
-            <input type="text" value="${escapeAttr(item.name)}" placeholder="Назва послуги" onchange="priceItems[${i}].name=this.value">
-            <input type="text" value="${escapeAttr(item.category)}" placeholder="Категорія" onchange="priceItems[${i}].category=this.value">
-            <input type="text" value="${escapeAttr(item.price)}" placeholder="Ціна" onchange="priceItems[${i}].price=this.value">
-            <button class="price-delete" onclick="deletePrice(${i})" title="Видалити">✕</button>
+            <input type="text" value="${escapeAttr(item.name)}" placeholder="РќР°Р·РІР° РїРѕСЃР»СѓРіРё" onchange="priceItems[${i}].name=this.value">
+            <input type="text" value="${escapeAttr(item.category)}" placeholder="РљР°С‚РµРіРѕСЂС–СЏ" onchange="priceItems[${i}].category=this.value">
+            <input type="text" value="${escapeAttr(item.price)}" placeholder="Р¦С–РЅР°" onchange="priceItems[${i}].price=this.value">
+            <button class="price-delete" onclick="deletePrice(${i})" title="Р’РёРґР°Р»РёС‚Рё">вњ•</button>
         </div>`;
     });
 
-    html += `<div style="margin-top:15px;"><button class="btn-primary" onclick="savePriceList()">💾 Зберегти прайс</button></div>`;
+    html += `<div style="margin-top:15px;"><button class="btn-primary" onclick="savePriceList()">рџ’ѕ Р—Р±РµСЂРµРіС‚Рё РїСЂР°Р№СЃ</button></div>`;
     area.innerHTML = html;
 }
 
@@ -1248,7 +1248,7 @@ async function deletePrice(index) {
     }
     priceItems.splice(index, 1);
     renderPriceList();
-    showToast('🗑️ Послугу видалено');
+    showToast('рџ—‘пёЏ РџРѕСЃР»СѓРіСѓ РІРёРґР°Р»РµРЅРѕ');
 }
 
 async function savePriceList() {
@@ -1273,7 +1273,7 @@ async function savePriceList() {
             }
         }
     }
-    showToast('✅ Прайс-лист збережено');
+    showToast('вњ… РџСЂР°Р№СЃ-Р»РёСЃС‚ Р·Р±РµСЂРµР¶РµРЅРѕ');
 }
 
 
@@ -1297,8 +1297,8 @@ async function loadDoctors() {
 
     if (doctors.length === 0 && !sb) {
         doctors = [
-            { id: 'l1', name: 'Др. Іванов А.В.', spec: 'Терапевт', photo: '' },
-            { id: 'l2', name: 'Др. Петрова О.М.', spec: 'Хірург-імплантолог', photo: '' },
+            { id: 'l1', name: 'Р”СЂ. Р†РІР°РЅРѕРІ Рђ.Р’.', spec: 'РўРµСЂР°РїРµРІС‚', photo: '' },
+            { id: 'l2', name: 'Р”СЂ. РџРµС‚СЂРѕРІР° Рћ.Рњ.', spec: 'РҐС–СЂСѓСЂРі-С–РјРїР»Р°РЅС‚РѕР»РѕРі', photo: '' },
         ];
     }
 
@@ -1308,7 +1308,7 @@ async function loadDoctors() {
 function renderDoctors() {
     const area = document.getElementById('doctorsArea');
     if (doctors.length === 0) {
-        area.innerHTML = '<p class="editor-placeholder">Лікарі не додані</p>';
+        area.innerHTML = '<p class="editor-placeholder">Р›С–РєР°СЂС– РЅРµ РґРѕРґР°РЅС–</p>';
         return;
     }
 
@@ -1316,15 +1316,15 @@ function renderDoctors() {
     doctors.forEach((doc, i) => {
         html += `<div class="doctor-card-admin">
             <div class="doctor-photo-admin" style="display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:40px;cursor:pointer;" onclick="uploadDoctorPhoto(${i})">
-                ${doc.photo ? `<img src="${doc.photo}" style="width:100%;height:100%;object-fit:cover;">` : '📷'}
+                ${doc.photo ? `<img src="${doc.photo}" style="width:100%;height:100%;object-fit:cover;">` : 'рџ“·'}
             </div>
             <div class="doctor-card-body">
-                <input type="text" value="${escapeAttr(doc.name)}" placeholder="ПІБ лікаря" onchange="doctors[${i}].name=this.value">
-                <input type="text" value="${escapeAttr(doc.spec)}" placeholder="Спеціалізація" onchange="doctors[${i}].spec=this.value">
+                <input type="text" value="${escapeAttr(doc.name)}" placeholder="РџР†Р‘ Р»С–РєР°СЂСЏ" onchange="doctors[${i}].name=this.value">
+                <input type="text" value="${escapeAttr(doc.spec)}" placeholder="РЎРїРµС†С–Р°Р»С–Р·Р°С†С–СЏ" onchange="doctors[${i}].spec=this.value">
             </div>
             <div class="doctor-card-actions">
-                <button class="btn-outline" style="flex:1;" onclick="saveDoctor(${i})">💾 Зберегти</button>
-                <button class="btn-danger" onclick="deleteDoctor(${i})">🗑️</button>
+                <button class="btn-outline" style="flex:1;" onclick="saveDoctor(${i})">рџ’ѕ Р—Р±РµСЂРµРіС‚Рё</button>
+                <button class="btn-danger" onclick="deleteDoctor(${i})">рџ—‘пёЏ</button>
             </div>
         </div>`;
     });
@@ -1344,7 +1344,7 @@ async function deleteDoctor(index) {
     }
     doctors.splice(index, 1);
     renderDoctors();
-    showToast('🗑️ Лікаря видалено');
+    showToast('рџ—‘пёЏ Р›С–РєР°СЂСЏ РІРёРґР°Р»РµРЅРѕ');
 }
 
 async function saveDoctor(index) {
@@ -1364,7 +1364,7 @@ async function saveDoctor(index) {
             if (data) doctors[index].id = data.id;
         }
     }
-    showToast('✅ Лікаря збережено');
+    showToast('вњ… Р›С–РєР°СЂСЏ Р·Р±РµСЂРµР¶РµРЅРѕ');
 }
 
 async function uploadDoctorPhoto(index) {
@@ -1381,7 +1381,7 @@ async function uploadDoctorPhoto(index) {
                 .from('clinic-media')
                 .upload(filePath, file, { upsert: true });
             if (error) {
-                showToast(`❌ ${error.message}`);
+                showToast(`вќЊ ${error.message}`);
                 return;
             }
             const { data: urlData } = sb.storage.from('clinic-media').getPublicUrl(filePath);
@@ -1394,7 +1394,7 @@ async function uploadDoctorPhoto(index) {
         }
 
         renderDoctors();
-        showToast('📤 Фото завантажено');
+        showToast('рџ“¤ Р¤РѕС‚Рѕ Р·Р°РІР°РЅС‚Р°Р¶РµРЅРѕ');
     };
     input.click();
 }
@@ -1493,7 +1493,7 @@ async function saveAISettings() {
         }
     }
 
-    showToast('✅ Налаштування ІІ збережено');
+    showToast('вњ… РќР°Р»Р°С€С‚СѓРІР°РЅРЅСЏ Р†Р† Р·Р±РµСЂРµР¶РµРЅРѕ');
 }
 
 async function handleKBUpload(event) {
@@ -1505,8 +1505,8 @@ async function handleKBUpload(event) {
         const item = document.createElement('div');
         item.className = 'kb-file-item';
         item.innerHTML = `
-            <span class="kb-file-name">📄 ${file.name} <small style="color:var(--text-dim);">(${(file.size / 1024).toFixed(1)} KB)</small></span>
-            <button class="btn-danger" onclick="this.parentElement.remove()">✕</button>
+            <span class="kb-file-name">рџ“„ ${file.name} <small style="color:var(--text-dim);">(${(file.size / 1024).toFixed(1)} KB)</small></span>
+            <button class="btn-danger" onclick="this.parentElement.remove()">вњ•</button>
         `;
         list.appendChild(item);
 
@@ -1517,7 +1517,7 @@ async function handleKBUpload(event) {
         }
     }
 
-    showToast(`📎 ${files.length} файл(ів) додано до бази знань`);
+    showToast(`рџ“Ћ ${files.length} С„Р°Р№Р»(С–РІ) РґРѕРґР°РЅРѕ РґРѕ Р±Р°Р·Рё Р·РЅР°РЅСЊ`);
 }
 
 
@@ -1529,11 +1529,11 @@ async function loadChatLogs() {
     const area = document.getElementById('chatLogsArea');
 
     if (!sb) {
-        area.innerHTML = '<p class="editor-placeholder">Підключіть Supabase для перегляду чат-логів</p>';
+        area.innerHTML = '<p class="editor-placeholder">РџС–РґРєР»СЋС‡С–С‚СЊ Supabase РґР»СЏ РїРµСЂРµРіР»СЏРґСѓ С‡Р°С‚-Р»РѕРіС–РІ</p>';
         return;
     }
 
-    area.innerHTML = '<p class="editor-placeholder">Завантаження...</p>';
+    area.innerHTML = '<p class="editor-placeholder">Р—Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ...</p>';
 
     // Get unique sessions, latest first
     const { data, error } = await sb.from('chat_logs')
@@ -1542,7 +1542,7 @@ async function loadChatLogs() {
         .limit(200);
 
     if (error || !data || data.length === 0) {
-        area.innerHTML = '<p class="editor-placeholder">Чат-логи поки відсутні</p>';
+        area.innerHTML = '<p class="editor-placeholder">Р§Р°С‚-Р»РѕРіРё РїРѕРєРё РІС–РґСЃСѓС‚РЅС–</p>';
         return;
     }
 
@@ -1559,7 +1559,7 @@ async function loadChatLogs() {
         const firstTime = new Date(msgs[0].created_at).toLocaleString('uk-UA');
         html += `<div class="chat-log-item">
             <div class="chat-log-header">
-                <span>Сесія: ${sid.slice(0, 8)}...</span>
+                <span>РЎРµСЃС–СЏ: ${sid.slice(0, 8)}...</span>
                 <span>${firstTime}</span>
             </div>
             <div class="chat-log-messages">`;
@@ -1580,8 +1580,8 @@ async function loadChatLogs() {
 // ============================================================
 
 async function loadDashboardData() {
-    document.getElementById('statServices').textContent = priceItems.length || '—';
-    document.getElementById('statDoctors').textContent = doctors.length || '—';
+    document.getElementById('statServices').textContent = priceItems.length || 'вЂ”';
+    document.getElementById('statDoctors').textContent = doctors.length || 'вЂ”';
 
     if (sb) {
         // Load fresh data
@@ -1622,4 +1622,5 @@ function escapeAttr(str) {
     if (!str) return '';
     return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
+
 
