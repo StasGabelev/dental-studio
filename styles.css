@@ -1568,7 +1568,7 @@ button { font-family: var(--font-sans); }
     .team-member__info {
         position: relative !important;
         display: none;
-        padding: 30px 20px !important;
+        padding: 15px 20px !important;
         text-align: center !important;
         opacity: 0;
         transform: translateY(10px);
