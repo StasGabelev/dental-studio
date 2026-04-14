@@ -1142,11 +1142,11 @@ async function loadPageEditor(pageSlug) {
         } else if (field.type === 'textarea') {
             html += `<textarea data-key="${field.key}" rows="3" placeholder="${field.label}">${escapeHtml(val)}</textarea>`;
         } else if (field.type === 'image') {
-            html += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'image')" id="media-${field.key}">
-                ${val ? `<img src="${val}" style="max-width:100%;max-height:200px;border-radius:4px;">` : ''}
-                <div class="media-upload-hint">📷 Натисніть щоб завантажити зображення</div>
-            </div>`;
-        } else if (field.type === 'video') {
+            const imgSrc = (val && !val.startsWith('http') && !val.startsWith('blob:')) ? '../' + val : val;
+            html += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'image')" id="media-${field.key}">`;
+            html += `${val ? `<img src="${imgSrc}" style="max-width:100%;max-height:200px;border-radius:4px;">` : ''}`;
+            html += `<div class="media-upload-hint">📷 Натисніть щоб завантажити зображення</div>`;
+            html += `</div>`;
             const videoSrc = (val && !val.startsWith('http') && !val.startsWith('blob:')) ? '../' + val : val;
             html += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'video')" id="media-${field.key}">
                 ${val ? `<video src="${videoSrc}" style="max-width:100%;max-height:200px;" controls></video>` : ''}
