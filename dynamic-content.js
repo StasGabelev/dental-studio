@@ -48,6 +48,7 @@
                             if (source) {
                                 source.src = item.media_url;
                                 mediaEl.load();
+                                mediaEl.play().catch(e => console.warn('Autoplay prevented:', e));
                             }
                         } else if (mediaEl.tagName === 'DIV' || mediaEl.tagName === 'SECTION') {
                             mediaEl.style.backgroundImage = `url('${item.media_url}')`;

@@ -195,9 +195,8 @@ const PAGE_SCHEMA = {
     "about": [
         { "key": "about-page-title", "label": "SEO Title сторінки", "type": "text" },
         { "key": "about-section-tag", "label": "Тег розділу (мала позначка)", "type": "text" },
-        { "key": "hero-title", "label": "Головний заголовок", "type": "text" },
-        { "key": "about-p1", "label": "Основний опис клініки", "type": "textarea" },
-        { "key": "about-p2", "label": "Другий (нижній) опис клініки", "type": "textarea" },
+        { "key": "about-p1", "label": "Головний заголовок (під 'Про клініку')", "type": "text" },
+        { "key": "about-p2", "label": "Опис клініки (текстовий блок)", "type": "textarea" },
         { "key": "about-hero-img", "label": "Фото: Головне (Hero)", "type": "image" },
         { "key": "about-secondary-img", "label": "Фото: Поруч з текстом", "type": "image" },
         { "key": "nav-works", "label": "Кнопка: Наші роботи", "type": "text" },
