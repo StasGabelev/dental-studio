@@ -1058,19 +1058,13 @@ async function loadPageEditor(pageSlug) {
         "about": {
             "about-page-title": "Про клініку — Dental Studio",
             "about-section-tag": "ПРО КЛІНІКУ",
-            "hero-title": "Ми доповнюємо вашу красу",
-            "about-p1": "Dental Studio — це стоматологічна клініка в Чернігові, що об'єднала однодумців, для яких краса та естетика вашої посмішки — сенс професійного життя.",
+            "about-p1": "Ми доповнюємо вашу красу",
+            "about-p2": "Dental Studio — це стоматологічна клініка в Чернігові, що об'єднала однодумців, для яких краса та естетика вашої посмішки — сенс професійного життя. Ми надаємо широкий спектр стоматологічних послуг найвищого рівня, в основі якого цифрова стоматологія та часть душі кожного з наших лікарів, що задають тенденції в сучасній стоматології.",
             "nav-works": "НАШІ РОБОТИ",
             "nav-services": "ПОСЛУГИ",
             "about-team-title": "НАША КОМАНДА",
             "about-hero-img": "assets/dental-2.png",
-            "about-secondary-img": "assets/dental-2.png",
-            "team-savchuk-name": "АНДРІЙ САВЧУК",
-            "team-savchuk-role": "Заступник головного лікаря. Художня реставрація зубів.",
-            "team-anatoliy-name": "АНАТОЛІЙ ТОКАР",
-            "team-anatoliy-role": "Засновник, головний лікар. Стоматолог-ортопед/хірург.",
-            "team-mariya-name": "МАРІЯ ТОКАР",
-
+            "about-secondary-img": "assets/dental-2.png"
         },
         "cases": {
             "cases-page-title": "Наші роботи — Dental Studio",
@@ -1142,16 +1136,17 @@ async function loadPageEditor(pageSlug) {
         } else if (field.type === 'textarea') {
             html += `<textarea data-key="${field.key}" rows="3" placeholder="${field.label}">${escapeHtml(val)}</textarea>`;
         } else if (field.type === 'image') {
-            const imgSrc = (val && !val.startsWith('http') && !val.startsWith('blob:')) ? '../' + val : val;
+            const imgSrc = (val && !val.startsWith('http') && !val.startsWith('blob:') && !val.startsWith('/')) ? '/' + val : val;
             html += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'image')" id="media-${field.key}">`;
             html += `${val ? `<img src="${imgSrc}" style="max-width:100%;max-height:200px;border-radius:4px;">` : ''}`;
             html += `<div class="media-upload-hint">📷 Натисніть щоб завантажити зображення</div>`;
             html += `</div>`;
-            const videoSrc = (val && !val.startsWith('http') && !val.startsWith('blob:')) ? '../' + val : val;
-            html += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'video')" id="media-${field.key}">
-                ${val ? `<video src="${videoSrc}" style="max-width:100%;max-height:200px;" controls></video>` : ''}
-                <div class="media-upload-hint">🎥 Натисніть щоб завантажити відео</div>
-            </div>`;
+        } else if (field.type === 'video') {
+            const videoSrc = (val && !val.startsWith('http') && !val.startsWith('blob:') && !val.startsWith('/')) ? '/' + val : val;
+            html += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'video')" id="media-${field.key}">`;
+            html += `${val ? `<video src="${videoSrc}" style="max-width:100%;max-height:200px;" controls></video>` : ''}`;
+            html += `<div class="media-upload-hint">🎥 Натисніть щоб завантажити відео</div>`;
+            html += `</div>`;
         }
 
         html += `</div>`;
