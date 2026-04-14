@@ -5,17 +5,12 @@
 // ============================================================
 
 (async function initDynamicContent() {
-    // Check if Supabase is configured
+    const PUBLIC_SB_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
+    const PUBLIC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
     let sbClient = null;
-    try {
-        const config = localStorage.getItem('ds_supabase');
-        if (config) {
-            const { url, key } = JSON.parse(config);
-            if (url && key && typeof supabase !== 'undefined') {
-                sbClient = supabase.createClient(url, key);
-            }
-        }
-    } catch(e) {}
+    if (typeof supabase !== 'undefined') {
+        sbClient = supabase.createClient(PUBLIC_SB_URL, PUBLIC_SB_KEY);
+    }
 
     if (!sbClient) return; // Keep hardcoded content
 
