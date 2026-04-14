@@ -1261,10 +1261,14 @@ async function triggerMediaUpload(key, type) {
 // ============================================================
 
 async function loadPriceList() {
-    // Refresh from Supabase if connected
     if (sb) {
-        const { data } = await sb.from('price_list')
-            .select('*').eq('is_active', true).order('sort_order');
+        const { data, error } = await sb.from('price_list')
+            .select('*').order('sort_order');
+        
+        if (error) {
+            showToast('❌ Помилка БД: ' + error.message);
+        }
+
         if (data) {
             priceItems = data.map(p => ({
                 id: p.id,
@@ -1276,7 +1280,6 @@ async function loadPriceList() {
         }
     }
 
-    // Fallback defaults if empty
     if (priceItems.length === 0 && !sb) {
         priceItems = [
             { id: 'l1', category: 'Терапія', name: 'Консультація лікаря', price: '500 грн' },
@@ -1358,15 +1361,25 @@ async function savePriceList() {
 // ============================================================
 
 async function loadDoctors() {
+    console.log('loading doctors...');
     if (sb) {
-        const { data } = await sb.from('doctors')
-            .select('*').eq('is_active', true).order('sort_order');
+        // Try without is_active filter to see if they are hidden
+        const { data, error } = await sb.from('doctors')
+            .select('*').order('sort_order');
+        
+        if (error) {
+            console.error('Doctors fetch error:', error);
+            showToast('❌ Помилка БД: ' + (error.message || 'невідома помилка'));
+        }
+        
         if (data) {
+            console.log('Doctors from DB:', data.length);
             doctors = data.map(d => ({
                 id: d.id,
-                name: d.name_uk,
+                name: d.name_uk || '',
                 spec: d.specialization_uk || '',
                 photo: d.photo_url || '',
+                is_active: d.is_active
             }));
         }
     }
