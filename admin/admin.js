@@ -1094,7 +1094,7 @@ async function loadPageEditor(pageSlug) {
         "home": {
             "hero-video": "https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4",
             "interior-video": "assets/dental2.mp4",
-            "hero-title": "\u0406\u041D\u041D\u041E\u0412\u0410\u0426\u0406\u0407.<br>\u0415\u0421\u0422\u0415\u0422\u0418\u041A\u0410.<br>\u041A\u041E\u041C\u0424\u041E\u0420\u0422",
+            "hero-title": "ІННОВАЦІЇ.\nЕСТЕТИКА.\nКОМФОРТ",
             "hero-subtitle": "\u0412\u0456\u0434 \u0456\u0434\u0435\u0430\u043B\u044C\u043D\u043E\u0457 \u0433\u0456\u0433\u0456\u0454\u043D\u0438 \u0434\u043E \u0456\u043C\u043F\u043B\u0430\u043D\u0442\u0456\u0432 '\u043F\u0456\u0434 \u043A\u043B\u044E\u0447'.",
             "btn-book": "\u0417\u0410\u041F\u0418\u0421\u0410\u0422\u0418\u0421\u042F \u041D\u0410 \u041A\u041E\u041D\u0421\u0423\u041B\u042C\u0422\u0410\u0426\u0406\u042E",
             "feat-aesthetic": "\u0415\u0441\u0442\u0435\u0442\u0438\u0447\u043D\u0430 \u0441\u0442\u043E\u043C\u0430\u0442\u043E\u043B\u043E\u0433\u0456\u044F",
