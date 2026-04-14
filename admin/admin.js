@@ -195,630 +195,630 @@ const PAGE_SCHEMA = {
     "about": [
         {
             "key": "about-page-title",
-            "label": "About Page Title",
+            "label": "SEO Title сторінки",
             "type": "text"
         },
         {
             "key": "about-section-tag",
-            "label": "About Section Tag",
+            "label": "Тег розділу (мала позначка)",
             "type": "text"
         },
         {
             "key": "hero-title",
-            "label": "Hero Title",
+            "label": "Головний заголовок",
             "type": "text"
         },
         {
             "key": "about-p1",
-            "label": "About P1",
+            "label": "Основний опис клініки",
             "type": "textarea"
         },
         {
             "key": "nav-works",
-            "label": "Nav Works",
+            "label": "Кнопка: Наші роботи",
             "type": "text"
         },
         {
             "key": "nav-services",
-            "label": "Nav Services",
+            "label": "Кнопка: Послуги",
             "type": "text"
         },
         {
             "key": "about-team-title",
-            "label": "About Team Title",
+            "label": "Заголовок команди",
             "type": "text"
         },
         {
             "key": "team-savchuk-name",
-            "label": "Team Savchuk Name",
+            "label": "Лікар 1: Ім'я (Савчук)",
             "type": "text"
         },
         {
             "key": "team-savchuk-role",
-            "label": "Team Savchuk Role",
+            "label": "Лікар 1: Посада (Савчук)",
             "type": "text"
         },
         {
             "key": "team-anatoliy-name",
-            "label": "Team Anatoliy Name",
+            "label": "Лікар 2: Ім'я (Анатолій)",
             "type": "text"
         },
         {
             "key": "team-anatoliy-role",
-            "label": "Team Anatoliy Role",
+            "label": "Лікар 2: Посада (Анатолій)",
             "type": "text"
         },
         {
             "key": "team-mariya-name",
-            "label": "Team Mariya Name",
+            "label": "Лікар 3: Ім'я (Марія)",
             "type": "text"
         },
         {
             "key": "team-mariya-role",
-            "label": "Team Mariya Role",
+            "label": "Лікар 3: Посада (Марія)",
             "type": "text"
         }
     ],
     "services": [
         {
             "key": "feat-aesthetic",
-            "label": "Feat Aesthetic",
+            "label": "Фільтр: Естетична стоматологія",
             "type": "text"
         },
         {
             "key": "btn-book",
-            "label": "Btn Book",
+            "label": "Кнопка: Записатися",
             "type": "text"
         },
         {
             "key": "feat-therapy",
-            "label": "Feat Therapy",
+            "label": "Фільтр: Лікування зубів",
             "type": "text"
         },
         {
             "key": "feat-surgery",
-            "label": "Feat Surgery",
+            "label": "Фільтр: Хірургія",
             "type": "text"
         },
         {
             "key": "feat-ortho",
-            "label": "Feat Ortho",
+            "label": "Фільтр: Ортодонтія",
             "type": "text"
         },
         {
             "key": "svc-consult-title",
-            "label": "Svc Consult Title",
+            "label": "Послуга: Консультація — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-consult-desc",
-            "label": "Svc Consult Desc",
+            "label": "Послуга: Консультація — Опис",
             "type": "textarea"
         },
         {
             "key": "price-consult-general",
-            "label": "Price Consult General",
+            "label": "Ціна: Загальна консультація",
             "type": "text"
         },
         {
             "key": "btn-book-short",
-            "label": "Btn Book Short",
+            "label": "Кнопка: Записатися (коротка)",
             "type": "text"
         },
         {
             "key": "price-consult-modjaw",
-            "label": "Price Consult Modjaw",
+            "label": "Ціна: Діагностика MODJAW",
             "type": "text"
         },
         {
             "key": "price-consult-checkup",
-            "label": "Price Consult Checkup",
+            "label": "Ціна: CHECK-UP",
             "type": "text"
         },
         {
             "key": "svc-composite-veneer-title",
-            "label": "Svc Composite Veneer Title",
+            "label": "Послуга: Композитні вініри — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-composite-veneer-desc",
-            "label": "Svc Composite Veneer Desc",
+            "label": "Послуга: Композитні вініри — Опис",
             "type": "textarea"
         },
         {
             "key": "price-frontal-restoration",
-            "label": "Price Frontal Restoration",
+            "label": "Ціна: Реставрація фронтального зуба",
             "type": "text"
         },
         {
             "key": "price-art-restoration",
-            "label": "Price Art Restoration",
+            "label": "Ціна: Художня реставрація",
             "type": "text"
         },
         {
             "key": "svc-ceramic-restoration-title",
-            "label": "Svc Ceramic Restoration Title",
+            "label": "Послуга: Керамічні реставрації — Заголовок",
             "type": "textarea"
         },
         {
             "key": "svc-ceramic-restoration-desc",
-            "label": "Svc Ceramic Restoration Desc",
+            "label": "Послуга: Керамічні реставрації — Опис",
             "type": "textarea"
         },
         {
             "key": "price-veneer-digital",
-            "label": "Price Veneer Digital",
+            "label": "Ціна: Вінір (digital)",
             "type": "text"
         },
         {
             "key": "price-veneer-layering",
-            "label": "Price Veneer Layering",
+            "label": "Ціна: Вінір (digital + нашарування)",
             "type": "text"
         },
         {
             "key": "price-veneer-handmade",
-            "label": "Price Veneer Handmade",
+            "label": "Ціна: Вінір (hand made)",
             "type": "text"
         },
         {
             "key": "price-veneer-rework",
-            "label": "Price Veneer Rework",
+            "label": "Ціна: Переробка вініра",
             "type": "text"
         },
         {
             "key": "price-veneer-single",
-            "label": "Price Veneer Single",
+            "label": "Ціна: Вінір одиночний",
             "type": "text"
         },
         {
             "key": "price-crown-digital",
-            "label": "Price Crown Digital",
+            "label": "Ціна: Коронка (digital)",
             "type": "text"
         },
         {
             "key": "price-crown-layering",
-            "label": "Price Crown Layering",
+            "label": "Ціна: Коронка (digital + нашарування)",
             "type": "textarea"
         },
         {
             "key": "price-crown-handmade",
-            "label": "Price Crown Handmade",
+            "label": "Ціна: Коронка (hand made)",
             "type": "textarea"
         },
         {
             "key": "svc-endo-title",
-            "label": "Svc Endo Title",
+            "label": "Послуга: Ендодонтія — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-endo-desc",
-            "label": "Svc Endo Desc",
+            "label": "Послуга: Ендодонтія — Опис",
             "type": "textarea"
         },
         {
             "key": "price-endo-incisor",
-            "label": "Price Endo Incisor",
+            "label": "Ціна: Канали (різці, ікла)",
             "type": "text"
         },
         {
             "key": "price-endo-premolar",
-            "label": "Price Endo Premolar",
+            "label": "Ціна: Канали (премоляри)",
             "type": "text"
         },
         {
             "key": "price-endo-molar",
-            "label": "Price Endo Molar",
+            "label": "Ціна: Канали (моляри)",
             "type": "text"
         },
         {
             "key": "svc-caries-title",
-            "label": "Svc Caries Title",
+            "label": "Послуга: Лікування карієсу — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-caries-desc",
-            "label": "Svc Caries Desc",
+            "label": "Послуга: Лікування карієсу — Опис",
             "type": "textarea"
         },
         {
             "key": "price-caries-2",
-            "label": "Price Caries 2",
+            "label": "Ціна: Карієс II рівень",
             "type": "text"
         },
         {
             "key": "price-caries-3",
-            "label": "Price Caries 3",
+            "label": "Ціна: Карієс III рівень",
             "type": "text"
         },
         {
             "key": "svc-periodontal-title",
-            "label": "Svc Periodontal Title",
+            "label": "Послуга: Пародонтологія — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-periodontal-desc",
-            "label": "Svc Periodontal Desc",
+            "label": "Послуга: Пародонтологія — Опис",
             "type": "textarea"
         },
         {
             "key": "price-periodont-1",
-            "label": "Price Periodont 1",
+            "label": "Ціна: Пародонтит I ступінь",
             "type": "text"
         },
         {
             "key": "price-periodont-2",
-            "label": "Price Periodont 2",
+            "label": "Ціна: Пародонтит II ступінь",
             "type": "text"
         },
         {
             "key": "price-periodont-3",
-            "label": "Price Periodont 3",
+            "label": "Ціна: Пародонтит III ступінь",
             "type": "text"
         },
         {
             "key": "svc-hygiene-title",
-            "label": "Svc Hygiene Title",
+            "label": "Послуга: Гігієна — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-hygiene-desc",
-            "label": "Svc Hygiene Desc",
+            "label": "Послуга: Гігієна — Опис",
             "type": "textarea"
         },
         {
             "key": "price-hygiene",
-            "label": "Price Hygiene",
+            "label": "Ціна: Гігієна",
             "type": "text"
         },
         {
             "key": "price-hygiene-smoker",
-            "label": "Price Hygiene Smoker",
+            "label": "Ціна: Гігієна (нальот курця)",
             "type": "text"
         },
         {
             "key": "svc-whitening-title",
-            "label": "Svc Whitening Title",
+            "label": "Послуга: Відбілювання — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-whitening-desc",
-            "label": "Svc Whitening Desc",
+            "label": "Послуга: Відбілювання — Опис",
             "type": "textarea"
         },
         {
             "key": "price-whitening",
-            "label": "Price Whitening",
+            "label": "Ціна: Відбілювання",
             "type": "text"
         },
         {
             "key": "svc-implant-title",
-            "label": "Svc Implant Title",
+            "label": "Послуга: Імплантація — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-implant-desc",
-            "label": "Svc Implant Desc",
+            "label": "Послуга: Імплантація — Опис",
             "type": "textarea"
         },
         {
             "key": "price-implant-neodent",
-            "label": "Price Implant Neodent",
+            "label": "Ціна: Імплант NEODENT",
             "type": "text"
         },
         {
             "key": "price-implant-sla",
-            "label": "Price Implant Sla",
+            "label": "Ціна: Імплант STRAUMANN SLA",
             "type": "text"
         },
         {
             "key": "price-implant-slactive",
-            "label": "Price Implant Slactive",
+            "label": "Ціна: Імплант STRAUMANN SLACTIVE",
             "type": "text"
         },
         {
             "key": "price-crown-monolit",
-            "label": "Price Crown Monolit",
+            "label": "Ціна: Коронка (monolit)",
             "type": "text"
         },
         {
             "key": "price-crown-aesthetic",
-            "label": "Price Crown Aesthetic",
+            "label": "Ціна: Коронка (ceramic + абатмент)",
             "type": "textarea"
         },
         {
             "key": "svc-extraction-title",
-            "label": "Svc Extraction Title",
+            "label": "Послуга: Видалення зубів — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-extraction-desc",
-            "label": "Svc Extraction Desc",
+            "label": "Послуга: Видалення зубів — Опис",
             "type": "textarea"
         },
         {
             "key": "price-extraction",
-            "label": "Price Extraction",
+            "label": "Ціна: Видалення зуба",
             "type": "text"
         },
         {
             "key": "price-extraction-atypical-1",
-            "label": "Price Extraction Atypical 1",
+            "label": "Ціна: Атипове видалення (просте)",
             "type": "text"
         },
         {
             "key": "price-extraction-atypical-2",
-            "label": "Price Extraction Atypical 2",
+            "label": "Ціна: Атипове видалення (складне)",
             "type": "text"
         },
         {
             "key": "price-sedation",
-            "label": "Price Sedation",
+            "label": "Ціна: Седація (1 година)",
             "type": "text"
         },
         {
             "key": "svc-gum-surgery-title",
-            "label": "Svc Gum Surgery Title",
+            "label": "Послуга: Хірургія ясен — Заголовок",
             "type": "textarea"
         },
         {
             "key": "svc-gum-surgery-desc",
-            "label": "Svc Gum Surgery Desc",
+            "label": "Послуга: Хірургія ясен — Опис",
             "type": "textarea"
         },
         {
             "key": "price-gum-smile",
-            "label": "Price Gum Smile",
+            "label": "Ціна: Усунення ясеневої посмішки",
             "type": "text"
         },
         {
             "key": "price-recession",
-            "label": "Price Recession",
+            "label": "Ціна: Закриття рецесій",
             "type": "text"
         },
         {
             "key": "price-gum-extension",
-            "label": "Price Gum Extension",
+            "label": "Ціна: Видовження ясен",
             "type": "text"
         },
         {
             "key": "svc-braces-title",
-            "label": "Svc Braces Title",
+            "label": "Послуга: Брекети — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-braces-desc",
-            "label": "Svc Braces Desc",
+            "label": "Послуга: Брекети — Опис",
             "type": "textarea"
         },
         {
             "key": "price-braces-metal",
-            "label": "Price Braces Metal",
+            "label": "Ціна: Брекети (метал)",
             "type": "text"
         },
         {
             "key": "price-braces-ceramic",
-            "label": "Price Braces Ceramic",
+            "label": "Ціна: Брекети (кераміка)",
             "type": "text"
         },
         {
             "key": "price-braces-self-metal",
-            "label": "Price Braces Self Metal",
+            "label": "Ціна: Самолігуючі (метал)",
             "type": "text"
         },
         {
             "key": "price-ortho-visit",
-            "label": "Price Ortho Visit",
+            "label": "Ціна: Контрольний візит ортодонта",
             "type": "text"
         },
         {
             "key": "price-braces-self-ceramic",
-            "label": "Price Braces Self Ceramic",
+            "label": "Ціна: Самолігуючі (кераміка)",
             "type": "text"
         },
         {
             "key": "svc-aligners-title",
-            "label": "Svc Aligners Title",
+            "label": "Послуга: Елайнери — Заголовок",
             "type": "text"
         },
         {
             "key": "svc-aligners-desc",
-            "label": "Svc Aligners Desc",
+            "label": "Послуга: Елайнери — Опис",
             "type": "textarea"
         },
         {
             "key": "price-aligners",
-            "label": "Price Aligners",
+            "label": "Ціна: Лікування елайнерами",
             "type": "text"
         },
         {
             "key": "form-name-placeholder",
-            "label": "Form Name Placeholder",
+            "label": "Форма: Плейсхолдер імені",
             "type": "text"
         },
         {
             "key": "form-comment-placeholder",
-            "label": "Form Comment Placeholder",
+            "label": "Форма: Плейсхолдер коментаря",
             "type": "text"
         },
         {
             "key": "form-phone-placeholder",
-            "label": "Form Phone Placeholder",
+            "label": "Форма: Плейсхолдер телефону",
             "type": "text"
         },
         {
             "key": "form-privacy",
-            "label": "Form Privacy",
+            "label": "Форма: Текст приватності",
             "type": "textarea"
         },
         {
             "key": "form-btn",
-            "label": "Form Btn",
+            "label": "Форма: Кнопка",
             "type": "text"
         }
     ],
     "cases": [
         {
             "key": "cases-page-title",
-            "label": "Cases Page Title",
+            "label": "SEO Title сторінки",
             "type": "text"
         },
         {
             "key": "cases-hero-title",
-            "label": "Cases Hero Title",
+            "label": "Головний заголовок",
             "type": "text"
         },
         {
             "key": "filter-all",
-            "label": "Filter All",
+            "label": "Фільтр: Всі роботи",
             "type": "text"
         },
         {
             "key": "filter-veneers",
-            "label": "Filter Veneers",
+            "label": "Фільтр: Керамічні вініри",
             "type": "text"
         },
         {
             "key": "filter-composite",
-            "label": "Filter Composite",
+            "label": "Фільтр: Композитні вініри",
             "type": "text"
         },
         {
             "key": "filter-restoration",
-            "label": "Filter Restoration",
+            "label": "Фільтр: Композитні реставрації",
             "type": "text"
         },
         {
             "key": "filter-implants",
-            "label": "Filter Implants",
+            "label": "Фільтр: Імплантація",
             "type": "text"
         },
         {
             "key": "filter-ortho",
-            "label": "Filter Ortho",
+            "label": "Фільтр: Ортодонтія",
             "type": "text"
         },
         {
             "key": "filter-whitening",
-            "label": "Filter Whitening",
+            "label": "Фільтр: Відбілювання зубів",
             "type": "text"
         }
     ],
     "contact": [
         {
             "key": "contacts-page-title",
-            "label": "Contacts Page Title",
+            "label": "SEO Title сторінки",
             "type": "text"
         },
         {
             "key": "form-title",
-            "label": "Form Title",
+            "label": "Форма: Заголовок",
             "type": "text"
         },
         {
             "key": "form-subtitle",
-            "label": "Form Subtitle",
+            "label": "Форма: Підзаголовок",
             "type": "textarea"
         },
         {
             "key": "form-phone-label",
-            "label": "Form Phone Label",
+            "label": "Форма: Телефон-лейбл",
             "type": "text"
         },
         {
             "key": "form-name-placeholder",
-            "label": "Form Name Placeholder",
+            "label": "Форма: Плейсхолдер імені",
             "type": "text"
         },
         {
             "key": "form-comment-placeholder",
-            "label": "Form Comment Placeholder",
+            "label": "Форма: Плейсхолдер коментаря",
             "type": "text"
         },
         {
             "key": "form-phone-placeholder",
-            "label": "Form Phone Placeholder",
+            "label": "Форма: Плейсхолдер телефону",
             "type": "text"
         },
         {
             "key": "form-privacy",
-            "label": "Form Privacy",
+            "label": "Форма: Текст приватності",
             "type": "textarea"
         },
         {
             "key": "form-btn",
-            "label": "Form Btn",
+            "label": "Форма: Кнопка",
             "type": "text"
         },
         {
             "key": "footer-find-us",
-            "label": "Footer Find Us",
+            "label": "Де нас знайти",
             "type": "text"
         },
         {
             "key": "map-address",
-            "label": "Map Address",
+            "label": "Адреса клініки",
             "type": "text"
         },
         {
             "key": "footer-map-btn",
-            "label": "Footer Map Btn",
+            "label": "Кнопка: Карта",
             "type": "text"
         },
         {
             "key": "footer-hours-title",
-            "label": "Footer Hours Title",
+            "label": "Графік: Заголовок",
             "type": "text"
         },
         {
             "key": "footer-hours-days",
-            "label": "Footer Hours Days",
+            "label": "Графік: Години роботи",
             "type": "text"
         }
     ],
     "footer": [
         {
             "key": "footer-find-us",
-            "label": "Footer Find Us",
+            "label": "Де нас знайти",
             "type": "text"
         },
         {
             "key": "footer-location",
-            "label": "Footer Location",
+            "label": "Місто",
             "type": "text"
         },
         {
             "key": "footer-address-street",
-            "label": "Footer Address Street",
+            "label": "Вулиця та номер",
             "type": "text"
         },
         {
             "key": "footer-map-btn",
-            "label": "Footer Map Btn",
+            "label": "Кнопка: Карта",
             "type": "text"
         },
         {
             "key": "footer-tagline",
-            "label": "Footer Tagline",
+            "label": "Слоган (з емодзі)",
             "type": "text"
         },
         {
             "key": "footer-hours-title",
-            "label": "Footer Hours Title",
+            "label": "Графік: Заголовок",
             "type": "text"
         },
         {
             "key": "footer-hours-days",
-            "label": "Footer Hours Days",
+            "label": "Графік: Години роботи",
             "type": "text"
         },
         {
             "key": "footer-copyright",
-            "label": "Footer Copyright",
+            "label": "Копірайт",
             "type": "text"
         },
         {
             "key": "btn-book",
-            "label": "Btn Book",
+            "label": "Кнопка: Записатися",
             "type": "text"
         }
     ]
@@ -1071,11 +1071,6 @@ function selectPage(pageSlug, tabEl) {
 async function loadPageEditor(pageSlug) {
     const area = document.getElementById('pageEditorArea');
     const schema = PAGE_SCHEMA[pageSlug];
-    if (!schema) {
-        area.innerHTML = '<p class="editor-placeholder">Схема сторінки не знайдена</p>';
-        return;
-    }
-
     // Load existing content from Supabase
     let existing = {};
     if (sb) {
@@ -1094,27 +1089,96 @@ async function loadPageEditor(pageSlug) {
         "home": {
             "hero-video": "https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4",
             "interior-video": "assets/dental2.mp4",
-            "hero-title": "ІННОВАЦІЇ.\nЕСТЕТИКА.\nКОМФОРТ",
-            "hero-subtitle": "\u0412\u0456\u0434 \u0456\u0434\u0435\u0430\u043B\u044C\u043D\u043E\u0457 \u0433\u0456\u0433\u0456\u0454\u043D\u0438 \u0434\u043E \u0456\u043C\u043F\u043B\u0430\u043D\u0442\u0456\u0432 '\u043F\u0456\u0434 \u043A\u043B\u044E\u0447'.",
-            "btn-book": "\u0417\u0410\u041F\u0418\u0421\u0410\u0422\u0418\u0421\u042F \u041D\u0410 \u041A\u041E\u041D\u0421\u0423\u041B\u042C\u0422\u0410\u0426\u0406\u042E",
-            "feat-aesthetic": "\u0415\u0441\u0442\u0435\u0442\u0438\u0447\u043D\u0430 \u0441\u0442\u043E\u043C\u0430\u0442\u043E\u043B\u043E\u0433\u0456\u044F",
-            "feat-therapy": "\u041B\u0456\u043A\u0443\u0432\u0430\u043D\u043D\u044F \u0437\u0443\u0431\u0456\u0432",
-            "feat-surgery": "\u0425\u0456\u0440\u0443\u0440\u0433\u0456\u044F",
-            "feat-ortho": "\u041E\u0440\u0442\u043E\u0434\u043E\u043D\u0442\u0456\u044F",
-            "about-p1": "Dental Studio \u2014 \u0446\u0435 \u0441\u0442\u043E\u043C\u0430\u0442\u043E\u043B\u043E\u0433\u0456\u0447\u043D\u0430 \u043A\u043B\u0456\u043D\u0456\u043A\u0430 \u0432 \u0427\u0435\u0440\u043D\u0456\u0433\u043E\u0432\u0456, \u0449\u043E \u043E\u0431'\u0454\u0434\u043D\u0430\u043B\u0430 \u043E\u0434\u043D\u043E\u0434\u0443\u043C\u0446\u0456\u0432, \u0434\u043B\u044F \u044F\u043A\u0438\u0445 \u043A\u0440\u0430\u0441\u0430 \u0442\u0430 \u0435\u0441\u0442\u0435\u0442\u0438\u043A\u0430 \u0432\u0430\u0448\u043E\u0457 \u043F\u043E\u0441\u043C\u0456\u0448\u043A\u0438 \u2014 \u0441\u0435\u043D\u0441 \u043F\u0440\u043E\u0444\u0435\u0441\u0456\u0439\u043D\u043E\u0433\u043E \u0436\u0438\u0442\u0442\u044F.",
-            "about-p2": "\u041C\u0438 \u043D\u0430\u0434\u0430\u0454\u043C\u043E \u0448\u0438\u0440\u043E\u043A\u0438\u0439 \u0441\u043F\u0435\u043A\u0442\u0440 \u0441\u0442\u043E\u043C\u0430\u0442\u043E\u043B\u043E\u0433\u0456\u0447\u043D\u0438\u0445 \u043F\u043E\u0441\u043B\u0443\u0433 \u043D\u0430\u0439\u0432\u0438\u0449\u043E\u0433\u043E \u0440\u0456\u0432\u043D\u044F, \u0432 \u043E\u0441\u043D\u043E\u0432\u0456 \u044F\u043A\u043E\u0433\u043E \u0446\u0438\u0444\u0440\u043E\u0432\u0430 \u0441\u0442\u043E\u043C\u0430\u0442\u043E\u043B\u043E\u0433\u0456\u044F \u0442\u0430 \u0447\u0430\u0441\u0442\u044C \u0434\u0443\u0448\u0456 \u043A\u043E\u0436\u043D\u043E\u0433\u043E \u0437 \u043D\u0430\u0448\u0438\u0445 \u043B\u0456\u043A\u0430\u0440\u0456\u0432, \u0449\u043E \u0437\u0430\u0434\u0430\u044E\u0442\u044C \u0442\u0435\u043D\u0434\u0435\u043D\u0446\u0456\u0457 \u0432 \u0441\u0443\u0447\u0430\u0441\u043D\u0456\u0439 \u0441\u0442\u043E\u043C\u0430\u0442\u043E\u043B\u043E\u0433\u0456\u0456\u0457.",
-            "about-more": "\u0414\u0406\u0417\u041D\u0410\u0422\u0418\u0421\u042F \u0411\u0406\u041B\u042C\u0428\u0415",
-            "about-services": "\u041F\u0415\u0420\u0415\u0413\u041B\u042F\u041D\u0423\u0422\u0418 \u041D\u0410\u0428\u0406 \u041F\u041E\u0421\u041B\u0423\u0413\u0418",
-            "works-title": "\u041D\u0410\u0428\u0406 \u0420\u041E\u0411\u041E\u0422\u0418",
-            "works-btn": "\u041F\u0415\u0420\u0415\u0413\u041B\u042F\u041D\u0423\u0422\u0418 \u0412\u0421\u0406 \u0420\u041E\u0411\u041E\u0422\u0418",
-            "contact-choice-title": "\u0417\u0410\u041F\u0418\u0421\u0410\u0422\u0418\u0421\u042F \u041D\u0410 \u041A\u041E\u041D\u0421\u0423\u041B\u042C\u0422\u0410\u0426\u0406\u042E",
-            "contact-choice-subtitle": "\u0412\u0438\u0431\u0435\u0440\u0456\u0442\u044C \u043E\u043D\u043B\u0430\u0439\u043D-\u0437\u0430\u043F\u0438\u0441 \u0434\u043B\u044F \u043C\u0438\u0442\u0442\u0454\u0432\u043E\u0433\u043E \u0431\u0440\u043E\u043D\u044E\u0432\u0430\u043D\u043D\u044F \u0447\u0430\u0441\u0443,<br>\u0430\u0431\u043E \u043D\u0430\u043F\u0438\u0448\u0456\u0442\u044C \u043D\u0430\u043C \u0443 \u043C\u0435\u0441\u0435\u043D\u0434\u0436\u0435\u0440 \u0434\u043B\u044F \u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u0446\u0456\u0457.",
-            "btn-online-booking": "\u041E\u041D\u041B\u0410\u0419\u041D \u0417\u0410\u041F\u0418\u0421",
-            "btn-contact-hub": "\u0417\u0412'\u042F\u0417\u0410\u0422\u0418\u0421\u042F \u0417 \u041D\u0410\u041C\u0418",
-            "map-title": "\u0414\u0415 \u041D\u0410\u0421 \u0417\u041D\u0410\u0419\u0422\u0418",
-            "map-open-btn": "\u0412\u0456\u0434\u043A\u0440\u0438\u0442\u0438 \u043A\u0430\u0440\u0442\u0443",
-            "map-hours-label": "\u0413\u0420\u0410\u0424\u0406\u041A \u0420\u041E\u0411\u041E\u0422\u0418",
-            "footer-hours": "\u041F\u043D \u2014 \u041F\u0442, 10:00 \u2014 18:00"
+            "hero-title": "ІННОВАЦІЇ.\nЕСТЕТИКА.\nКОМФОРТ🤍",
+            "hero-subtitle": "Від ідеальної гігієни до імплантів 'під ключ'.",
+            "btn-book": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ",
+            "feat-aesthetic": "Естетична стоматологія",
+            "feat-therapy": "Лікування зубів",
+            "feat-surgery": "Хірургія",
+            "feat-ortho": "Ортодонтія",
+            "about-p1": "Dental Studio — це стоматологічна клініка в Чернігові, що об'єднала однодумців, для яких краса та естетика вашої посмішки — сенс професійного життя.",
+            "about-p2": "Ми надаємо широкий спектр стоматологічних послуг найвищого рівня, в основі якого цифрова стоматологія та частина душі кожного з наших лікарів, що задають тенденції в сучасній стоматології.",
+            "about-more": "ДІЗНАТИСЯ БІЛЬШЕ",
+            "about-services": "ПЕРЕГЛЯНУТИ НАШІ ПОСЛУГИ",
+            "works-title": "НАШІ РОБОТИ",
+            "works-btn": "ПЕРЕГЛЯНУТИ ВСІ РОБОТИ",
+            "contact-choice-title": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ",
+            "contact-choice-subtitle": "Виберіть онлайн-запис для миттєвого бронювання часу,<br>або напишіть нам у месенджер для консультації.",
+            "btn-online-booking": "ОНЛАЙН ЗАПИС",
+            "btn-contact-hub": "ЗВ'ЯЗАТИСЯ З НАМИ",
+            "map-title": "ДЕ НАС ЗНАЙТИ",
+            "map-open-btn": "Відкрити карту",
+            "map-hours-label": "ГРАФІК РОБОТИ",
+            "footer-hours": "Пн — Пт, 10:00 — 18:00"
+        },
+        "about": {
+            "about-page-title": "Про клініку — Dental Studio",
+            "about-section-tag": "ПРО КЛІНІКУ",
+            "hero-title": "Ми доповнюємо вашу красу",
+            "about-p1": "Dental Studio — це стоматологічна клініка в Чернігові, що об'єднала однодумців, для яких краса та естетика вашої посмішки — сенс професійного життя.",
+            "nav-works": "НАШІ РОБОТИ",
+            "nav-services": "ПОСЛУГИ",
+            "about-team-title": "НАША КОМАНДА",
+            "team-savchuk-name": "АНДРІЙ САВЧУК",
+            "team-savchuk-role": "Заступник головного лікаря. Художня реставрація зубів.",
+            "team-anatoliy-name": "АНАТОЛІЙ ТОКАР",
+            "team-anatoliy-role": "Засновник, головний лікар. Стоматолог-ортопед/хірург.",
+            "team-mariya-name": "МАРІЯ ТОКАР",
+            "team-mariya-role": "Стоматолог-терапевт. Естетична реставрація."
+        },
+        "cases": {
+            "cases-page-title": "Наші роботи — Dental Studio",
+            "cases-hero-title": "НАШІ РОБОТИ",
+            "filter-all": "Всі роботи",
+            "filter-veneers": "Керамічні вініри",
+            "filter-composite": "Композитні вініри",
+            "filter-restoration": "Композитні реставрації",
+            "filter-implants": "Імплантація",
+            "filter-ortho": "Ортодонтія",
+            "filter-whitening": "Відбілювання зубів"
+        },
+        "services": {
+            "feat-aesthetic": "Естетична стоматологія",
+            "btn-book": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ",
+            "feat-therapy": "Лікування зубів",
+            "feat-surgery": "Хірургія",
+            "feat-ortho": "Ортодонтія",
+            "svc-consult-title": "Консультація",
+            "svc-consult-desc": "Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу.",
+            "price-consult-general": "Загальна консультація",
+            "btn-book-short": "Записатися",
+            "form-name-placeholder": "Прізвище та ім'я",
+            "form-comment-placeholder": "Коментар",
+            "form-phone-placeholder": "Номер телефону",
+            "form-privacy": "Погоджуюся на обробку персональних даних та з умовами політики конфіденційності",
+            "form-btn": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ"
+        },
+        "contact": {
+            "contacts-page-title": "Контакти — Dental Studio",
+            "form-title": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ",
+            "form-subtitle": "Залишіть заявку й адміністратор зв'яжеться з Вами, або зателефонуйте нам особисто",
+            "form-phone-label": "Зв'язатися з нами для консультації:",
+            "form-name-placeholder": "Прізвище та ім'я",
+            "form-comment-placeholder": "Коментар",
+            "form-phone-placeholder": "Номер телефону",
+            "form-privacy": "Погоджуюся на обробку персональних даних та з умовами політики конфіденційності",
+            "form-btn": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ",
+            "footer-find-us": "ДЕ НАС ЗНАЙТИ",
+            "map-address": "ВУЛИЦЯ НЕЗАЛЕЖНОСТІ, 21, ЧЕРНІГІВ, УКРАЇНА",
+            "footer-map-btn": "ЗНАЙТИ НАС НА КАРТІ",
+            "footer-hours-title": "ГРАФІК РОБОТИ",
+            "footer-hours-days": "ПН — ПТ, 10:00 — 18:00"
+        },
+        "footer": {
+            "footer-find-us": "ДЕ НАС ЗНАЙТИ",
+            "footer-location": "Чернігів, Україна",
+            "footer-address-street": "Вулиця Незалежності, 21",
+            "footer-map-btn": "ЗНАЙТИ НАС НА КАРТІ",
+            "footer-tagline": "ІННОВАЦІЇ, ЕСТЕТИКА, КОМФОРТ🤍",
+            "footer-hours-title": "ГРАФІК РОБОТИ",
+            "footer-hours-days": "Пн — Пт, 10:00 — 18:00",
+            "footer-copyright": "Copyright © 2026. Dental Studio. Всі права захищені.",
+            "btn-book": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ"
         }
     };
 
