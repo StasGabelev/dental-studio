@@ -1092,7 +1092,7 @@ async function loadPageEditor(pageSlug) {
 
     const PAGE_DEFAULTS = {
         "home": {
-            "hero-video": "assets/dental-hero.mp4",
+            "hero-video": "https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4",
             "interior-video": "assets/dental2.mp4",
             "hero-title": "\u0406\u041D\u041D\u041E\u0412\u0410\u0426\u0406\u0407.<br>\u0415\u0421\u0422\u0415\u0422\u0418\u041A\u0410.<br>\u041A\u041E\u041C\u0424\u041E\u0420\u0422",
             "hero-subtitle": "\u0412\u0456\u0434 \u0456\u0434\u0435\u0430\u043B\u044C\u043D\u043E\u0457 \u0433\u0456\u0433\u0456\u0454\u043D\u0438 \u0434\u043E \u0456\u043C\u043F\u043B\u0430\u043D\u0442\u0456\u0432 '\u043F\u0456\u0434 \u043A\u043B\u044E\u0447'.",
