@@ -1730,3 +1730,15 @@ function escapeAttr(str) {
     return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+
+function copyConfigForAI() {
+    const config = getSupabaseConfig();
+    if (!config) {
+        showToast('❌ Спочатку підключіть Supabase');
+        return;
+    }
+    const text = 'URL: ' + config.url + '\nKEY: ' + config.key;
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('✅ Скопійовано! Відправте це мені в чат.');
+    });
+}
