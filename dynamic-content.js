@@ -136,6 +136,8 @@
                     html += `<div class="team-member ${activeClass}">
                         <div class="team-member__img" style="background-image: url('${photo}')"></div>
                         <div class="team-member__info">
+                            <h3>${doc.name_uk.toUpperCase()}</h3>
+                            <p class="specialist-tag">${doc.specialization_uk || 'Лікар'}</p>
                             <p>${doc.bio_uk || ''}</p>
                         </div>
                         <div class="team-member__label">

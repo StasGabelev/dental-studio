@@ -1429,6 +1429,22 @@ button { font-family: var(--font-sans); }
     line-height: 1.8;
 }
 
+.team-member__info .specialist-tag {
+    color: #ff3b3b;
+    font-weight: 500;
+    font-size: 13px;
+    margin: 5px 0 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.team-member__info h3 {
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
 .team-member__label {
     position: absolute;
     top: 50%;
