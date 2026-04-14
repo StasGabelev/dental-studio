@@ -1582,7 +1582,14 @@ button { font-family: var(--font-sans); }
         transform: translateY(0);
     }
 
-    .team-member__info h3 { display: none; }
+    .team-member__info h3 { 
+        display: block !important; 
+        color: #B8924A !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        margin-bottom: 8px !important;
+        letter-spacing: 1.5px !important;
+    }
 
     .team-member__info p {
         font-size: 16px !important;
