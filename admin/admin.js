@@ -1383,6 +1383,8 @@ async function loadDoctors() {
 
 function renderDoctors() {
     const area = document.getElementById('doctorsArea');
+    if (!area) return;
+    
     if (doctors.length === 0) {
         area.innerHTML = '<p class="editor-placeholder">Лікарі не додані</p>';
         return;
@@ -1390,12 +1392,15 @@ function renderDoctors() {
 
     let html = '';
     doctors.forEach((doc, i) => {
+        let photoSrc = doc.photo || '';
+        // Fix path if it's a relative asset
+        if (photoSrc && !photoSrc.startsWith('http') && !photoSrc.startsWith('blob:') && !photoSrc.startsWith('/')) {
+            photoSrc = '/' + photoSrc;
+        }
+
         html += `<div class="doctor-card-admin">
             <div class="doctor-photo-admin" style="display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:40px;cursor:pointer;" onclick="uploadDoctorPhoto(${i})">
-                ${(()=>{
-                const photoSrc = doc.photo ? ((!doc.photo.startsWith('http') && !doc.photo.startsWith('blob:') && !doc.photo.startsWith('/')) ? '/' + doc.photo : doc.photo) : '';
-                return photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : '📷';
-            })()}
+                ${photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : '📷'}
             </div>
             <div class="doctor-card-body">
                 <input type="text" value="${escapeAttr(doc.name)}" placeholder="ПІБ лікаря" onchange="doctors[${i}].name=this.value">
