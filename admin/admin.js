@@ -1444,3 +1444,46 @@ function copyConfigForAI() {
         showToast('✅ Скопійовано! Відправте це мені в чат.');
     });
 }
+
+function renderEditorField(field, existing, defaults, pageSlug) {
+    let val = existing[field.key] !== undefined ? existing[field.key] : '';
+    if (!val && defaults[pageSlug] && defaults[pageSlug][field.key]) {
+        val = defaults[pageSlug][field.key];
+    }
+    
+    let out = `<div class="editor-field">`;
+    out += `<div class="editor-field-label">${field.label}</div>`;
+
+    if (field.type === 'text') {
+        out += `<input type="text" data-key="${field.key}" placeholder="${field.label}" value="${escapeAttr(val)}">`;
+    } else if (field.type === 'textarea') {
+        out += `<textarea data-key="${field.key}" rows="3" placeholder="${field.label}">${escapeHtml(val)}</textarea>`;
+    } else if (field.type === 'image') {
+        const imgSrc = (val && !val.startsWith('http') && !val.startsWith('blob:') && !val.startsWith('/')) ? '/' + val : val;
+        out += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'image')" id="media-${field.key}">`;
+        out += `${val ? `<img src="${imgSrc}" style="max-width:100%;max-height:200px;border-radius:4px;">` : ''}`;
+        out += `<div class="media-upload-hint">📷 Натисніть щоб завантажити зображення</div>`;
+        out += `</div>`;
+    } else if (field.type === 'video') {
+        const videoSrc = (val && !val.startsWith('http') && !val.startsWith('blob:') && !val.startsWith('/')) ? '/' + val : val;
+        out += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'video')" id="media-${field.key}">`;
+        out += `${val ? `<video src="${videoSrc}" style="max-width:100%;max-height:200px;" controls></video>` : ''}`;
+        out += `<div class="media-upload-hint">🎥 Натисніть щоб завантажити відео</div>`;
+        out += `</div>`;
+    }
+
+    out += `</div>`;
+    return out;
+}
+
+window.switchInnerTab = function(btnEl, targetId) {
+    // de-activate all tabs
+    const container = btnEl.closest('.editor-area');
+    container.querySelectorAll('.inner-tab-btn').forEach(btn => btn.classList.remove('active'));
+    container.querySelectorAll('.inner-tab-content').forEach(content => content.style.display = 'none');
+    
+    // activate chosen tab
+    btnEl.classList.add('active');
+    const targetEl = document.getElementById(targetId);
+    if (targetEl) targetEl.style.display = 'block';
+};
