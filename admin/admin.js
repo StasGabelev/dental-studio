@@ -193,71 +193,15 @@ const PAGE_SCHEMA = {
         }
     ],
     "about": [
-        {
-            "key": "about-page-title",
-            "label": "SEO Title сторінки",
-            "type": "text"
-        },
-        {
-            "key": "about-section-tag",
-            "label": "Тег розділу (мала позначка)",
-            "type": "text"
-        },
-        {
-            "key": "hero-title",
-            "label": "Головний заголовок",
-            "type": "text"
-        },
-        {
-            "key": "about-p1",
-            "label": "Основний опис клініки",
-            "type": "textarea"
-        },
-        {
-            "key": "nav-works",
-            "label": "Кнопка: Наші роботи",
-            "type": "text"
-        },
-        {
-            "key": "nav-services",
-            "label": "Кнопка: Послуги",
-            "type": "text"
-        },
-        {
-            "key": "about-team-title",
-            "label": "Заголовок команди",
-            "type": "text"
-        },
-        {
-            "key": "team-savchuk-name",
-            "label": "Лікар 1: Ім'я (Савчук)",
-            "type": "text"
-        },
-        {
-            "key": "team-savchuk-role",
-            "label": "Лікар 1: Посада (Савчук)",
-            "type": "text"
-        },
-        {
-            "key": "team-anatoliy-name",
-            "label": "Лікар 2: Ім'я (Анатолій)",
-            "type": "text"
-        },
-        {
-            "key": "team-anatoliy-role",
-            "label": "Лікар 2: Посада (Анатолій)",
-            "type": "text"
-        },
-        {
-            "key": "team-mariya-name",
-            "label": "Лікар 3: Ім'я (Марія)",
-            "type": "text"
-        },
-        {
-            "key": "team-mariya-role",
-            "label": "Лікар 3: Посада (Марія)",
-            "type": "text"
-        }
+        { "key": "about-page-title", "label": "SEO Title сторінки", "type": "text" },
+        { "key": "about-section-tag", "label": "Тег розділу (мала позначка)", "type": "text" },
+        { "key": "hero-title", "label": "Головний заголовок", "type": "text" },
+        { "key": "about-p1", "label": "Основний опис клініки", "type": "textarea" },
+        { "key": "about-hero-img", "label": "Фото: Головне (Hero)", "type": "image" },
+        { "key": "about-secondary-img", "label": "Фото: Поруч з текстом", "type": "image" },
+        { "key": "nav-works", "label": "Кнопка: Наші роботи", "type": "text" },
+        { "key": "nav-services", "label": "Кнопка: Послуги", "type": "text" },
+        { "key": "about-team-title", "label": "Заголовок команди (Лікарі налаштовуються у розділі 'Лікарі')", "type": "text" }
     ],
     "services": [
         {
@@ -1119,12 +1063,14 @@ async function loadPageEditor(pageSlug) {
             "nav-works": "НАШІ РОБОТИ",
             "nav-services": "ПОСЛУГИ",
             "about-team-title": "НАША КОМАНДА",
+            "about-hero-img": "assets/dental-2.png",
+            "about-secondary-img": "assets/dental-2.png",
             "team-savchuk-name": "АНДРІЙ САВЧУК",
             "team-savchuk-role": "Заступник головного лікаря. Художня реставрація зубів.",
             "team-anatoliy-name": "АНАТОЛІЙ ТОКАР",
             "team-anatoliy-role": "Засновник, головний лікар. Стоматолог-ортопед/хірург.",
             "team-mariya-name": "МАРІЯ ТОКАР",
-            "team-mariya-role": "Стоматолог-терапевт. Естетична реставрація."
+
         },
         "cases": {
             "cases-page-title": "Наші роботи — Dental Studio",

@@ -49,6 +49,8 @@
                                 source.src = item.media_url;
                                 mediaEl.load();
                             }
+                        } else if (mediaEl.tagName === 'DIV' || mediaEl.tagName === 'SECTION') {
+                            mediaEl.style.backgroundImage = `url('${item.media_url}')`;
                         }
                     }
                 }
@@ -116,6 +118,41 @@
                     </div>`;
                 });
                 doctorsContainer.innerHTML = html;
+            }
+        }
+
+        // About page specific team accordion
+        const accordionContainer = document.querySelector('.team-accordion');
+        if (accordionContainer) {
+            const { data: docs } = await sbClient.from('doctors')
+                .select('*').eq('is_active', true).order('sort_order');
+
+            if (docs && docs.length > 0) {
+                let html = '';
+                docs.forEach((doc, idx) => {
+                    const activeClass = idx === 0 ? 'active' : '';
+                    const photo = doc.photo_url || 'assets/doctor.png';
+                    html += `<div class="team-member ${activeClass}">
+                        <div class="team-member__img" style="background-image: url('${photo}')"></div>
+                        <div class="team-member__info">
+                            <p>${doc.bio_uk || ''}</p>
+                        </div>
+                        <div class="team-member__label">
+                            <strong>${doc.name_uk.toUpperCase()}</strong>
+                            <small>${doc.specialization_uk || 'Лікар'}</small>
+                        </div>
+                    </div>`;
+                });
+                accordionContainer.innerHTML = html;
+
+                // Rebind accordion events
+                document.querySelectorAll('.team-member').forEach(member => {
+                    member.addEventListener('mouseenter', () => {
+                        const active = document.querySelector('.team-member.active');
+                        if (active) active.classList.remove('active');
+                        member.classList.add('active');
+                    });
+                });
             }
         }
     } catch(e) {

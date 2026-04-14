@@ -15,7 +15,7 @@
     <main class="page-container">
         <!-- Hero Section -->
         <section class="about-hero">
-            <div class="about-hero__img" style="background-image: url('assets/dental-2.png')"></div>
+            <div id="about-hero-img" class="about-hero__img" style="background-image: url('assets/dental-2.png')"></div>
             <div class="about-hero__overlay"></div>
         </section>
 
@@ -24,7 +24,7 @@
             <div class="container-full">
                 <div class="about-row reveal">
                     <div class="about-col about-col--img">
-                        <img src="assets/dental-2.png" alt="Dental Studio">
+                        <img id="about-secondary-img" src="assets/dental-2.png" alt="Dental Studio">
                     </div>
                     <div class="about-col about-col--text">
                         <p class="section-tag" data-i18n="about-section-tag">ПРО КЛІНІКУ</p>
@@ -46,138 +46,7 @@
             <div class="container-full">
                 <h2 class="section-heading reveal" data-i18n="about-team-title">НАША КОМАНДА</h2>
                 <div class="team-accordion">
-                    <!-- 1 -->
-                    <div class="team-member active">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Естетична реставрація та ендодонтія. Спеціаліст з художньої реконструкції посмішки.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>ДЕЙНЕКА ОЛЕНА</strong>
-                            <small>Стоматолог-терапевт</small>
-                        </div>
-                    </div>
-                    <!-- 2 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Протезування та цифрова стоматологія. Експерт у подрібненні складних клінічних випадків.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>КОМЕРЧИЙ ДАНИЛ</strong>
-                            <small>Стоматолог-ортопед</small>
-                        </div>
-                    </div>
-                    <!-- 3 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Хірургічна стоматологія високої складності, імплантація та кісткова пластика.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>ПАВЛЕНКО ДМИТРО</strong>
-                            <small>Стоматолог-хірург, імплантолог</small>
-                        </div>
-                    </div>
-                    <!-- 4 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Турбота про посмішки найменших пацієнтів у ігровій та комфортній формі.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>ДЕНДАК МАРИНА</strong>
-                            <small>Дитячий стоматолог</small>
-                        </div>
-                    </div>
-                    <!-- 5 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Повний спектр терапевтичного лікування та професійна гігієна.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>ФОМІЧЕНКО ДМИТРО</strong>
-                            <small>Лікар-стоматолог</small>
-                        </div>
-                    </div>
-                    <!-- 6 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Лікування кореневих каналів під мікроскопом та естетична стоматологія.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>ПОКЛАД ЯРОСЛАВ</strong>
-                            <small>Стоматолог-терапевт, ендодонтист</small>
-                        </div>
-                    </div>
-                    <!-- 7 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Професійна гігієна порожнини рота та сучасні методи відбілювання зубів.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>ОЛЕВІНСЬКА МАРИНА</strong>
-                            <small>Стоматолог-гігієніст</small>
-                        </div>
-                    </div>
-                    <!-- 8 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Видалення зубів будь-якої складності та підготовка до протезування.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>СТРАТІЛАТ ВЛАДИСЛАВ</strong>
-                            <small>Стоматолог-хірург</small>
-                        </div>
-                    </div>
-                    <!-- 9 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Загальна стоматологія та профілактичні огляди.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>ХОРУНЖИЙ АРТЕМ</strong>
-                            <small>Лікар-стоматолог</small>
-                        </div>
-                    </div>
-                    <!-- 10 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Забезпечення комфортного та стерильного прийому пацієнтів.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>ДУДАРЧУК ПОЛІНА</strong>
-                            <small>Асистент стоматолога</small>
-                        </div>
-                    </div>
-                    <!-- 11 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Професійна допомога лікарю та турбота про пацієнта під час візиту.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>БРАГИНЕЦЬ ЕЛЬВІРА</strong>
-                            <small>Асистент стоматолога</small>
-                        </div>
-                    </div>
-                    <!-- 12 -->
-                    <div class="team-member">
-                        <div class="team-member__img" style="background-image: url('assets/doctor.png')"></div>
-                        <div class="team-member__info">
-                            <p>Ваша перша зустріч у клініці: запис, координація та сервіс на найвищому рівні.</p>
-                        </div>
-                        <div class="team-member__label">
-                            <strong>БОРОВИК АЛІНА</strong>
-                            <small>Адміністратор</small>
-                        </div>
-                    </div>
+                    <!-- Dynamic team members will be injected here via dynamic-content.js -->
                 </div>
             </div>
         </section>
