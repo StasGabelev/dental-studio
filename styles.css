@@ -1429,7 +1429,7 @@ button { font-family: var(--font-sans); }
     line-height: 1.8;
 }
 
-.team-member__info .specialist-tag {
+.team-member__info .specialist-label-gold {
     color: #B8924A;
     font-weight: 400;
     font-size: 13px;

@@ -132,12 +132,12 @@
                         <div class="team-member__img" style="background-image: url('${photo}')"></div>
                         <div class="team-member__info">
                             <h3>${doc.name_uk.toUpperCase()}</h3>
-                            <p class="specialist-tag">${doc.specialization_uk || 'Лікар'}</p>
+                            <p class="specialist-label-gold">${doc.specialization_uk || 'Лікар'}</p>
                             <p>${doc.bio_uk || ''}</p>
                         </div>
                         <div class="team-member__label">
                             <strong>${doc.name_uk.toUpperCase()}</strong>
-                            <small>${doc.specialization_uk || 'Лікар'}</small>
+                            <small class="specialist-label-gold">${doc.specialization_uk || 'Лікар'}</small>
                         </div>
                     </div>`;
                 });
