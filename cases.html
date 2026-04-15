@@ -36,12 +36,11 @@
                     </div>
                 </div>
 
-                <div class="cases-grid" id="cases-grid-dynamic">
-                    <div style="grid-column: 1/-1; text-align: center; padding: 100px 0;" id="cases-loading">
+                <div class="cases-grid">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 100px 0;">
                         <div class="spinner" style="margin: 0 auto;"></div>
                         <p style="margin-top: 20px; font-family: var(--font-sans); letter-spacing: 2px; font-size: 11px; color: #888;">ЗАВАНТАЖЕННЯ РОБІТ...</p>
                     </div>
-                    <!-- Cases will be injected here -->
                 </div>
             </div>
         </section>
@@ -66,62 +65,15 @@
 
     <div id="footer-placeholder"></div>
 
-    <script src="translations.js?v=1776175731"></script>
-    <script src="components.js?v=1776175731"></script>
-    <script src="main.js?v=1776175731"></script>
-    <!-- Filters and Case filtering is now handled in main.js -->
+    <script src="translations.js?v=1776204000"></script>
+    <script src="components.js?v=1776204000"></script>
+    <script src="main.js?v=1776204000"></script>
 
     <!-- Supabase & Dynamic Content Engine -->
-    <script>
-        // Supabase cases loader
-        const SB_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-
-        async function loadDynamicCases() {
-            const grid = document.getElementById('cases-grid-dynamic');
-            try {
-                const { data: cases, error } = await supabaseClient
-                    .from('treatment_cases')
-                    .select('*')
-                    .eq('is_published', true)
-                    .order('sort_order', { ascending: true });
-
-                if (error) throw error;
-
-                document.getElementById('cases-loading').remove();
-
-                if (!cases || cases.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #888;">Роботи ще не додані.</p>';
-                    return;
-                }
-
-                cases.forEach(c => {
-                    const card = document.createElement('div');
-                    card.className = 'case-card';
-                    card.setAttribute('data-category', c.category);
-                    card.onclick = () => location.href = `case.html?id=${c.slug || c.id}`;
-                    
-                    card.innerHTML = `
-                        <div class="case-card__img" style="background-image: url('${c.main_image_url}')"></div>
-                        <div class="case-card__overlay">
-                            <span>${c.title_uk}</span>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-
-                // Init filters after loading
-                if (window.initCasesFilters) window.initCasesFilters();
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('cases-loading').innerHTML = '<p style="color:red;">Помилка завантаження</p>';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', loadDynamicCases);
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="dynamic-content.js?v=v1293-portfolio-fix"></script>
+    <script src="chat-widget.js?v=1776204000"></script>
+    <!-- Cases loaded dynamically via dynamic-content.js -->
 </body>
 </html>
 
