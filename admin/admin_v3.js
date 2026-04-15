@@ -1166,10 +1166,11 @@ async function loadDoctors() {
                 id: d.id,
                 name: d.name_uk || d.name || '',
                 spec: d.specialization_uk || d.specialization || '',
-                photo: d.photo_url || d.photo || '',
+                photo: d.photo_url || d.photo || 'assets/doctor.png',
                 bio: d.bio_uk || d.description || '',
                 is_active: d.is_active !== false
             }));
+
         }
     } catch (e) {
         console.error('loadDoctors error:', e);
