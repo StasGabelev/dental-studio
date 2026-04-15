@@ -283,34 +283,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Refined Cases Filtering (Instant & Reliable)
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const caseCards = document.querySelectorAll('.case-card');
+    // Refined Cases Filtering (Support for dynamic loading)
+    window.initCasesFilters = function() {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const caseCards = document.querySelectorAll('.case-card');
 
-    if (filterBtns.length > 0) {
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const filterValue = btn.getAttribute('data-filter');
-                
-                // Update buttons
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // Filter cards
-                caseCards.forEach(card => {
-                    const category = card.getAttribute('data-category');
-                    if (filterValue === 'all' || category === filterValue) {
-                        card.style.display = 'block';
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    } else {
-                        card.style.display = 'none';
-                    }
+        if (filterBtns.length > 0) {
+            filterBtns.forEach(btn => {
+                // Remove potential duplicate listeners
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+
+                newBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const filterValue = newBtn.getAttribute('data-filter');
+                    
+                    // Update buttons status
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    newBtn.classList.add('active');
+                    
+                    // Filter cards with a smooth fade
+                    const cards = document.querySelectorAll('.case-card');
+                    cards.forEach(card => {
+                        const category = card.getAttribute('data-category');
+                        if (filterValue === 'all' || category === filterValue) {
+                            card.style.display = 'block';
+                            setTimeout(() => { card.style.opacity = '1'; }, 10);
+                        } else {
+                            card.style.opacity = '0';
+                            setTimeout(() => { card.style.display = 'none'; }, 300);
+                        }
+                    });
                 });
             });
-        });
-    }
+        }
+    };
+
+    // Run once on load for static cases (if any)
+    window.initCasesFilters();
 
     console.log("Dental Studio JS Initialized (v3 - Gold Edition)");
 });

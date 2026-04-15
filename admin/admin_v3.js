@@ -1309,18 +1309,19 @@ async function uploadDoctorPhoto(index) {
 // ============================================================
 
 let cases = [];
+let editingCaseIndex = -1; // -1 means list view, >=0 means editing specific case
 
 async function loadCases() {
     if (!sb) {
         cases = [
-            { id: 'c1', title: 'Керамічні вініри (Анна)', category: 'veneers', before: '', after: '' }
+            { id: 'c1', slug: 'ceramic-veneers-anna', title_uk: 'Керамічні вініри (Анна)', category: 'veneers', stages: [] }
         ];
         renderCases();
         return;
     }
 
     try {
-        const { data, error } = await sb.from('cases').select('*').order('sort_order');
+        const { data, error } = await sb.from('treatment_cases').select('*').order('sort_order');
         if (error) throw error;
         cases = data || [];
     } catch (e) {
@@ -1334,62 +1335,197 @@ function renderCases() {
     const area = document.getElementById('casesArea');
     if (!area) return;
     
-    if (cases.length === 0) {
-        area.innerHTML = '<p class="editor-placeholder">Кейси не додані. Натисніть "+ Додати кейс"</p>';
+    if (editingCaseIndex !== -1) {
+        renderFullCaseEditor();
         return;
     }
 
-    let html = '';
+    let html = `
+        <div class="section-toolbar">
+            <button class="btn-primary" onclick="addCase()">+ Додати кейс</button>
+        </div>
+    `;
+
+    if (cases.length === 0) {
+        html += '<p class="editor-placeholder">Кейси не додані. Натисніть "+ Додати кейс"</p>';
+        area.innerHTML = html;
+        return;
+    }
+
+    html += '<div class="cases-grid-admin">';
     cases.forEach((c, i) => {
-        const heroImg = c.hero_image_url || '';
-        const beforeImg = c.before_image_url || '';
-        const afterImg = c.after_image_url || '';
-        
+        const heroImg = c.main_image_url || '';
         html += `<div class="case-card-admin">
-            <div class="case-photo-admin" onclick="uploadCaseMedia(${i}, 'hero_image_url')">
+            <div class="case-photo-admin">
                 ${heroImg ? `<img src="${heroImg}">` : '🖼️'}
-                <div class="media-upload-hint">Головне фото</div>
             </div>
             <div class="case-card-body">
-                <div class="card-field-group">
-                    <label class="card-field-label">Назва кейсу / Ім'я пацієнта</label>
-                    <input type="text" value="${escapeAttr(c.title_uk || '')}" placeholder="Напр: Керамічні вініри (Марія)" onchange="cases[${i}].title_uk=this.value">
-                </div>
-                <div class="card-field-group">
-                    <label class="card-field-label">Категорія (фільтр)</label>
-                    <select onchange="cases[${i}].category=this.value">
-                        <option value="veneers" ${c.category === 'veneers' ? 'selected' : ''}>Керамічні вініри</option>
-                        <option value="composite-veneers" ${c.category === 'composite-veneers' ? 'selected' : ''}>Композитні вініри</option>
-                        <option value="restorations" ${c.category === 'restorations' ? 'selected' : ''}>Реставрації</option>
-                        <option value="implants" ${c.category === 'implants' ? 'selected' : ''}>Імплантація</option>
-                        <option value="ortho" ${c.category === 'ortho' ? 'selected' : ''}>Ортодонтія</option>
-                    </select>
-                </div>
-                
-                <div class="case-results-preview">
-                    <div class="res-preview-box" onclick="uploadCaseMedia(${i}, 'before_image_url')">
-                        ${beforeImg ? `<img src="${beforeImg}">` : '📷'}
-                        <div class="res-preview-label">ДО</div>
-                    </div>
-                    <div class="res-preview-box" onclick="uploadCaseMedia(${i}, 'after_image_url')">
-                        ${afterImg ? `<img src="${afterImg}">` : '📷'}
-                        <div class="res-preview-label">ПІСЛЯ</div>
-                    </div>
-                </div>
+                <div class="case-card-title">${escapeHtml(c.title_uk || 'Без назви')}</div>
+                <div class="case-card-meta">${c.category} | /${c.slug || 'no-slug'}</div>
             </div>
             <div class="case-card-actions">
-                <button class="btn-primary" style="flex:1;" onclick="saveCase(${i})">💾 Зберегти</button>
+                <button class="btn-primary" onclick="editCase(${i})">✏️ Редагувати</button>
                 <button class="btn-danger" onclick="deleteCase(${i})">🗑️</button>
             </div>
         </div>`;
     });
+    html += '</div>';
 
     area.innerHTML = html;
 }
 
 function addCase() {
-    cases.unshift({ id: 'new_' + Date.now(), title_uk: '', category: 'veneers', stages: [] });
+    const newCase = { 
+        id: 'new_' + Date.now(), 
+        slug: 'case-' + Date.now(),
+        title_uk: 'Новий кейс', 
+        category: 'veneers', 
+        stages: [],
+        main_image_url: '',
+        before_image_url: '',
+        after_image_url: ''
+    };
+    cases.unshift(newCase);
+    editingCaseIndex = 0;
     renderCases();
+}
+
+function editCase(index) {
+    editingCaseIndex = index;
+    renderCases();
+}
+
+function closeCaseEditor() {
+    editingCaseIndex = -1;
+    renderCases();
+}
+
+function renderFullCaseEditor() {
+    const area = document.getElementById('casesArea');
+    const c = cases[editingCaseIndex];
+
+    let html = `
+        <div class="full-editor">
+            <div class="editor-header-actions">
+                <button class="btn-outline" onclick="closeCaseEditor()">← Назад до списку</button>
+                <button class="btn-primary" onclick="saveCase(${editingCaseIndex})">💾 Зберегти кейс</button>
+            </div>
+            
+            <div class="editor-grid-dynamic">
+                <div class="editor-column">
+                    <h3>Основна інформація</h3>
+                    <div class="card-field-group">
+                        <label class="card-field-label">Назва кейсу (Заголовок на сторінці)</label>
+                        <input type="text" value="${escapeAttr(c.title_uk || '')}" onchange="cases[${editingCaseIndex}].title_uk=this.value">
+                    </div>
+                    <div class="card-field-group">
+                        <label class="card-field-label">URL Slug (для посилання, англійською)</label>
+                        <input type="text" value="${escapeAttr(c.slug || '')}" onchange="cases[${editingCaseIndex}].slug=this.value">
+                        <small>Буде доступно як: domain.com/case.html?id=${c.slug}</small>
+                    </div>
+                    <div class="card-field-group">
+                        <label class="card-field-label">Категорія</label>
+                        <select onchange="cases[${editingCaseIndex}].category=this.value">
+                            <option value="veneers" ${c.category === 'veneers' ? 'selected' : ''}>Керамічні вініри</option>
+                            <option value="composite-veneers" ${c.category === 'composite-veneers' ? 'selected' : ''}>Композитні вініри</option>
+                            <option value="restorations" ${c.category === 'restorations' ? 'selected' : ''}>Реставрації</option>
+                            <option value="implants" ${c.category === 'implants' ? 'selected' : ''}>Імплантація</option>
+                            <option value="surgery" ${c.category === 'surgery' ? 'selected' : ''}>Хірургія</option>
+                            <option value="ortho" ${c.category === 'ortho' ? 'selected' : ''}>Ортодонтія</option>
+                        </select>
+                    </div>
+                    <div class="card-field-group">
+                        <label class="card-field-label">Опис кейсу (під заголовком)</label>
+                        <textarea rows="3" onchange="cases[${editingCaseIndex}].description_uk=this.value">${escapeHtml(c.description_uk || '')}</textarea>
+                    </div>
+                </div>
+
+                <div class="editor-column">
+                    <h3>Медіа (Зображення)</h3>
+                    <div class="media-row-admin">
+                        <div class="media-box-small" onclick="uploadCaseMedia(${editingCaseIndex}, 'main_image_url')">
+                            <img src="${c.main_image_url || 'https://via.placeholder.com/150?text=Hero'}" id="prev-hero">
+                            <div class="media-label">Головне фото (Hero)</div>
+                        </div>
+                        <div class="media-box-small" onclick="uploadCaseMedia(${editingCaseIndex}, 'before_image_url')">
+                            <img src="${c.before_image_url || 'https://via.placeholder.com/150?text=Before'}" id="prev-before">
+                            <div class="media-label">Фото ДО</div>
+                        </div>
+                        <div class="media-box-small" onclick="uploadCaseMedia(${editingCaseIndex}, 'after_image_url')">
+                            <img src="${c.after_image_url || 'https://via.placeholder.com/150?text=After'}" id="prev-after">
+                            <div class="media-label">Фото ПІСЛЯ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stages-manager">
+                <div class="stages-header">
+                    <h3>Етапи лікування (Конструктор)</h3>
+                    <button class="btn-outline btn-sm" onclick="addStage(${editingCaseIndex})">+ Додати етап</button>
+                </div>
+                <div id="stagesList" class="stages-list-admin">
+                    ${renderStages(c.stages || [], editingCaseIndex)}
+                </div>
+            </div>
+        </div>
+    `;
+    area.innerHTML = html;
+}
+
+function renderStages(stages, caseIdx) {
+    if (!stages || stages.length === 0) return '<p class="dim-text">Етапи не додані...</p>';
+    
+    return stages.map((s, i) => `
+        <div class="stage-item-admin">
+            <div class="stage-num">${i + 1}</div>
+            <div class="stage-img-admin" onclick="uploadStageMedia(${caseIdx}, ${i})">
+                <img src="${s.image_url || 'https://via.placeholder.com/80?text=Image'}">
+            </div>
+            <div class="stage-inputs">
+                <input type="text" value="${escapeAttr(s.title || '')}" placeholder="Назва етапу (напр: ОРТОДОНТІЯ)" onchange="cases[${caseIdx}].stages[${i}].title=this.value">
+                <input type="text" value="${escapeAttr(s.doctor || '')}" placeholder="Лікар (напр: МАРІЯ ТОКАР)" onchange="cases[${caseIdx}].stages[${i}].doctor=this.value">
+                <textarea rows="2" placeholder="Опис етапу..." onchange="cases[${caseIdx}].stages[${i}].desc=this.value">${escapeHtml(s.desc || '')}</textarea>
+            </div>
+            <button class="btn-danger btn-sm" onclick="deleteStage(${caseIdx}, ${i})">✕</button>
+        </div>
+    `).join('');
+}
+
+function addStage(caseIdx) {
+    if (!cases[caseIdx].stages) cases[caseIdx].stages = [];
+    cases[caseIdx].stages.push({ title: '', doctor: '', desc: '', image_url: '' });
+    renderFullCaseEditor();
+}
+
+function deleteStage(caseIdx, stageIdx) {
+    cases[caseIdx].stages.splice(stageIdx, 1);
+    renderFullCaseEditor();
+}
+
+async function uploadStageMedia(caseIdx, stageIdx) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        showToast('⏳ Завантаження...');
+        if (sb) {
+            const filePath = `cases/stages/s_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            const { error } = await sb.storage.from('clinic-media').upload(filePath, file);
+            if (error) { showToast(`❌ ${error.message}`); return; }
+            const { data: urlData } = sb.storage.from('clinic-media').getPublicUrl(filePath);
+            cases[caseIdx].stages[stageIdx].image_url = urlData.publicUrl;
+        } else {
+            const reader = new FileReader();
+            reader.onload = (ev) => { cases[caseIdx].stages[stageIdx].image_url = ev.target.result; renderFullCaseEditor(); };
+            reader.readAsDataURL(file);
+        }
+        renderFullCaseEditor();
+        showToast('📤 Завантажено');
+    };
+    input.click();
 }
 
 async function saveCase(index) {
@@ -1398,34 +1534,39 @@ async function saveCase(index) {
 
     try {
         const row = {
-            title_uk: c.title_uk,
+            slug: c.slug,
             category: c.category,
-            hero_image_url: c.hero_image_url,
+            title_uk: c.title_uk,
+            description_uk: c.description_uk,
+            main_image_url: c.main_image_url,
             before_image_url: c.before_image_url,
             after_image_url: c.after_image_url,
-            sort_order: index,
-            is_active: true
+            stages: c.stages,
+            is_published: true,
+            sort_order: index
         };
 
         if (c.id && !String(c.id).startsWith('new_')) {
-            await sb.from('cases').update(row).eq('id', c.id);
+            const { error } = await sb.from('treatment_cases').update(row).eq('id', c.id);
+            if (error) throw error;
         } else {
-            const { data, error } = await sb.from('cases').insert(row).select('id').single();
+            const { data, error } = await sb.from('treatment_cases').insert(row).select('id').single();
             if (error) throw error;
             if (data) cases[index].id = data.id;
         }
-        showToast('✅ Кейс збережено');
-        renderCases();
+        showToast('✅ Кейс успішно збережено!');
+        editingCaseIndex = -1;
+        loadCases();
     } catch (e) {
         showToast(`❌ Помилка: ${e.message}`);
     }
 }
 
 async function deleteCase(index) {
-    if (!confirm('Видалити цей кейс?')) return;
+    if (!confirm('Видалити цей кейс назавжди?')) return;
     const c = cases[index];
     if (sb && c.id && !String(c.id).startsWith('new_')) {
-        await sb.from('cases').delete().eq('id', c.id);
+        await sb.from('treatment_cases').delete().eq('id', c.id);
     }
     cases.splice(index, 1);
     renderCases();
@@ -1439,23 +1580,19 @@ async function uploadCaseMedia(index, field) {
     input.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
-        showToast('⏳ Завантаження...');
+        showToast('⏳ Завантаження основного медіа...');
         if (sb) {
-            const filePath = `cases/case_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            const filePath = `cases/c_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
             const { error } = await sb.storage.from('clinic-media').upload(filePath, file);
-            if (error) {
-                showToast(`❌ ${error.message}`);
-                return;
-            }
+            if (error) { showToast(`❌ ${error.message}`); return; }
             const { data: urlData } = sb.storage.from('clinic-media').getPublicUrl(filePath);
             cases[index][field] = urlData.publicUrl;
         } else {
             const reader = new FileReader();
-            reader.onload = (ev) => { cases[index][field] = ev.target.result; renderCases(); };
+            reader.onload = (ev) => { cases[index][field] = ev.target.result; renderFullCaseEditor(); };
             reader.readAsDataURL(file);
         }
-        renderCases();
+        renderFullCaseEditor();
         showToast('📤 Завантажено');
     };
     input.click();

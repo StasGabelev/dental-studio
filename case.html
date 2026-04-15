@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Кейс — Dental Studio</title>
+    <link rel="stylesheet" href="styles.css?v=1776204000">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Loader styles */
+        .case-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        .case-loader.hidden { opacity: 0; pointer-events: none; }
+        .spinner { width: 40px; height: 40px; border: 2px solid rgba(0,0,0,0.1); border-top-color: #e5d5c5; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Dynamic Styles */
+        .stages-tabs { display: flex; gap: 40px; margin-bottom: 60px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; flex-wrap: wrap; }
+        .stage-tab { cursor: pointer; opacity: 0.3; transition: all 0.4s; font-family: var(--font-sans); letter-spacing: 2px; font-size: 11px; font-weight: 500; position: relative; }
+        .stage-tab.active { opacity: 1; }
+        .stage-tab.active::after { content: ''; position: absolute; bottom: -21px; left: 0; width: 100%; height: 2px; background: #000; }
+        
+        .stage-content { display: none; animation: fadeIn 0.6s ease; }
+        .stage-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-white">
+    <div id="case-loader" class="case-loader"><div class="spinner"></div></div>
+    
+    <div id="header-placeholder"></div>
+
+    <main class="page-container" id="case-app" style="display:none;">
+        <!-- HERO SECTION -->
+        <section class="case-hero" id="case-hero-bg" style="background-image: url('');">
+            <div class="case-hero__overlay"></div>
+            <div class="container-full">
+                <div class="case-hero__content reveal">
+                    <span class="case-hero__tag" id="case-category">ПОСЛУГА</span>
+                    <h1 class="case-hero__title" id="case-title">ЗАВАНТАЖЕННЯ...</h1>
+                    <p class="case-hero__desc" id="case-description"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STAGES SECTION -->
+        <section class="case-plan" style="padding: 120px 0;">
+            <div class="container--narrow">
+                <div class="reveal">
+                    <h2 class="section-title-alt" style="margin-bottom: 60px;">ПЛАН ЛІКУВАННЯ</h2>
+                    
+                    <div class="stages-tabs" id="stages-tabs-container">
+                        <!-- Dynamic Tabs -->
+                    </div>
+
+                    <div id="stages-content-container">
+                        <!-- Dynamic Contents -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEFORE/AFTER SECTION -->
+        <section class="case-results" style="padding: 120px 0; background: #fafafa;">
+            <div class="container--narrow">
+                <div class="reveal">
+                    <h2 class="section-title-alt" style="margin-bottom: 60px; text-align: center;">РЕЗУЛЬТАТ</h2>
+                    
+                    <div class="ba-slider" id="ba-slider">
+                        <div class="ba-slider__img ba-slider__before" id="img-before" style="background-image: url('');"></div>
+                        <div class="ba-slider__img ba-slider__after" id="img-after" style="background-image: url('');"></div>
+                        <div class="ba-slider__handle">
+                            <div class="ba-slider__arrow"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALL TO ACTION -->
+        <section id="contact-choice" class="appointment" style="padding: 100px 0; background: #fff; border-top: 1px solid rgba(0,0,0,0.03);">
+            <div class="container--narrow">
+                <div class="appointment__inner reveal" style="text-align: center;">
+                    <h2 class="section-title-alt" style="margin-bottom: 24px;">БАЖАЄТЕ ТАКИЙ ЖЕ РЕЗУЛЬТАТ?</h2>
+                    <p class="appointment-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;">
+                        Запишіться на консультацію в Dental Studio вже сьогодні.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto;">
+                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase;">ОНЛАЙН ЗАПИС</button>
+                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; font-family: var(--font-sans);">ЗВ'ЯЗАТИСЯ З НАМИ</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="translations.js?v=1776204000"></script>
+    <script src="components.js?v=1776204000"></script>
+    <script src="main.js?v=1776204000"></script>
+
+    <!-- Supabase Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SB_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+
+        async function initCasePage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const caseId = urlParams.get('id');
+
+            if (!caseId) {
+                window.location.href = 'cases.html';
+                return;
+            }
+
+            try {
+                const { data: c, error } = await supabaseClient
+                    .from('treatment_cases')
+                    .select('*')
+                    .or(`slug.eq.${caseId},id.eq.${caseId}`)
+                    .single();
+
+                if (error || !c) throw new Error('Case not found');
+
+                renderCase(c);
+            } catch (err) {
+                console.error(err);
+                alert('Кейс не знайдено');
+                window.location.href = 'cases.html';
+            }
+        }
+
+        function renderCase(c) {
+            document.getElementById('page-title').textContent = `${c.title_uk} — Dental Studio`;
+            document.getElementById('case-title').textContent = c.title_uk;
+            document.getElementById('case-category').textContent = c.category.toUpperCase();
+            document.getElementById('case-description').textContent = c.description_uk || '';
+            document.getElementById('case-hero-bg').style.backgroundImage = `url('${c.main_image_url}')`;
+            
+            document.getElementById('img-before').style.backgroundImage = `url('${c.before_image_url}')`;
+            document.getElementById('img-after').style.backgroundImage = `url('${c.after_image_url}')`;
+
+            // Stages
+            const tabsContainer = document.getElementById('stages-tabs-container');
+            const contentContainer = document.getElementById('stages-content-container');
+            
+            if (c.stages && c.stages.length > 0) {
+                c.stages.forEach((s, i) => {
+                    const tab = document.createElement('div');
+                    tab.className = `stage-tab ${i === 0 ? 'active' : ''}`;
+                    tab.textContent = s.title.toUpperCase();
+                    tab.onclick = () => switchStage(i);
+                    tabsContainer.appendChild(tab);
+
+                    const content = document.createElement('div');
+                    content.className = `stage-content ${i === 0 ? 'active' : ''}`;
+                    content.id = `stage-${i}`;
+                    content.innerHTML = `
+                        <div class="plan-step">
+                            <div class="plan-step__info">
+                                <span class="plan-step__label">ЛІКУВАННЯ</span>
+                                <p class="plan-step__text">${s.desc}</p>
+                                <div class="plan-step__doctor">
+                                    <span class="plan-step__label">ОПЕРАЦІЮ ПРОВІВ:</span>
+                                    <p class="plan-step__text-alt">${s.doctor}</p>
+                                </div>
+                            </div>
+                            <div class="plan-step__img">
+                                <img src="${s.image_url}" alt="${s.title}">
+                            </div>
+                        </div>
+                    `;
+                    contentContainer.appendChild(content);
+                });
+            }
+
+            // Show app, hide loader
+            document.getElementById('case-app').style.display = 'block';
+            document.getElementById('case-loader').classList.add('hidden');
+            
+            // Re-init BA slider
+            initBASlider();
+        }
+
+        function switchStage(index) {
+            document.querySelectorAll('.stage-tab').forEach((t, i) => {
+                t.classList.toggle('active', i === index);
+            });
+            document.querySelectorAll('.stage-content').forEach((c, i) => {
+                c.classList.toggle('active', i === index);
+            });
+        }
+
+        function initBASlider() {
+            const slider = document.getElementById('ba-slider');
+            if(!slider) return;
+            const handle = slider.querySelector('.ba-slider__handle');
+            const beforeImg = slider.querySelector('.ba-slider__before');
+            let isResizing = false;
+
+            const updateSlider = (x) => {
+                let rect = slider.getBoundingClientRect();
+                let position = ((x - rect.left) / rect.width) * 100;
+                if (position < 0) position = 0;
+                if (position > 100) position = 100;
+                handle.style.left = position + '%';
+                beforeImg.style.width = position + '%';
+            };
+
+            slider.addEventListener('mousedown', () => isResizing = true);
+            window.addEventListener('mouseup', () => isResizing = false);
+            window.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                updateSlider(e.pageX);
+            });
+            // Touch support
+            slider.addEventListener('touchstart', () => isResizing = true);
+            window.addEventListener('touchend', () => isResizing = false);
+            window.addEventListener('touchmove', (e) => {
+                if (!isResizing) return;
+                updateSlider(e.touches[0].pageX);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initCasePage);
+    </script>
+</body>
+</html>
