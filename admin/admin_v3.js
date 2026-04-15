@@ -695,7 +695,7 @@ function switchSection(sectionId, navEl) {
     if (sectionId === 'pages') loadPageEditor(currentPage);
     if (sectionId === 'prices') loadPriceList();
     if (sectionId === 'doctors') loadDoctors();
-    if (sectionId === 'cases') loadCases();
+    if (sectionId === 'portfolio') loadCases();
     if (sectionId === 'ai-settings') loadAISettings();
     if (sectionId === 'chat-logs') loadChatLogs();
     if (sectionId === 'setup') loadSetupForm();
@@ -1332,7 +1332,7 @@ async function loadCases() {
 }
 
 function renderCases() {
-    const area = document.getElementById('casesArea');
+    const area = document.getElementById('portfolioArea');
     if (!area) return;
     
     if (editingCaseIndex !== -1) {
@@ -1392,16 +1392,16 @@ function addCase() {
 
 function editCase(index) {
     editingCaseIndex = index;
-    renderCases();
+    renderPortfolioPage();
 }
 
 function closeCaseEditor() {
     editingCaseIndex = -1;
-    renderCases();
+    renderPortfolioPage();
 }
 
 function renderFullCaseEditor() {
-    const area = document.getElementById('casesArea');
+    const area = document.getElementById('portfolioArea');
     const c = cases[editingCaseIndex];
 
     let html = `
