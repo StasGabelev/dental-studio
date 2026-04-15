@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <!-- Hard redirect to bypass any edge caching on the /admin route -->
+    <meta http-equiv="refresh" content="0; url=panel.html?v=fresh123">
+</head>
+<body>
+    <script>
+        window.location.replace("panel.html?v=" + new Date().getTime());
+    </script>
+</body>
+</html>
