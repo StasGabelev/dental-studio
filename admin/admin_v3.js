@@ -540,29 +540,42 @@ async function handleLogin(e) {
     btn.textContent = 'Завантаження...';
     errorEl.style.display = 'none';
 
-    // Try Supabase Auth
-    if (sb) {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) {
-            errorEl.textContent = 'Невірний email або пароль (Supabase)';
-            errorEl.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = 'Увійти';
-            return;
+    try {
+        console.log('Attempting login with Supabase...');
+        if (!sb) {
+            console.warn('Supabase not initialized, attempting re-init...');
+            initSupabase();
         }
-        currentUser = data.user;
-        document.getElementById('userEmail').textContent = email;
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'flex';
-        loadDashboardData();
-        return;
-    }
 
-    errorEl.textContent = 'Помилка: Невірний email або пароль.';
-    errorEl.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Увійти';
+        if (sb) {
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+            if (error) {
+                console.error('Auth error:', error.message);
+                errorEl.textContent = 'Помилка: Невірний email або пароль.';
+                errorEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Увійти';
+                return;
+            }
+            console.log('Login successful!');
+            currentUser = data.user;
+            document.getElementById('userEmail').textContent = email;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminDashboard').style.display = 'flex';
+            loadDashboardData();
+            return;
+        } else {
+            throw new Error('Supabase client failed to initialize');
+        }
+    } catch (err) {
+        console.error('Login crash:', err);
+        errorEl.textContent = 'Помилка мережі або з\'єднання: ' + err.message;
+        errorEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Увійти';
+    }
 }
+
 
 
 
