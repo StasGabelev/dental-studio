@@ -1,339 +1,92 @@
-// ============================================================
-// DENTAL STUDIO ADMIN PANEL — JavaScript Logic + Supabase
-// ============================================================
-
-// --- Supabase Client ---
-let sb = null; 
-
-// Global Error Handler for debugging
-window.onerror = function(msg, url, lineNo, columnNo, error) {
-    console.error('Global JS Error:', msg, lineNo);
-    if (typeof showToast === 'function') {
-        showToast(`❌ JS Error: ${msg} (line ${lineNo})`);
-    }
-};
-
-function getSupabaseConfig() {
-    try {
-        const c = localStorage.getItem('ds_supabase');
-        return c ? JSON.parse(c) : null;
-    } catch(e) { return null; }
-}
-
-function initSupabase() {
-    const config = getSupabaseConfig();
-    if (config && config.url && config.key) {
-        sb = supabase.createClient(config.url, config.key);
-        return true;
-    }
-    return false;
-}
-
-// Try to init on load
-initSupabase();
-
-// --- State ---
-let currentUser = null;
-let currentSection = 'dashboard';
-let currentPage = 'home';
-let priceItems = [];
-let doctors = [];
-
-// --- Model options per provider ---
-const MODEL_OPTIONS = {
-    openai: [
-        { value: 'gpt-4o-mini', label: 'GPT-4o-mini (дешево, швидко)' },
-        { value: 'gpt-4o', label: 'GPT-4o (потужний)' },
-        { value: 'gpt-4.1', label: 'GPT-4.1 (новітній)' },
-        { value: 'gpt-4.1-mini', label: 'GPT-4.1-mini' },
-        { value: 'o4-mini', label: 'o4-mini (reasoning)' },
-    ],
-    anthropic: [
-        { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4 (рекомендовано)' },
-        { value: 'claude-opus-4-20250514', label: 'Claude Opus 4 (найпотужніший)' },
-        { value: 'claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku (швидкий)' },
-    ],
-    google: [
-        { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
-        { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (швидкий)' },
-        { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
-    ],
-    deepseek: [
-        { value: 'deepseek-chat', label: 'DeepSeek Chat (V3)' },
-        { value: 'deepseek-reasoner', label: 'DeepSeek Reasoner (R1)' },
-    ],
-    openrouter: [
-        { value: 'auto', label: 'Auto (OpenRouter обере найкращу)' },
-        { value: 'anthropic/claude-sonnet-4', label: 'Claude Sonnet 4' },
-        { value: 'openai/gpt-4o', label: 'GPT-4o' },
-        { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
-    ],
-    custom: [
-        { value: 'custom', label: 'Custom Model ID' },
-    ]
-};
-
-// --- Page content schema ---
-const PAGE_SCHEMA = {
-    "home": [
-        {
-            "key": "hero-video",
-            "label": "\u0413\u043E\u043B\u043E\u0432\u043D\u0435 \u0432\u0456\u0434\u0435\u043E",
-            "type": "video"
-        },
-        {
-            "key": "interior-video",
-            "label": "\u0412\u0456\u0434\u0435\u043E \u0456\u043D\u0442\u0435\u0440'\u0454\u0440\u0443",
-            "type": "video"
-        },
-        {
-            "key": "hero-title",
-            "label": "\u0413\u043E\u043B\u043E\u0432\u043D\u0438\u0439 \u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A",
-            "type": "textarea"
-        },
-        {
-            "key": "hero-subtitle",
-            "label": "\u041F\u0456\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A",
-            "type": "textarea"
-        },
-        {
-            "key": "btn-book",
-            "label": "\u041A\u043D\u043E\u043F\u043A\u0430: \u0417\u0430\u043F\u0438\u0441\u0430\u0442\u0438\u0441\u044F",
-            "type": "text"
-        },
-        {
-            "key": "feat-aesthetic",
-            "label": "\u0411\u043B\u043E\u043A: \u0415\u0441\u0442\u0435\u0442\u0438\u0447\u043D\u0430 \u0441\u0442\u043E\u043C\u0430\u0442\u043E\u043B\u043E\u0433\u0456\u044F",
-            "type": "text"
-        },
-        {
-            "key": "feat-therapy",
-            "label": "\u0411\u043B\u043E\u043A: \u041B\u0456\u043A\u0443\u0432\u0430\u043D\u043D\u044F \u0437\u0443\u0431\u0456\u0432",
-            "type": "text"
-        },
-        {
-            "key": "feat-surgery",
-            "label": "\u0411\u043B\u043E\u043A: \u0425\u0456\u0440\u0443\u0440\u0433\u0456\u044F",
-            "type": "text"
-        },
-        {
-            "key": "feat-ortho",
-            "label": "\u0411\u043B\u043E\u043A: \u041E\u0440\u0442\u043E\u0434\u043E\u043D\u0442\u0456\u044F",
-            "type": "text"
-        },
-        {
-            "key": "about-p1",
-            "label": "\u041F\u0440\u043E \u043D\u0430\u0441: \u0410\u0431\u0437\u0430\u0446 1",
-            "type": "textarea"
-        },
-        {
-            "key": "about-p2",
-            "label": "\u041F\u0440\u043E \u043D\u0430\u0441: \u0410\u0431\u0437\u0430\u0446 2",
-            "type": "textarea"
-        },
-        {
-            "key": "about-more",
-            "label": "\u041A\u043D\u043E\u043F\u043A\u0430: \u0414\u0456\u0437\u043D\u0430\u0442\u0438\u0441\u044F \u0431\u0456\u043B\u044C\u0448\u0435",
-            "type": "text"
-        },
-        {
-            "key": "about-services",
-            "label": "\u041A\u043D\u043E\u043F\u043A\u0430: \u041F\u0435\u0440\u0435\u0433\u043B\u044F\u043D\u0443\u0442\u0438 \u043F\u043E\u0441\u043B\u0443\u0433\u0438",
-            "type": "text"
-        },
-        {
-            "key": "works-title",
-            "label": "\u041D\u0430\u0448\u0456 \u0440\u043E\u0431\u043E\u0442\u0438: \u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A",
-            "type": "text"
-        },
-        {
-            "key": "works-btn",
-            "label": "\u041A\u043D\u043E\u043F\u043A\u0430: \u041F\u0435\u0440\u0435\u0433\u043B\u044F\u043D\u0443\u0442\u0438 \u0432\u0441\u0456 \u0440\u043E\u0431\u043E\u0442\u0438",
-            "type": "text"
-        },
-        {
-            "key": "contact-choice-title",
-            "label": "\u041A\u043E\u043D\u0442\u0430\u043A\u0442\u0438: \u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A",
-            "type": "text"
-        },
-        {
-            "key": "contact-choice-subtitle",
-            "label": "\u041A\u043E\u043D\u0442\u0430\u043A\u0442\u0438: \u041F\u0456\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A",
-            "type": "textarea"
-        },
-        {
-            "key": "btn-online-booking",
-            "label": "\u041A\u043D\u043E\u043F\u043A\u0430: \u041E\u043D\u043B\u0430\u0439\u043D \u0437\u0430\u043F\u0438\u0441",
-            "type": "text"
-        },
-        {
-            "key": "btn-contact-hub",
-            "label": "\u041A\u043D\u043E\u043F\u043A\u0430: \u041C\u0435\u0441\u0435\u043D\u0434\u0436\u0435\u0440\u0438",
-            "type": "text"
-        },
-        {
-            "key": "map-title",
-            "label": "\u041A\u0430\u0440\u0442\u0430: \u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A",
-            "type": "text"
-        },
-        {
-            "key": "map-open-btn",
-            "label": "\u041A\u043D\u043E\u043F\u043A\u0430: \u0412\u0456\u0434\u043A\u0440\u0438\u0442\u0438 \u043A\u0430\u0440\u0442\u0443",
-            "type": "text"
-        },
-        {
-            "key": "map-hours-label",
-            "label": "\u0413\u0440\u0430\u0444\u0456\u043A: \u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A",
-            "type": "text"
-        },
-        {
-            "key": "footer-hours",
-            "label": "\u0413\u0440\u0430\u0444\u0456\u043A: \u0420\u043E\u0431\u043E\u0447\u0456 \u0433\u043E\u0434\u0438\u043D\u0438",
-            "type": "text"
-        }
-    ],
-    "about": [
-        { "key": "about-page-title", "label": "SEO Title сторінки", "type": "text" },
-        { "key": "about-section-tag", "label": "Тег розділу (мала позначка)", "type": "text" },
-        { "key": "about-p1", "label": "Головний заголовок (під 'Про клініку')", "type": "text" },
-        { "key": "about-p2", "label": "Опис клініки (текстовий блок)", "type": "textarea" },
-        { "key": "about-hero-img", "label": "Фото: Головне (Hero)", "type": "image" },
-        { "key": "about-secondary-img", "label": "Фото: Поруч з текстом", "type": "image" },
-        { "key": "nav-works", "label": "Кнопка: Наші роботи", "type": "text" },
-        { "key": "nav-services", "label": "Кнопка: Послуги", "type": "text" },
-        { "key": "about-team-title", "label": "Заголовок команди (Лікарі налаштовуються у розділі 'Лікарі')", "type": "text" }
-    ],
-        "services": [
+"services": [
         { "label": "ЕСТЕТИЧНА СТОМАТОЛОГІЯ", "type": "heading" },
         { "key": "feat-aesthetic", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
         { "key": "svc-consult-title", "label": "Консультація — Заголовок (спільна для всіх розділів)", "type": "text" },
         { "key": "svc-consult-desc", "label": "Консультація — Опис", "type": "textarea" },
-        { "key": "price-consult-general", "label": "Назва: Загальна консультація", "type": "text" },
-        { "key": "price-consult-general-val", "label": "💰 Ціна: Загальна консультація", "type": "text" },
-        { "key": "price-consult-modjaw", "label": "Назва: Діагностика MODJAW", "type": "text" },
-        { "key": "price-consult-modjaw-val", "label": "💰 Ціна: Діагностика MODJAW", "type": "text" },
-        { "key": "price-consult-checkup", "label": "Назва: CHECK-UP", "type": "text" },
-        { "key": "price-consult-checkup-val", "label": "💰 Ціна: CHECK-UP", "type": "text" },
+        { "key": "price-consult-general", "label": "Ціна: Загальна консультація", "type": "text" },
+        { "key": "price-consult-modjaw", "label": "Ціна: Діагностика MODJAW", "type": "text" },
+        { "key": "price-consult-checkup", "label": "Ціна: CHECK-UP", "type": "text" },
 
         { "key": "svc-composite-veneer-title", "label": "Композитні вініри — Заголовок", "type": "text" },
         { "key": "svc-composite-veneer-desc", "label": "Композитні вініри — Опис", "type": "textarea" },
-        { "key": "price-frontal-restoration", "label": "Назва: Реставрація фронтального зуба", "type": "text" },
-        { "key": "price-frontal-restoration-val", "label": "💰 Ціна: Реставрація фронт. зуба", "type": "text" },
-        { "key": "price-art-restoration", "label": "Назва: Художня реставрація", "type": "text" },
-        { "key": "price-art-restoration-val", "label": "💰 Ціна: Художня реставрація", "type": "text" },
+        { "key": "price-frontal-restoration", "label": "Ціна: Реставрація фронтального зуба", "type": "text" },
+        { "key": "price-art-restoration", "label": "Ціна: Художня реставрація", "type": "text" },
 
         { "key": "svc-ceramic-restoration-title", "label": "Керамічні реставрації — Заголовок", "type": "textarea" },
         { "key": "svc-ceramic-restoration-desc", "label": "Керамічні реставрації — Опис", "type": "textarea" },
-        { "key": "price-veneer-digital", "label": "Назва: Вінір (digital)", "type": "text" },
-        { "key": "price-veneer-digital-val", "label": "💰 Ціна: Вінір (digital)", "type": "text" },
-        { "key": "price-veneer-layering", "label": "Назва: Вінір (digital + нашарування)", "type": "text" },
-        { "key": "price-veneer-layering-val", "label": "💰 Ціна: Вінір (digital + нашарування)", "type": "text" },
-        { "key": "price-veneer-handmade", "label": "Назва: Вінір (hand made)", "type": "text" },
-        { "key": "price-veneer-handmade-val", "label": "💰 Ціна: Вінір (hand made)", "type": "text" },
-        { "key": "price-veneer-rework", "label": "Назва: Переробка вініра", "type": "text" },
-        { "key": "price-veneer-rework-val", "label": "💰 Ціна: Переробка вініра", "type": "text" },
-        { "key": "price-veneer-single", "label": "Назва: Вінір одиночний", "type": "text" },
-        { "key": "price-veneer-single-val", "label": "💰 Ціна: Вінір одиночний", "type": "text" },
-        { "key": "price-crown-digital", "label": "Назва: Коронка (digital)", "type": "text" },
-        { "key": "price-crown-digital-val", "label": "💰 Ціна: Коронка (digital)", "type": "text" },
-        { "key": "price-crown-layering", "label": "Назва: Коронка (digital + нашарування)", "type": "textarea" },
-        { "key": "price-crown-layering-val", "label": "💰 Ціна: Коронка (digital + нашарування)", "type": "text" },
-        { "key": "price-crown-handmade", "label": "Назва: Коронка (hand made)", "type": "textarea" },
-        { "key": "price-crown-handmade-val", "label": "💰 Ціна: Коронка (hand made)", "type": "text" },
+        { "key": "price-veneer-digital", "label": "Ціна: Вінір (digital)", "type": "text" },
+        { "key": "price-veneer-layering", "label": "Ціна: Вінір (digital + нашарування)", "type": "text" },
+        { "key": "price-veneer-handmade", "label": "Ціна: Вінір (hand made)", "type": "text" },
+        { "key": "price-veneer-rework", "label": "Ціна: Переробка вініра", "type": "text" },
+        { "key": "price-veneer-single", "label": "Ціна: Вінір одиночний", "type": "text" },
+        { "key": "price-crown-digital", "label": "Ціна: Коронка (digital)", "type": "text" },
+        { "key": "price-crown-layering", "label": "Ціна: Коронка (digital + нашарування)", "type": "textarea" },
+        { "key": "price-crown-handmade", "label": "Ціна: Коронка (hand made)", "type": "textarea" },
 
         { "label": "ЛІКУВАННЯ ЗУБІВ", "type": "heading" },
         { "key": "feat-therapy", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
         { "key": "svc-endo-title", "label": "Ендодонтія — Заголовок", "type": "text" },
         { "key": "svc-endo-desc", "label": "Ендодонтія — Опис", "type": "textarea" },
-        { "key": "price-endo-incisor", "label": "Назва: Канали (різці, ікла)", "type": "text" },
-        { "key": "price-endo-incisor-val", "label": "💰 Ціна: Канали (різці, ікла)", "type": "text" },
-        { "key": "price-endo-premolar", "label": "Назва: Канали (премоляри)", "type": "text" },
-        { "key": "price-endo-premolar-val", "label": "💰 Ціна: Канали (премоляри)", "type": "text" },
-        { "key": "price-endo-molar", "label": "Назва: Канали (моляри)", "type": "text" },
-        { "key": "price-endo-molar-val", "label": "💰 Ціна: Канали (моляри)", "type": "text" },
+        { "key": "price-endo-incisor", "label": "Ціна: Канали (різці, ікла)", "type": "text" },
+        { "key": "price-endo-premolar", "label": "Ціна: Канали (премоляри)", "type": "text" },
+        { "key": "price-endo-molar", "label": "Ціна: Канали (моляри)", "type": "text" },
 
         { "key": "svc-caries-title", "label": "Лікування карієсу — Заголовок", "type": "text" },
         { "key": "svc-caries-desc", "label": "Лікування карієсу — Опис", "type": "textarea" },
-        { "key": "price-caries-2", "label": "Назва: Карієс II рівень", "type": "text" },
-        { "key": "price-caries-2-val", "label": "💰 Ціна: Карієс II рівень", "type": "text" },
-        { "key": "price-caries-3", "label": "Назва: Карієс III рівень", "type": "text" },
-        { "key": "price-caries-3-val", "label": "💰 Ціна: Карієс III рівень", "type": "text" },
+        { "key": "price-caries-2", "label": "Ціна: Карієс II рівень", "type": "text" },
+        { "key": "price-caries-3", "label": "Ціна: Карієс III рівень", "type": "text" },
 
         { "key": "svc-periodontal-title", "label": "Пародонтологія — Заголовок", "type": "text" },
         { "key": "svc-periodontal-desc", "label": "Пародонтологія — Опис", "type": "textarea" },
-        { "key": "price-periodont-1", "label": "Назва: Пародонтит I ступінь", "type": "text" },
-        { "key": "price-periodont-1-val", "label": "💰 Ціна: Пародонтит I ступінь", "type": "text" },
-        { "key": "price-periodont-2", "label": "Назва: Пародонтит II ступінь", "type": "text" },
-        { "key": "price-periodont-2-val", "label": "💰 Ціна: Пародонтит II ступінь", "type": "text" },
-        { "key": "price-periodont-3", "label": "Назва: Пародонтит III ступінь", "type": "text" },
-        { "key": "price-periodont-3-val", "label": "💰 Ціна: Пародонтит III ступінь", "type": "text" },
+        { "key": "price-periodont-1", "label": "Ціна: Пародонтит I ступінь", "type": "text" },
+        { "key": "price-periodont-2", "label": "Ціна: Пародонтит II ступінь", "type": "text" },
+        { "key": "price-periodont-3", "label": "Ціна: Пародонтит III ступінь", "type": "text" },
 
         { "key": "svc-hygiene-title", "label": "Гігієна — Заголовок", "type": "text" },
         { "key": "svc-hygiene-desc", "label": "Гігієна — Опис", "type": "textarea" },
-        { "key": "price-hygiene", "label": "Назва: Гігієна", "type": "text" },
-        { "key": "price-hygiene-val", "label": "💰 Ціна: Гігієна", "type": "text" },
-        { "key": "price-hygiene-smoker", "label": "Назва: Гігієна (нальот курця)", "type": "text" },
-        { "key": "price-hygiene-smoker-val", "label": "💰 Ціна: Гігієна (нальот курця)", "type": "text" },
+        { "key": "price-hygiene", "label": "Ціна: Гігієна", "type": "text" },
+        { "key": "price-hygiene-smoker", "label": "Ціна: Гігієна (нальот курця)", "type": "text" },
 
         { "key": "svc-whitening-title", "label": "Відбілювання — Заголовок", "type": "text" },
         { "key": "svc-whitening-desc", "label": "Відбілювання — Опис", "type": "textarea" },
-        { "key": "price-whitening", "label": "Назва: Відбілювання", "type": "text" },
-        { "key": "price-whitening-val", "label": "💰 Ціна: Відбілювання", "type": "text" },
+        { "key": "price-whitening", "label": "Ціна: Відбілювання", "type": "text" },
 
         { "label": "ХІРУРГІЯ", "type": "heading" },
         { "key": "feat-surgery", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
         { "key": "svc-implant-title", "label": "Імплантація — Заголовок", "type": "text" },
         { "key": "svc-implant-desc", "label": "Імплантація — Опис", "type": "textarea" },
-        { "key": "price-implant-neodent", "label": "Назва: Імплант NEODENT", "type": "text" },
-        { "key": "price-implant-neodent-val", "label": "💰 Ціна: Імплант NEODENT", "type": "text" },
-        { "key": "price-implant-sla", "label": "Назва: Імплант STRAUMANN SLA", "type": "text" },
-        { "key": "price-implant-sla-val", "label": "💰 Ціна: Імплант STRAUMANN SLA", "type": "text" },
-        { "key": "price-implant-slactive", "label": "Назва: Імплант STRAUMANN SLACTIVE", "type": "text" },
-        { "key": "price-implant-slactive-val", "label": "💰 Ціна: Імплант STRAUMANN SLACTIVE", "type": "text" },
-        { "key": "price-crown-monolit", "label": "Назва: Коронка (monolit)", "type": "text" },
-        { "key": "price-crown-monolit-val", "label": "💰 Ціна: Коронка (monolit)", "type": "text" },
-        { "key": "price-crown-aesthetic", "label": "Назва: Коронка (ceramic + абатмент)", "type": "textarea" },
-        { "key": "price-crown-aesthetic-val", "label": "💰 Ціна: Коронка (ceramic + абатмент)", "type": "text" },
+        { "key": "price-implant-neodent", "label": "Ціна: Імплант NEODENT", "type": "text" },
+        { "key": "price-implant-sla", "label": "Ціна: Імплант STRAUMANN SLA", "type": "text" },
+        { "key": "price-implant-slactive", "label": "Ціна: Імплант STRAUMANN SLACTIVE", "type": "text" },
+        { "key": "price-crown-monolit", "label": "Ціна: Коронка (monolit)", "type": "text" },
+        { "key": "price-crown-aesthetic", "label": "Ціна: Коронка (ceramic + абатмент)", "type": "textarea" },
 
         { "key": "svc-extraction-title", "label": "Видалення зубів — Заголовок", "type": "text" },
         { "key": "svc-extraction-desc", "label": "Видалення зубів — Опис", "type": "textarea" },
-        { "key": "price-extraction", "label": "Назва: Видалення зуба", "type": "text" },
-        { "key": "price-extraction-val", "label": "💰 Ціна: Видалення зуба", "type": "text" },
-        { "key": "price-extraction-atypical-1", "label": "Назва: Атипове видалення (просте)", "type": "text" },
-        { "key": "price-extraction-atypical-1-val", "label": "💰 Ціна: Атипове видалення (просте)", "type": "text" },
-        { "key": "price-extraction-atypical-2", "label": "Назва: Атипове видалення (складне)", "type": "text" },
-        { "key": "price-extraction-atypical-2-val", "label": "💰 Ціна: Атипове видалення (складне)", "type": "text" },
-        { "key": "price-sedation", "label": "Назва: Седація (1 година)", "type": "text" },
-        { "key": "price-sedation-val", "label": "💰 Ціна: Седація (1 година)", "type": "text" },
+        { "key": "price-extraction", "label": "Ціна: Видалення зуба", "type": "text" },
+        { "key": "price-extraction-atypical-1", "label": "Ціна: Атипове видалення (просте)", "type": "text" },
+        { "key": "price-extraction-atypical-2", "label": "Ціна: Атипове видалення (складне)", "type": "text" },
+        { "key": "price-sedation", "label": "Ціна: Седація (1 година)", "type": "text" },
 
         { "key": "svc-gum-surgery-title", "label": "Хірургія ясен — Заголовок", "type": "textarea" },
         { "key": "svc-gum-surgery-desc", "label": "Хірургія ясен — Опис", "type": "textarea" },
-        { "key": "price-gum-smile", "label": "Назва: Усунення ясеневої посмішки", "type": "text" },
-        { "key": "price-gum-smile-val", "label": "💰 Ціна: Усунення ясенної посмішки", "type": "text" },
-        { "key": "price-recession", "label": "Назва: Закриття рецесій", "type": "text" },
-        { "key": "price-recession-val", "label": "💰 Ціна: Закриття рецесій", "type": "text" },
-        { "key": "price-gum-extension", "label": "Назва: Видовження ясен", "type": "text" },
-        { "key": "price-gum-extension-val", "label": "💰 Ціна: Видовження ясен", "type": "text" },
+        { "key": "price-gum-smile", "label": "Ціна: Усунення ясеневої посмішки", "type": "text" },
+        { "key": "price-recession", "label": "Ціна: Закриття рецесій", "type": "text" },
+        { "key": "price-gum-extension", "label": "Ціна: Видовження ясен", "type": "text" },
 
         { "label": "ОРТОДОНТІЯ", "type": "heading" },
         { "key": "feat-ortho", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
         { "key": "svc-braces-title", "label": "Брекети — Заголовок", "type": "text" },
         { "key": "svc-braces-desc", "label": "Брекети — Опис", "type": "textarea" },
-        { "key": "price-braces-metal", "label": "Назва: Брекети (метал)", "type": "text" },
-        { "key": "price-braces-metal-val", "label": "💰 Ціна: Брекети (метал)", "type": "text" },
-        { "key": "price-braces-ceramic", "label": "Назва: Брекети (кераміка)", "type": "text" },
-        { "key": "price-braces-ceramic-val", "label": "💰 Ціна: Брекети (кераміка)", "type": "text" },
-        { "key": "price-braces-self-metal", "label": "Назва: Самолігуючі (метал)", "type": "text" },
-        { "key": "price-braces-self-metal-val", "label": "💰 Ціна: Самолігуючі (метал)", "type": "text" },
-        { "key": "price-braces-self-ceramic", "label": "Назва: Самолігуючі (кераміка)", "type": "text" },
-        { "key": "price-braces-self-ceramic-val", "label": "💰 Ціна: Самолігуючі (кераміка)", "type": "text" },
-        { "key": "price-ortho-visit", "label": "Назва: Контрольний візит ортодонта", "type": "text" },
-        { "key": "price-ortho-visit-val", "label": "💰 Ціна: Контрольний візит ортодонта", "type": "text" },
+        { "key": "price-braces-metal", "label": "Ціна: Брекети (метал)", "type": "text" },
+        { "key": "price-braces-ceramic", "label": "Ціна: Брекети (кераміка)", "type": "text" },
+        { "key": "price-braces-self-metal", "label": "Ціна: Самолігуючі (метал)", "type": "text" },
+        { "key": "price-braces-self-ceramic", "label": "Ціна: Самолігуючі (кераміка)", "type": "text" },
+        { "key": "price-ortho-visit", "label": "Ціна: Контрольний візит ортодонта", "type": "text" },
 
         { "key": "svc-aligners-title", "label": "Елайнери — Заголовок", "type": "text" },
         { "key": "svc-aligners-desc", "label": "Елайнери — Опис", "type": "textarea" },
-        { "key": "price-aligners", "label": "Назва: Лікування елайнерами", "type": "text" },
-        { "key": "price-aligners-val", "label": "💰 Ціна: Лікування елайнерами", "type": "text" },
+        { "key": "price-aligners", "label": "Ціна: Лікування елайнерами", "type": "text" },
 
         { "label": "КНОПКИ ТА ФОРМА ЗАПИСУ", "type": "heading" },
         { "key": "btn-book", "label": "Кнопка: Записатися (Hero)", "type": "text" },
@@ -706,7 +459,6 @@ function switchSection(sectionId, navEl) {
     if (sectionId === 'pages') loadPageEditor(currentPage);
     if (sectionId === 'prices') loadPriceList();
     if (sectionId === 'doctors') loadDoctors();
-    if (sectionId === 'cases') loadCases();
     if (sectionId === 'ai-settings') loadAISettings();
     if (sectionId === 'chat-logs') loadChatLogs();
     if (sectionId === 'setup') loadSetupForm();
@@ -837,49 +589,6 @@ async function loadPageEditor(pageSlug) {
             "form-phone-placeholder": "Номер телефону",
             "form-privacy": "Погоджуюся на обробку персональних даних та з умовами політики конфіденційності",
             "form-btn": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ"
-        ,
-            "price-consult-general-val": "2000 ₴",
-            "price-consult-modjaw-val": "400 €",
-            "price-consult-checkup-val": "4900 ₴",
-            "price-frontal-restoration-val": "230 €",
-            "price-art-restoration-val": "350 €",
-            "price-veneer-digital-val": "600 €",
-            "price-veneer-layering-val": "750 €",
-            "price-veneer-handmade-val": "850 €",
-            "price-veneer-rework-val": "1200 €",
-            "price-veneer-single-val": "1500 €",
-            "price-crown-digital-val": "680 €",
-            "price-crown-layering-val": "850 €",
-            "price-crown-handmade-val": "950 €",
-            "price-endo-incisor-val": "285 €",
-            "price-endo-premolar-val": "320 €",
-            "price-endo-molar-val": "440 €",
-            "price-caries-2-val": "150 €",
-            "price-caries-3-val": "170 €",
-            "price-periodont-1-val": "140 €",
-            "price-periodont-2-val": "280 €",
-            "price-periodont-3-val": "400 €",
-            "price-hygiene-val": "100 €",
-            "price-hygiene-smoker-val": "140 €",
-            "price-whitening-val": "150 €",
-            "price-implant-neodent-val": "550 €",
-            "price-implant-sla-val": "780 €",
-            "price-implant-slactive-val": "980 €",
-            "price-crown-monolit-val": "650 €",
-            "price-crown-aesthetic-val": "850 €",
-            "price-extraction-val": "100 €",
-            "price-extraction-atypical-1-val": "150 €",
-            "price-extraction-atypical-2-val": "220 €",
-            "price-sedation-val": "140 €",
-            "price-gum-smile-val": "1950 €",
-            "price-recession-val": "290 €",
-            "price-gum-extension-val": "160 €",
-            "price-braces-metal-val": "2600 €",
-            "price-braces-ceramic-val": "3100 €",
-            "price-braces-self-metal-val": "3900 €",
-            "price-braces-self-ceramic-val": "4640 €",
-            "price-ortho-visit-val": "65 €",
-            "price-aligners-val": "3900 €",
         },
         "contact": {
             "contacts-page-title": "Контакти — Dental Studio",
@@ -1162,32 +871,46 @@ async function savePriceList() {
 // ============================================================
 
 async function loadDoctors() {
+    console.log('DEFENSIVE LOAD DOCTORS START');
     if (!sb) {
+        console.warn('Supabase not connected, showing defaults');
         doctors = [
-            { id: 'l1', name: 'Др. Анатолій Токар', spec: 'Стоматолог-ортопед', photo: '' },
-            { id: 'l2', name: 'Марія Токар', spec: 'Стоматолог-ортодонт', photo: '' },
+            { id: 'l1', name: 'Др. Іванов А.В.', spec: 'Терапевт', photo: '' },
+            { id: 'l2', name: 'Др. Петрова О.М.', spec: 'Хірург-імплантолог', photo: '' },
         ];
         renderDoctors();
         return;
     }
 
     try {
+        const area = document.getElementById('doctorsArea');
+        if (area) area.innerHTML = '<p class="editor-placeholder">Завантаження з бази даних...</p>';
+
         const { data, error } = await sb.from('doctors').select('*').order('sort_order');
-        if (error) throw error;
-        if (data) {
+        
+        if (error) {
+            console.error('DB ERROR:', error);
+            showToast('❌ Помилка БД: ' + error.message);
+            // Don't clear current doctors if error
+        } else if (data) {
+            console.log('DB SUCCESS, items:', data.length);
             doctors = data.map(d => ({
                 id: d.id,
                 name: d.name_uk || d.name || '',
-                spec: d.specialization_uk || d.specialization || '',
+                spec: d.specialization_uk || d.specialization || d.spec || '',
                 photo: d.photo_url || d.photo || '',
-                bio: d.bio_uk || d.description || '',
                 is_active: d.is_active !== false
             }));
+            
+            if (doctors.length === 0) {
+                console.warn('DB returned 0 doctors');
+            }
         }
     } catch (e) {
-        console.error('loadDoctors error:', e);
-        showToast('❌ Помилка завантаження лікарів');
+        console.error('CRITICAL JS ERROR in loadDoctors:', e);
+        showToast('❌ JS Error: ' + e.message);
     }
+
     renderDoctors();
 }
 
@@ -1203,31 +926,21 @@ function renderDoctors() {
     let html = '';
     doctors.forEach((doc, i) => {
         let photoSrc = doc.photo || '';
+        // Fix path if it's a relative asset
         if (photoSrc && !photoSrc.startsWith('http') && !photoSrc.startsWith('blob:') && !photoSrc.startsWith('/')) {
             photoSrc = '/' + photoSrc;
         }
 
         html += `<div class="doctor-card-admin">
-            <div class="doctor-photo-admin" onclick="uploadDoctorPhoto(${i})">
-                ${photoSrc ? `<img src="${photoSrc}">` : '📷'}
-                <div class="media-upload-hint">Змінити фото</div>
+            <div class="doctor-photo-admin" style="display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:40px;cursor:pointer;" onclick="uploadDoctorPhoto(${i})">
+                ${photoSrc ? `<img src="${photoSrc}" style="width:100%;height:100%;object-fit:cover;">` : '📷'}
             </div>
             <div class="doctor-card-body">
-                <div class="card-field-group">
-                    <label class="card-field-label">ПІБ лікаря</label>
-                    <input type="text" value="${escapeAttr(doc.name)}" placeholder="ПІБ" onchange="doctors[${i}].name=this.value">
-                </div>
-                <div class="card-field-group">
-                    <label class="card-field-label">Спеціалізація</label>
-                    <input type="text" value="${escapeAttr(doc.spec)}" placeholder="Спеціалізація" onchange="doctors[${i}].spec=this.value">
-                </div>
-                <div class="card-field-group">
-                    <label class="card-field-label">Біографія / Опис</label>
-                    <textarea rows="2" placeholder="Короткий опис..." onchange="doctors[${i}].bio=this.value">${escapeHtml(doc.bio)}</textarea>
-                </div>
+                <input type="text" value="${escapeAttr(doc.name)}" placeholder="ПІБ лікаря" onchange="doctors[${i}].name=this.value">
+                <input type="text" value="${escapeAttr(doc.spec)}" placeholder="Спеціалізація" onchange="doctors[${i}].spec=this.value">
             </div>
             <div class="doctor-card-actions">
-                <button class="btn-primary" style="flex:1;" onclick="saveDoctor(${i})">💾 Зберегти</button>
+                <button class="btn-outline" style="flex:1;" onclick="saveDoctor(${i})">💾 Зберегти</button>
                 <button class="btn-danger" onclick="deleteDoctor(${i})">🗑️</button>
             </div>
         </div>`;
@@ -1236,52 +949,39 @@ function renderDoctors() {
     area.innerHTML = html;
 }
 
-async function saveDoctor(index) {
-    const doc = doctors[index];
-    if (!sb) {
-        showToast('✅ Збережено локально (режим демо)');
-        return;
-    }
-
-    try {
-        const row = {
-            name_uk: doc.name,
-            specialization_uk: doc.spec,
-            bio_uk: doc.bio,
-            photo_url: doc.photo,
-            sort_order: index + 1,
-            is_active: true
-        };
-
-        if (doc.id && !String(doc.id).startsWith('new_') && !String(doc.id).startsWith('l')) {
-            await sb.from('doctors').update(row).eq('id', doc.id);
-        } else {
-            const { data, error } = await sb.from('doctors').insert(row).select('id').single();
-            if (error) throw error;
-            if (data) doctors[index].id = data.id;
-        }
-        showToast('✅ Лікаря збережено');
-        renderDoctors();
-    } catch (e) {
-        showToast(`❌ Помилка: ${e.message}`);
-    }
-}
-
-async function addDoctor() {
-    doctors.unshift({ id: 'new_' + Date.now(), name: '', spec: '', bio: '', photo: '' });
+function addDoctor() {
+    doctors.push({ id: 'new_' + Date.now(), name: '', spec: '', photo: '' });
     renderDoctors();
-    window.scrollTo({ top: document.getElementById('doctorsArea').offsetTop - 100, behavior: 'smooth' });
 }
 
 async function deleteDoctor(index) {
-    if (!confirm('Видалити цього лікаря?')) return;
     const doc = doctors[index];
     if (sb && doc.id && !String(doc.id).startsWith('new_') && !String(doc.id).startsWith('l')) {
-        await sb.from('doctors').delete().eq('id', doc.id);
+        await sb.from('doctors').update({ is_active: false }).eq('id', doc.id);
     }
     doctors.splice(index, 1);
     renderDoctors();
-    showToast('🗑️ Видалено');
+    showToast('🗑️ Лікаря видалено');
+}
+
+async function saveDoctor(index) {
+    const doc = doctors[index];
+    if (sb) {
+        const row = {
+            name_uk: doc.name,
+            specialization_uk: doc.spec,
+            photo_url: doc.photo,
+            sort_order: index + 1,
+            is_active: true,
+        };
+        if (doc.id && !String(doc.id).startsWith('new_') && !String(doc.id).startsWith('l')) {
+            await sb.from('doctors').update(row).eq('id', doc.id);
+        } else {
+            const { data } = await sb.from('doctors').insert(row).select('id').single();
+            if (data) doctors[index].id = data.id;
+        }
+    }
+    showToast('✅ Лікаря збережено');
 }
 
 async function uploadDoctorPhoto(index) {
@@ -1292,10 +992,11 @@ async function uploadDoctorPhoto(index) {
         const file = e.target.files[0];
         if (!file) return;
 
-        showToast('⏳ Завантаження фото...');
         if (sb) {
-            const filePath = `doctors/doc_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-            const { error } = await sb.storage.from('clinic-media').upload(filePath, file);
+            const filePath = `doctors/doc_${index}_${Date.now()}_${file.name}`;
+            const { error } = await sb.storage
+                .from('clinic-media')
+                .upload(filePath, file, { upsert: true });
             if (error) {
                 showToast(`❌ ${error.message}`);
                 return;
@@ -1303,170 +1004,14 @@ async function uploadDoctorPhoto(index) {
             const { data: urlData } = sb.storage.from('clinic-media').getPublicUrl(filePath);
             doctors[index].photo = urlData.publicUrl;
         } else {
+            // Local preview fallback
             const reader = new FileReader();
             reader.onload = (ev) => { doctors[index].photo = ev.target.result; renderDoctors(); };
             reader.readAsDataURL(file);
         }
+
         renderDoctors();
         showToast('📤 Фото завантажено');
-    };
-    input.click();
-}
-
-
-// ============================================================
-// CASES (OUR WORKS)
-// ============================================================
-
-let cases = [];
-
-async function loadCases() {
-    if (!sb) {
-        cases = [
-            { id: 'c1', title: 'Керамічні вініри (Анна)', category: 'veneers', before: '', after: '' }
-        ];
-        renderCases();
-        return;
-    }
-
-    try {
-        const { data, error } = await sb.from('cases').select('*').order('sort_order');
-        if (error) throw error;
-        cases = data || [];
-    } catch (e) {
-        console.error('loadCases error:', e);
-        showToast('❌ Помилка завантаження кейсів');
-    }
-    renderCases();
-}
-
-function renderCases() {
-    const area = document.getElementById('casesArea');
-    if (!area) return;
-    
-    if (cases.length === 0) {
-        area.innerHTML = '<p class="editor-placeholder">Кейси не додані. Натисніть "+ Додати кейс"</p>';
-        return;
-    }
-
-    let html = '';
-    cases.forEach((c, i) => {
-        const heroImg = c.hero_image_url || '';
-        const beforeImg = c.before_image_url || '';
-        const afterImg = c.after_image_url || '';
-        
-        html += `<div class="case-card-admin">
-            <div class="case-photo-admin" onclick="uploadCaseMedia(${i}, 'hero_image_url')">
-                ${heroImg ? `<img src="${heroImg}">` : '🖼️'}
-                <div class="media-upload-hint">Головне фото</div>
-            </div>
-            <div class="case-card-body">
-                <div class="card-field-group">
-                    <label class="card-field-label">Назва кейсу / Ім'я пацієнта</label>
-                    <input type="text" value="${escapeAttr(c.title_uk || '')}" placeholder="Напр: Керамічні вініри (Марія)" onchange="cases[${i}].title_uk=this.value">
-                </div>
-                <div class="card-field-group">
-                    <label class="card-field-label">Категорія (фільтр)</label>
-                    <select onchange="cases[${i}].category=this.value">
-                        <option value="veneers" ${c.category === 'veneers' ? 'selected' : ''}>Керамічні вініри</option>
-                        <option value="composite-veneers" ${c.category === 'composite-veneers' ? 'selected' : ''}>Композитні вініри</option>
-                        <option value="restorations" ${c.category === 'restorations' ? 'selected' : ''}>Реставрації</option>
-                        <option value="implants" ${c.category === 'implants' ? 'selected' : ''}>Імплантація</option>
-                        <option value="ortho" ${c.category === 'ortho' ? 'selected' : ''}>Ортодонтія</option>
-                    </select>
-                </div>
-                
-                <div class="case-results-preview">
-                    <div class="res-preview-box" onclick="uploadCaseMedia(${i}, 'before_image_url')">
-                        ${beforeImg ? `<img src="${beforeImg}">` : '📷'}
-                        <div class="res-preview-label">ДО</div>
-                    </div>
-                    <div class="res-preview-box" onclick="uploadCaseMedia(${i}, 'after_image_url')">
-                        ${afterImg ? `<img src="${afterImg}">` : '📷'}
-                        <div class="res-preview-label">ПІСЛЯ</div>
-                    </div>
-                </div>
-            </div>
-            <div class="case-card-actions">
-                <button class="btn-primary" style="flex:1;" onclick="saveCase(${i})">💾 Зберегти</button>
-                <button class="btn-danger" onclick="deleteCase(${i})">🗑️</button>
-            </div>
-        </div>`;
-    });
-
-    area.innerHTML = html;
-}
-
-function addCase() {
-    cases.unshift({ id: 'new_' + Date.now(), title_uk: '', category: 'veneers', stages: [] });
-    renderCases();
-}
-
-async function saveCase(index) {
-    const c = cases[index];
-    if (!sb) { showToast('✅ Збережено (демо)'); return; }
-
-    try {
-        const row = {
-            title_uk: c.title_uk,
-            category: c.category,
-            hero_image_url: c.hero_image_url,
-            before_image_url: c.before_image_url,
-            after_image_url: c.after_image_url,
-            sort_order: index,
-            is_active: true
-        };
-
-        if (c.id && !String(c.id).startsWith('new_')) {
-            await sb.from('cases').update(row).eq('id', c.id);
-        } else {
-            const { data, error } = await sb.from('cases').insert(row).select('id').single();
-            if (error) throw error;
-            if (data) cases[index].id = data.id;
-        }
-        showToast('✅ Кейс збережено');
-        renderCases();
-    } catch (e) {
-        showToast(`❌ Помилка: ${e.message}`);
-    }
-}
-
-async function deleteCase(index) {
-    if (!confirm('Видалити цей кейс?')) return;
-    const c = cases[index];
-    if (sb && c.id && !String(c.id).startsWith('new_')) {
-        await sb.from('cases').delete().eq('id', c.id);
-    }
-    cases.splice(index, 1);
-    renderCases();
-    showToast('🗑️ Кейс видалено');
-}
-
-async function uploadCaseMedia(index, field) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        showToast('⏳ Завантаження...');
-        if (sb) {
-            const filePath = `cases/case_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-            const { error } = await sb.storage.from('clinic-media').upload(filePath, file);
-            if (error) {
-                showToast(`❌ ${error.message}`);
-                return;
-            }
-            const { data: urlData } = sb.storage.from('clinic-media').getPublicUrl(filePath);
-            cases[index][field] = urlData.publicUrl;
-        } else {
-            const reader = new FileReader();
-            reader.onload = (ev) => { cases[index][field] = ev.target.result; renderCases(); };
-            reader.readAsDataURL(file);
-        }
-        renderCases();
-        showToast('📤 Завантажено');
     };
     input.click();
 }
@@ -1749,4 +1294,4 @@ window.switchInnerTab = function(btnEl, targetId) {
     btnEl.classList.add('active');
     const targetEl = document.getElementById(targetId);
     if (targetEl) targetEl.style.display = 'block';
-};
+}

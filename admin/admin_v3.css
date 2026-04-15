@@ -697,52 +697,149 @@ body {
     color: var(--danger);
 }
 
-/* === DOCTORS GRID === */
-.doctors-grid-admin {
+/* === DOCTORS & CASES GRID (PREMIUM) === */
+.doctors-grid-admin,
+.cases-grid-admin {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+    padding-top: 10px;
 }
 
-.doctor-card-admin {
+.doctor-card-admin,
+.case-card-admin {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 12px;
     overflow: hidden;
-}
-
-.doctor-photo-admin {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    background: var(--bg-input);
-}
-
-.doctor-card-body {
-    padding: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+}
+
+.doctor-card-admin:hover,
+.case-card-admin:hover {
+    border-color: var(--accent);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.doctor-photo-admin,
+.case-photo-admin {
+    width: 100%;
+    height: 240px;
+    background: var(--bg-input);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doctor-photo-admin img,
+.case-photo-admin img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.doctor-card-admin:hover .doctor-photo-admin img,
+.case-card-admin:hover .case-photo-admin img {
+    transform: scale(1.05);
+}
+
+.doctor-card-body,
+.case-card-body {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.card-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.card-field-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
 }
 
 .doctor-card-body input,
-.doctor-card-body textarea {
+.doctor-card-body textarea,
+.case-card-body input,
+.case-card-body textarea,
+.case-card-body select {
     width: 100%;
     background: var(--bg-input);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 8px 12px;
+    padding: 10px 14px;
     border-radius: 6px;
     font-family: var(--font);
     font-size: 13px;
     outline: none;
+    transition: border-color 0.2s;
 }
 
-.doctor-card-actions {
+.doctor-card-body input:focus,
+.case-card-body input:focus {
+    border-color: var(--accent);
+}
+
+.doctor-card-actions,
+.case-card-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     padding: 15px 20px;
+    background: rgba(255,255,255,0.02);
     border-top: 1px solid var(--border);
+}
+
+/* Case Specifics */
+.case-results-preview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.res-preview-box {
+    height: 80px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+}
+
+.res-preview-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.res-preview-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 8px;
+    text-align: center;
+    padding: 2px 0;
 }
 
 /* === CHAT LOGS === */

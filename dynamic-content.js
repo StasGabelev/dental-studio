@@ -106,7 +106,7 @@
                     html += `<div class="doctor-card">
                         ${doc.photo_url
                             ? `<img src="${doc.photo_url}" alt="${doc.name_uk}" class="doctor-card__photo">`
-                            : `<div class="doctor-card__photo-placeholder">👨‍⚕️</div>`
+                            : `<div class="doctor-card__photo-placeholder">&#x1F9D1;&#x200D;&#x2695;&#xFE0F;</div>`
                         }
                         <h3 class="doctor-card__name">${doc.name_uk}</h3>
                         <p class="doctor-card__spec">${doc.specialization_uk || ''}</p>
@@ -157,24 +157,48 @@
         console.warn('Doctors load error:', e);
     }
 
-    // --- Load dynamic cases (before/after) ---
+    // --- Load dynamic cases ---
     try {
-        const casesGrid = document.querySelector('.works__grid');
-        if (casesGrid) {
-            const { data: cases } = await sbClient.from('cases')
-                .select('*').eq('is_published', true).order('created_at', { ascending: false });
+        // Homepage preview (works__grid on index.html)
+        const worksGrid = document.querySelector('.works__grid');
+        if (worksGrid) {
+            const { data: homeCases } = await sbClient.from('cases')
+                .select('*').eq('is_active', true).order('sort_order').limit(4);
 
-            if (cases && cases.length > 0) {
+            if (homeCases && homeCases.length > 0) {
                 let html = '';
-                cases.forEach(c => {
-                    if (c.before_photo_url) {
-                        html += `<div class="works__item">
-                            <img src="${c.before_photo_url}" alt="${c.title_uk || 'Кейс'}">
-                            ${c.title_uk ? `<div class="works__item-title">${c.title_uk}</div>` : ''}
+                homeCases.forEach(c => {
+                    const img = c.hero_image_url || c.before_image_url || '';
+                    if (img) {
+                        html += `<div class="works__item" onclick="location.href='case-db.html?id=${c.id}'" style="cursor:pointer;">
+                            <img src="${img}" alt="${c.title_uk || 'Кейс'}">
                         </div>`;
                     }
                 });
-                if (html) casesGrid.innerHTML = html;
+                if (html) worksGrid.innerHTML = html;
+            }
+        }
+
+        // Full cases page — append dynamic cases to existing hardcoded cards (.cases-grid)
+        const casesGridFull = document.querySelector('.cases-grid');
+        if (casesGridFull) {
+            const { data: allCases } = await sbClient.from('cases')
+                .select('*').eq('is_active', true).order('sort_order');
+
+            if (allCases && allCases.length > 0) {
+                allCases.forEach(c => {
+                    const img = c.hero_image_url || c.before_image_url || '';
+                    const label = c.title_uk || '';
+                    const card = document.createElement('div');
+                    card.className = 'case-card';
+                    card.dataset.category = c.category || '';
+                    card.style.cursor = 'pointer';
+                    card.onclick = () => { location.href = `case-db.html?id=${c.id}`; };
+                    card.innerHTML = `
+                        <div class="case-card__img" style="background-image: url('${img}');"></div>
+                        <div class="case-card__overlay"><span>${label}</span></div>`;
+                    casesGridFull.appendChild(card);
+                });
             }
         }
     } catch(e) {

@@ -1,18 +1,41 @@
 const fs = require('fs');
 
-const path = 'admin/admin_v3.js';
-let code = fs.readFileSync(path, 'utf8');
+const adminJsPath = './admin/admin.js';
+let content = fs.readFileSync(adminJsPath, 'utf8');
 
-const anchor = "    let html = '';\r\n    schema.forEach(field => {\r\n        let val = existing[field.key] !== undefined ? existing[field.key] : '';";
+const oldRender = `    let html = '';
+    schema.forEach(field => {
+        if (field.type === 'heading') {
+            html += \`<div class="editor-section-heading">\${field.label}</div>\`;
+            return;
+        }
+        let val = existing[field.key] !== undefined ? existing[field.key] : '';
+        if (!val && PAGE_DEFAULTS[pageSlug] && PAGE_DEFAULTS[pageSlug][field.key]) {
+            val = PAGE_DEFAULTS[pageSlug][field.key];
+        }
+        html += \`<div class="editor-field">\`;
+        html += \`<div class="editor-field-label">\${field.label}</div>\`;
 
-// Since we might have \r\n vs \n issues, let's just do an index of:
-const loopStart = code.indexOf("    let html = '';");
-const loopEnd = code.indexOf("    area.innerHTML = html;") + "    area.innerHTML = html;".length;
+        if (field.type === 'text') {
+            html += \`<input type="text" data-key="\${field.key}" placeholder="\${field.label}" value="\${escapeAttr(val)}">\`;
+        } else if (field.type === 'textarea') {
+            html += \`<textarea data-key="\${field.key}" rows="3" placeholder="\${field.label}">\${escapeHtml(val)}</textarea>\`;
+        } else if (field.type === 'image') {
+            const imgSrc = (val && !val.startsWith('http') && !val.startsWith('blob:') && !val.startsWith('/')) ? '/' + val : val;
+            html += \`<div class="media-upload-box" onclick="triggerMediaUpload('\${field.key}', 'image')" id="media-\${field.key}">\`;
+            html += \`\${val ? \`<img src="\${imgSrc}" style="max-width:100%;max-height:200px;border-radius:4px;">\` : ''}\`;
+            html += \`<div class="media-upload-hint">📷 Натисніть щоб завантажити зображення</div>\`;
+            html += \`</div>\`;
+        } else if (field.type === 'video') {
+            const videoSrc = (val && !val.startsWith('http') && !val.startsWith('blob:') && !val.startsWith('/')) ? '/' + val : val;
+            html += \`<div class="media-upload-box" onclick="triggerMediaUpload('\${field.key}', 'video')" id="media-\${field.key}">\`;
+            html += \`\${val ? \`<video src="\${videoSrc}" style="max-width:100%;max-height:200px;" controls></video>\` : ''}\`;
+            html += \`<div class="media-upload-hint">🎥 Натисніть щоб завантажити відео</div>\`;
+            html += \`</div>\`;
+        }
 
-if (loopStart === -1 || loopEnd === -1) {
-    console.error("COULD NOT FIND INJECTION POINTS");
-    process.exit(1);
-}
+        html += \`</div>\`;
+    });`;
 
 const newRender = `    let html = '';
     
@@ -57,10 +80,8 @@ const newRender = `    let html = '';
         });
     }
 
-    html += \`<div style="margin-top:25px;">
-        <button id="saveBtn-\${pageSlug}" class="btn-primary" onclick="this.innerHTML='⏳ Зберігаємо...'; savePageContent('\${pageSlug}')">💾 Зберегти зміни</button>
-    </div>\`;
-    area.innerHTML = html;`;
+    // Helper to render a single field (put inside or near loadPageEditor)
+`;
 
 const newHelper = `
 function renderEditorField(field, existing, defaults, pageSlug) {
@@ -107,11 +128,8 @@ window.switchInnerTab = function(btnEl, targetId) {
 };
 `;
 
-code = code.substring(0, loopStart) + newRender + code.substring(loopEnd);
+content = content.replace(oldRender, newRender);
+content += newHelper; 
 
-if (code.indexOf('function renderEditorField') === -1) {
-    code += newHelper;
-}
-
-fs.writeFileSync(path, code, 'utf8');
-console.log('Successfully injected!');
+fs.writeFileSync(adminJsPath, content, 'utf8');
+console.log('Successfully injected inner tabs rendering! Updated lines in admin.js');

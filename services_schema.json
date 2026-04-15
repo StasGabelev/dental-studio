@@ -1,0 +1,1268 @@
+[
+  {
+    "type": "heading",
+    "label": "Консультація"
+  },
+  {
+    "key": "svc-consult-desc",
+    "label": "Консультація — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-modjaw",
+    "label": "Назва: Функціональна діагностика MODJAW i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-modjaw-val",
+    "label": "Ціна: Функціональна діагностика MODJAW i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup",
+    "label": "Назва: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup-val",
+    "label": "Ціна: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Композитні вініри та реставрації"
+  },
+  {
+    "key": "svc-composite-veneer-desc",
+    "label": "Композитні вініри та реставрації — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-frontal-restoration",
+    "label": "Назва: Реставрація фронтального зуба i",
+    "type": "text"
+  },
+  {
+    "key": "price-frontal-restoration-val",
+    "label": "Ціна: Реставрація фронтального зуба i",
+    "type": "text"
+  },
+  {
+    "key": "price-frontal-restoration",
+    "label": "Назва: Реставрація фронтального зуба i",
+    "type": "text"
+  },
+  {
+    "key": "price-frontal-restoration-val",
+    "label": "Ціна: Реставрація фронтального зуба i",
+    "type": "text"
+  },
+  {
+    "key": "price-art-restoration",
+    "label": "Назва: Художня реставрація - по ключу i",
+    "type": "text"
+  },
+  {
+    "key": "price-art-restoration-val",
+    "label": "Ціна: Художня реставрація - по ключу i",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Керамічні реставрації (вініри, коронки,\n                                        накладки)"
+  },
+  {
+    "key": "svc-ceramic-restoration-desc",
+    "label": "Керамічні реставрації (вініри, коронки,\n                                        накладки) — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-veneer-digital",
+    "label": "Назва: Керамічний вінір (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-digital-val",
+    "label": "Ціна: Керамічний вінір (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-digital",
+    "label": "Назва: Керамічний вінір (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-digital-val",
+    "label": "Ціна: Керамічний вінір (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-layering",
+    "label": "Назва: Керамічний вінір (digital + нашарування) i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-layering-val",
+    "label": "Ціна: Керамічний вінір (digital + нашарування) i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-handmade",
+    "label": "Назва: Керамічний вінір (hand made, полевошпат) i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-handmade-val",
+    "label": "Ціна: Керамічний вінір (hand made, полевошпат) i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-rework",
+    "label": "Назва: Переробка керамічного вініра чужої роботи (за зуб)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-rework-val",
+    "label": "Ціна: Переробка керамічного вініра чужої роботи (за зуб)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-single",
+    "label": "Назва: Керамічний вінір - одиночний центральний різець\n                                            i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-single-val",
+    "label": "Ціна: Керамічний вінір - одиночний центральний різець\n                                            i",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-digital",
+    "label": "Назва: Керамічна коронка на імплантаті (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-digital-val",
+    "label": "Ціна: Керамічна коронка на імплантаті (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-layering",
+    "label": "Назва: Керамічна коронка на імплантаті (digital +\n                                            нашарування)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-layering-val",
+    "label": "Ціна: Керамічна коронка на імплантаті (digital +\n                                            нашарування)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-handmade",
+    "label": "Назва: Керамічна коронка на імплантаті (hand made,\n                                            полевошпат)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-handmade-val",
+    "label": "Ціна: Керамічна коронка на імплантаті (hand made,\n                                            полевошпат)",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Консультація"
+  },
+  {
+    "key": "svc-consult-desc",
+    "label": "Консультація — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup",
+    "label": "Назва: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup-val",
+    "label": "Ціна: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Ендодонтія"
+  },
+  {
+    "key": "svc-endo-desc",
+    "label": "Ендодонтія — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-endo-incisor",
+    "label": "Назва: Лікування кореневих каналів (різці, ікла)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-incisor-val",
+    "label": "Ціна: Лікування кореневих каналів (різці, ікла)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-incisor",
+    "label": "Назва: Лікування кореневих каналів (різці, ікла)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-incisor-val",
+    "label": "Ціна: Лікування кореневих каналів (різці, ікла)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-premolar",
+    "label": "Назва: Лікування кореневих каналів (премоляри)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-premolar-val",
+    "label": "Ціна: Лікування кореневих каналів (премоляри)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-molar",
+    "label": "Назва: Лікування кореневих каналів (моляри)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-molar-val",
+    "label": "Ціна: Лікування кореневих каналів (моляри)",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Лікування карієсу"
+  },
+  {
+    "key": "svc-caries-desc",
+    "label": "Лікування карієсу — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-caries-2",
+    "label": "Назва: Лікування карієсу - І рівень складності",
+    "type": "text"
+  },
+  {
+    "key": "price-caries-2-val",
+    "label": "Ціна: Лікування карієсу - І рівень складності",
+    "type": "text"
+  },
+  {
+    "key": "price-caries-2",
+    "label": "Назва: Лікування карієсу - ІI рівень складності",
+    "type": "text"
+  },
+  {
+    "key": "price-caries-2-val",
+    "label": "Ціна: Лікування карієсу - ІI рівень складності",
+    "type": "text"
+  },
+  {
+    "key": "price-caries-3",
+    "label": "Назва: Лікування карієсу - ІII рівень складності",
+    "type": "text"
+  },
+  {
+    "key": "price-caries-3-val",
+    "label": "Ціна: Лікування карієсу - ІII рівень складності",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Пародонтологічне лікування"
+  },
+  {
+    "key": "svc-periodontal-desc",
+    "label": "Пародонтологічне лікування — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-periodont-1",
+    "label": "Назва: Лікування пародонтиту - І ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-1-val",
+    "label": "Ціна: Лікування пародонтиту - І ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-1",
+    "label": "Назва: Лікування пародонтиту - І ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-1-val",
+    "label": "Ціна: Лікування пародонтиту - І ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-2",
+    "label": "Назва: Лікування пародонтиту - ІІ ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-2-val",
+    "label": "Ціна: Лікування пародонтиту - ІІ ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-3",
+    "label": "Назва: Лікування пародонтиту - ІІI ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-3-val",
+    "label": "Ціна: Лікування пародонтиту - ІІI ступінь",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Професійна гігієна зубів"
+  },
+  {
+    "key": "svc-hygiene-desc",
+    "label": "Професійна гігієна зубів — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-hygiene",
+    "label": "Назва: Професійна гігієна",
+    "type": "text"
+  },
+  {
+    "key": "price-hygiene-val",
+    "label": "Ціна: Професійна гігієна",
+    "type": "text"
+  },
+  {
+    "key": "price-hygiene",
+    "label": "Назва: Професійна гігієна",
+    "type": "text"
+  },
+  {
+    "key": "price-hygiene-val",
+    "label": "Ціна: Професійна гігієна",
+    "type": "text"
+  },
+  {
+    "key": "price-hygiene-smoker",
+    "label": "Назва: Професійна гігієна (наліт курця)",
+    "type": "text"
+  },
+  {
+    "key": "price-hygiene-smoker-val",
+    "label": "Ціна: Професійна гігієна (наліт курця)",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Відбілювання зубів"
+  },
+  {
+    "key": "svc-whitening-desc",
+    "label": "Відбілювання зубів — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-whitening",
+    "label": "Назва: Відбілювання",
+    "type": "text"
+  },
+  {
+    "key": "price-whitening-val",
+    "label": "Ціна: Відбілювання",
+    "type": "text"
+  },
+  {
+    "key": "price-whitening",
+    "label": "Назва: Відбілювання",
+    "type": "text"
+  },
+  {
+    "key": "price-whitening-val",
+    "label": "Ціна: Відбілювання",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup",
+    "label": "Назва: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup-val",
+    "label": "Ціна: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Імплантація"
+  },
+  {
+    "key": "svc-implant-desc",
+    "label": "Імплантація — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-implant-neodent",
+    "label": "Назва: Імплант NEODENT (Бразилія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-neodent-val",
+    "label": "Ціна: Імплант NEODENT (Бразилія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-neodent",
+    "label": "Назва: Імплант NEODENT (Бразилія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-neodent-val",
+    "label": "Ціна: Імплант NEODENT (Бразилія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-sla",
+    "label": "Назва: Імплант STRAUMANN SLA (Швейцарія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-sla-val",
+    "label": "Ціна: Імплант STRAUMANN SLA (Швейцарія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-slactive",
+    "label": "Назва: Імплант STRAUMANN SLACTIVE (Швейцарія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-slactive-val",
+    "label": "Ціна: Імплант STRAUMANN SLACTIVE (Швейцарія)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-monolit",
+    "label": "Назва: Коронка на імпланті (monolit)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-monolit-val",
+    "label": "Ціна: Коронка на імпланті (monolit)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-aesthetic",
+    "label": "Назва: Коронка на імпланті (платформа + абатмент + керамічний вінір)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-aesthetic-val",
+    "label": "Ціна: Коронка на імпланті (платформа + абатмент + керамічний вінір)",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Видалення зубів"
+  },
+  {
+    "key": "svc-extraction-desc",
+    "label": "Видалення зубів — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-extraction",
+    "label": "Назва: Видалення зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-val",
+    "label": "Ціна: Видалення зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction",
+    "label": "Назва: Видалення зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-val",
+    "label": "Ціна: Видалення зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-atypical-1",
+    "label": "Назва: Атипове видалення (просте)",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-atypical-1-val",
+    "label": "Ціна: Атипове видалення (просте)",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-atypical-2",
+    "label": "Назва: Атипове видалення (складне)",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-atypical-2-val",
+    "label": "Ціна: Атипове видалення (складне)",
+    "type": "text"
+  },
+  {
+    "key": "price-sedation",
+    "label": "Назва: Медикаментозний сон (седація) - 1 година",
+    "type": "text"
+  },
+  {
+    "key": "price-sedation-val",
+    "label": "Ціна: Медикаментозний сон (седація) - 1 година",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Закриття рецесій, хірургічне подовження клінічної коронки зуба, усунення ясеневої посмішки"
+  },
+  {
+    "key": "svc-gum-surgery-desc",
+    "label": "Закриття рецесій, хірургічне подовження клінічної коронки зуба, усунення ясеневої посмішки — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-gum-smile",
+    "label": "Назва: Операція усунення ясенної посмішки (10 зубів)",
+    "type": "text"
+  },
+  {
+    "key": "price-gum-smile-val",
+    "label": "Ціна: Операція усунення ясенної посмішки (10 зубів)",
+    "type": "text"
+  },
+  {
+    "key": "price-gum-smile",
+    "label": "Назва: Операція усунення ясенної посмішки (10 зубів)",
+    "type": "text"
+  },
+  {
+    "key": "price-gum-smile-val",
+    "label": "Ціна: Операція усунення ясенної посмішки (10 зубів)",
+    "type": "text"
+  },
+  {
+    "key": "price-recession",
+    "label": "Назва: Закриття рецесій біля одного зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-recession-val",
+    "label": "Ціна: Закриття рецесій біля одного зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-gum-extension",
+    "label": "Назва: Видовження ясен біля одного зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-gum-extension-val",
+    "label": "Ціна: Видовження ясен біля одного зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-modjaw",
+    "label": "Назва: Функціональна діагностика MODJAW",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-modjaw-val",
+    "label": "Ціна: Функціональна діагностика MODJAW",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup",
+    "label": "Назва: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup-val",
+    "label": "Ціна: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Лікування брекет-системою"
+  },
+  {
+    "key": "svc-braces-desc",
+    "label": "Лікування брекет-системою — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-braces-metal",
+    "label": "Назва: Лікування брекет-системою (метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-metal-val",
+    "label": "Ціна: Лікування брекет-системою (метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-metal",
+    "label": "Назва: Лікування брекет-системою (метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-metal-val",
+    "label": "Ціна: Лікування брекет-системою (метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-ceramic",
+    "label": "Назва: Лікування брекет-системою (кераміка)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-ceramic-val",
+    "label": "Ціна: Лікування брекет-системою (кераміка)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-self-metal",
+    "label": "Назва: Лікування брекет-системою (самолігуючі, метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-self-metal-val",
+    "label": "Ціна: Лікування брекет-системою (самолігуючі, метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-ortho-visit",
+    "label": "Назва: Щомісячний контрольний візит до ортодонта",
+    "type": "text"
+  },
+  {
+    "key": "price-ortho-visit-val",
+    "label": "Ціна: Щомісячний контрольний візит до ортодонта",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-self-ceramic",
+    "label": "Назва: Лікування брекет-системою (самолігуючі, кераміка)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-self-ceramic-val",
+    "label": "Ціна: Лікування брекет-системою (самолігуючі, кераміка)",
+    "type": "text"
+  },
+  {
+    "type": "heading",
+    "label": "Лікування елайнерами"
+  },
+  {
+    "key": "svc-aligners-desc",
+    "label": "Лікування елайнерами — Опис",
+    "type": "textarea"
+  },
+  {
+    "key": "price-aligners",
+    "label": "Назва: Лікування елайнерами",
+    "type": "text"
+  },
+  {
+    "key": "price-aligners-val",
+    "label": "Ціна: Лікування елайнерами",
+    "type": "text"
+  },
+  {
+    "key": "price-aligners",
+    "label": "Назва: Лікування елайнерами",
+    "type": "text"
+  },
+  {
+    "key": "price-aligners-val",
+    "label": "Ціна: Лікування елайнерами",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-modjaw",
+    "label": "Назва: Функціональна діагностика MODJAW i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-modjaw-val",
+    "label": "Ціна: Функціональна діагностика MODJAW i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup",
+    "label": "Назва: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup-val",
+    "label": "Ціна: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-frontal-restoration",
+    "label": "Назва: Реставрація фронтального зуба i",
+    "type": "text"
+  },
+  {
+    "key": "price-frontal-restoration-val",
+    "label": "Ціна: Реставрація фронтального зуба i",
+    "type": "text"
+  },
+  {
+    "key": "price-art-restoration",
+    "label": "Назва: Художня реставрація - по ключу i",
+    "type": "text"
+  },
+  {
+    "key": "price-art-restoration-val",
+    "label": "Ціна: Художня реставрація - по ключу i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-digital",
+    "label": "Назва: Керамічний вінір (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-digital-val",
+    "label": "Ціна: Керамічний вінір (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-layering",
+    "label": "Назва: Керамічний вінір (digital + нашарування) i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-layering-val",
+    "label": "Ціна: Керамічний вінір (digital + нашарування) i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-handmade",
+    "label": "Назва: Керамічний вінір (hand made, полевошпат) i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-handmade-val",
+    "label": "Ціна: Керамічний вінір (hand made, полевошпат) i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-rework",
+    "label": "Назва: Переробка керамічного вініра чужої роботи (за зуб)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-rework-val",
+    "label": "Ціна: Переробка керамічного вініра чужої роботи (за зуб)",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-single",
+    "label": "Назва: Керамічний вінір - одиночний центральний різець\n                                            i",
+    "type": "text"
+  },
+  {
+    "key": "price-veneer-single-val",
+    "label": "Ціна: Керамічний вінір - одиночний центральний різець\n                                            i",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-digital",
+    "label": "Назва: Керамічна коронка на імплантаті (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-digital-val",
+    "label": "Ціна: Керамічна коронка на імплантаті (digital)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-layering",
+    "label": "Назва: Керамічна коронка на імплантаті (digital +\n                                            нашарування)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-layering-val",
+    "label": "Ціна: Керамічна коронка на імплантаті (digital +\n                                            нашарування)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-handmade",
+    "label": "Назва: Керамічна коронка на імплантаті (hand made,\n                                            полевошпат)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-handmade-val",
+    "label": "Ціна: Керамічна коронка на імплантаті (hand made,\n                                            полевошпат)",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup",
+    "label": "Назва: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup-val",
+    "label": "Ціна: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-incisor",
+    "label": "Назва: Лікування кореневих каналів (різці, ікла)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-incisor-val",
+    "label": "Ціна: Лікування кореневих каналів (різці, ікла)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-premolar",
+    "label": "Назва: Лікування кореневих каналів (премоляри)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-premolar-val",
+    "label": "Ціна: Лікування кореневих каналів (премоляри)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-molar",
+    "label": "Назва: Лікування кореневих каналів (моляри)",
+    "type": "text"
+  },
+  {
+    "key": "price-endo-molar-val",
+    "label": "Ціна: Лікування кореневих каналів (моляри)",
+    "type": "text"
+  },
+  {
+    "key": "price-caries-2",
+    "label": "Назва: Лікування карієсу - ІI рівень складності",
+    "type": "text"
+  },
+  {
+    "key": "price-caries-2-val",
+    "label": "Ціна: Лікування карієсу - ІI рівень складності",
+    "type": "text"
+  },
+  {
+    "key": "price-caries-3",
+    "label": "Назва: Лікування карієсу - ІII рівень складності",
+    "type": "text"
+  },
+  {
+    "key": "price-caries-3-val",
+    "label": "Ціна: Лікування карієсу - ІII рівень складності",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-1",
+    "label": "Назва: Лікування пародонтиту - І ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-1-val",
+    "label": "Ціна: Лікування пародонтиту - І ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-2",
+    "label": "Назва: Лікування пародонтиту - ІІ ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-2-val",
+    "label": "Ціна: Лікування пародонтиту - ІІ ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-3",
+    "label": "Назва: Лікування пародонтиту - ІІI ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-periodont-3-val",
+    "label": "Ціна: Лікування пародонтиту - ІІI ступінь",
+    "type": "text"
+  },
+  {
+    "key": "price-hygiene",
+    "label": "Назва: Професійна гігієна",
+    "type": "text"
+  },
+  {
+    "key": "price-hygiene-val",
+    "label": "Ціна: Професійна гігієна",
+    "type": "text"
+  },
+  {
+    "key": "price-hygiene-smoker",
+    "label": "Назва: Професійна гігієна (наліт курця)",
+    "type": "text"
+  },
+  {
+    "key": "price-hygiene-smoker-val",
+    "label": "Ціна: Професійна гігієна (наліт курця)",
+    "type": "text"
+  },
+  {
+    "key": "price-whitening",
+    "label": "Назва: Відбілювання",
+    "type": "text"
+  },
+  {
+    "key": "price-whitening-val",
+    "label": "Ціна: Відбілювання",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup",
+    "label": "Назва: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup-val",
+    "label": "Ціна: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-neodent",
+    "label": "Назва: Імплант NEODENT (Бразилія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-neodent-val",
+    "label": "Ціна: Імплант NEODENT (Бразилія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-sla",
+    "label": "Назва: Імплант STRAUMANN SLA (Швейцарія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-sla-val",
+    "label": "Ціна: Імплант STRAUMANN SLA (Швейцарія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-slactive",
+    "label": "Назва: Імплант STRAUMANN SLACTIVE (Швейцарія)",
+    "type": "text"
+  },
+  {
+    "key": "price-implant-slactive-val",
+    "label": "Ціна: Імплант STRAUMANN SLACTIVE (Швейцарія)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-monolit",
+    "label": "Назва: Коронка на імпланті (monolit)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-monolit-val",
+    "label": "Ціна: Коронка на імпланті (monolit)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-aesthetic",
+    "label": "Назва: Коронка на імпланті (платформа + абатмент + керамічний вінір)",
+    "type": "text"
+  },
+  {
+    "key": "price-crown-aesthetic-val",
+    "label": "Ціна: Коронка на імпланті (платформа + абатмент + керамічний вінір)",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction",
+    "label": "Назва: Видалення зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-val",
+    "label": "Ціна: Видалення зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-atypical-1",
+    "label": "Назва: Атипове видалення (просте)",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-atypical-1-val",
+    "label": "Ціна: Атипове видалення (просте)",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-atypical-2",
+    "label": "Назва: Атипове видалення (складне)",
+    "type": "text"
+  },
+  {
+    "key": "price-extraction-atypical-2-val",
+    "label": "Ціна: Атипове видалення (складне)",
+    "type": "text"
+  },
+  {
+    "key": "price-sedation",
+    "label": "Назва: Медикаментозний сон (седація) - 1 година",
+    "type": "text"
+  },
+  {
+    "key": "price-sedation-val",
+    "label": "Ціна: Медикаментозний сон (седація) - 1 година",
+    "type": "text"
+  },
+  {
+    "key": "price-gum-smile",
+    "label": "Назва: Операція усунення ясенної посмішки (10 зубів)",
+    "type": "text"
+  },
+  {
+    "key": "price-gum-smile-val",
+    "label": "Ціна: Операція усунення ясенної посмішки (10 зубів)",
+    "type": "text"
+  },
+  {
+    "key": "price-recession",
+    "label": "Назва: Закриття рецесій біля одного зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-recession-val",
+    "label": "Ціна: Закриття рецесій біля одного зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-gum-extension",
+    "label": "Назва: Видовження ясен біля одного зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-gum-extension-val",
+    "label": "Ціна: Видовження ясен біля одного зуба",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general",
+    "label": "Назва: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-general-val",
+    "label": "Ціна: Загальна консультація",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-modjaw",
+    "label": "Назва: Функціональна діагностика MODJAW",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-modjaw-val",
+    "label": "Ціна: Функціональна діагностика MODJAW",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup",
+    "label": "Назва: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-consult-checkup-val",
+    "label": "Ціна: Стоматологічний CHECK-UP i",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-metal",
+    "label": "Назва: Лікування брекет-системою (метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-metal-val",
+    "label": "Ціна: Лікування брекет-системою (метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-ceramic",
+    "label": "Назва: Лікування брекет-системою (кераміка)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-ceramic-val",
+    "label": "Ціна: Лікування брекет-системою (кераміка)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-self-metal",
+    "label": "Назва: Лікування брекет-системою (самолігуючі, метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-self-metal-val",
+    "label": "Ціна: Лікування брекет-системою (самолігуючі, метал)",
+    "type": "text"
+  },
+  {
+    "key": "price-ortho-visit",
+    "label": "Назва: Щомісячний контрольний візит до ортодонта",
+    "type": "text"
+  },
+  {
+    "key": "price-ortho-visit-val",
+    "label": "Ціна: Щомісячний контрольний візит до ортодонта",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-self-ceramic",
+    "label": "Назва: Лікування брекет-системою (самолігуючі, кераміка)",
+    "type": "text"
+  },
+  {
+    "key": "price-braces-self-ceramic-val",
+    "label": "Ціна: Лікування брекет-системою (самолігуючі, кераміка)",
+    "type": "text"
+  },
+  {
+    "key": "price-aligners",
+    "label": "Назва: Лікування елайнерами",
+    "type": "text"
+  },
+  {
+    "key": "price-aligners-val",
+    "label": "Ціна: Лікування елайнерами",
+    "type": "text"
+  }
+]
