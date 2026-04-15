@@ -162,8 +162,8 @@
         // Homepage preview (works__grid on index.html)
         const worksGrid = document.querySelector('.works__grid');
         if (worksGrid) {
-            const { data: homeCases } = await sbClient.from('cases')
-                .select('*').eq('is_active', true).order('sort_order').limit(4);
+            const { data: homeCases } = await sbClient.from('treatment_cases')
+                .select('*').eq('is_published', true).order('sort_order').limit(4);
 
             if (homeCases && homeCases.length > 0) {
                 let html = '';
@@ -182,23 +182,25 @@
         // Full cases page — append dynamic cases to existing hardcoded cards (.cases-grid)
         const casesGridFull = document.querySelector('.cases-grid');
         if (casesGridFull) {
-            const { data: allCases } = await sbClient.from('cases')
-                .select('*').eq('is_active', true).order('sort_order');
+            const { data: allCases } = await sbClient.from('treatment_cases')
+                .select('*').eq('is_published', true).order('sort_order');
 
-            if (allCases && allCases.length > 0) {
+                casesGridFull.innerHTML = ''; // Clear loading message
                 allCases.forEach(c => {
-                    const img = c.hero_image_url || c.before_image_url || '';
+                    const img = c.main_image_url || c.before_image_url || '';
                     const label = c.title_uk || '';
                     const card = document.createElement('div');
                     card.className = 'case-card';
                     card.dataset.category = c.category || '';
                     card.style.cursor = 'pointer';
-                    card.onclick = () => { location.href = `case-db.html?id=${c.id}`; };
+                    card.onclick = () => { location.href = `case.html?id=${c.id}`; };
                     card.innerHTML = `
                         <div class="case-card__img" style="background-image: url('${img}');"></div>
                         <div class="case-card__overlay"><span>${label}</span></div>`;
                     casesGridFull.appendChild(card);
                 });
+            } else {
+                casesGridFull.innerHTML = '<p style="text-align:center; padding: 40px; color: #999;">Роботи скоро з\'являться...</p>';
             }
         }
     } catch(e) {
