@@ -13,34 +13,26 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
     }
 };
 
-function getSupabaseConfig() {
-    try {
-        const c = localStorage.getItem('ds_supabase');
-        return c ? JSON.parse(c) : null;
-    } catch(e) { return null; }
-}
-
 function initSupabase() {
     const config = getSupabaseConfig();
-    if (config && config.url && config.key) {
-        sb = supabase.createClient(config.url, config.key);
-        document.getElementById('setupLink').style.display = 'none';
+    const defaultUrl = 'https://ckldvntrsiacbjpiydmn.supabase.co';
+    const defaultKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
+
+    const url = (config && config.url) ? config.url : defaultUrl;
+    const key = (config && config.key) ? config.key : defaultKey;
+
+    if (url && key) {
+        sb = supabase.createClient(url, key);
         return true;
     }
-    document.getElementById('setupLink').style.display = 'block';
     return false;
 }
+
 
 
 // Try to init on load
 initSupabase();
 
-function showEmergencySetup() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminDashboard').style.display = 'flex';
-    switchSection('setup', document.querySelector('[data-section="setup"]'));
-    showToast('⚠️ Ви в режимі аварійного налаштування');
-}
 
 
 // --- State ---
@@ -558,12 +550,12 @@ async function handleLogin(e) {
         return;
     }
 
-    errorEl.textContent = 'Помилка: Налаштування бази даних не знайдено. Натисніть "Налаштувати з\'єднання вручну" нижче.';
+    errorEl.textContent = 'Помилка: Невірний email або пароль.';
     errorEl.style.display = 'block';
-    document.getElementById('setupLink').style.display = 'block';
     btn.disabled = false;
     btn.textContent = 'Увійти';
 }
+
 
 
 
