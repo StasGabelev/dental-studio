@@ -282,30 +282,11 @@ async function handleLogin(e) {
     btn.textContent = 'Завантаження...';
     errorEl.style.display = 'none';
 
-    // Priority: password 1234
-    if (password === '1234') {
-        currentUser = { email: email || 'admin@dental-studio.com' };
-        document.getElementById('userEmail').textContent = currentUser.email;
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'flex';
-        localStorage.setItem('ds_admin_email', currentUser.email);
-        loadDashboardData();
-        return;
-    }
-
-    // Try Supabase Auth first
+    // Try Supabase Auth
     if (sb) {
         const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if (error) {
-            // If user doesn't exist yet, try sign up (first admin)
-            if (error.message.includes('Invalid login')) {
-                errorEl.textContent = 'Невірний email або пароль';
-                errorEl.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'Увійти';
-                return;
-            }
-            errorEl.textContent = error.message;
+            errorEl.textContent = 'Невірний email або пароль (Supabase)';
             errorEl.style.display = 'block';
             btn.disabled = false;
             btn.textContent = 'Увійти';
@@ -318,29 +299,24 @@ async function handleLogin(e) {
         loadDashboardData();
         return;
     }
+        currentUser = data.user;
+        document.getElementById('userEmail').textContent = email;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'flex';
+        loadDashboardData();
+        return;
+    }
 
-    // Fallback: demo mode without Supabase
-    setTimeout(() => {
-        if (email && password.length >= 4) {
-            currentUser = { email };
-            document.getElementById('userEmail').textContent = email;
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'flex';
-            localStorage.setItem('ds_admin_email', email);
-            loadDashboardData();
-        } else {
-            errorEl.textContent = 'Невірний email або пароль';
-            errorEl.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = 'Увійти';
-        }
-    }, 600);
+    errorEl.textContent = 'Supabase не підключено!';
+    errorEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Увійти';
 }
+
 
 async function handleLogout() {
     if (sb) await sb.auth.signOut();
     currentUser = null;
-    localStorage.removeItem('ds_admin_email');
     document.getElementById('adminDashboard').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('loginPassword').value = '';
@@ -359,16 +335,8 @@ async function handleLogout() {
             return;
         }
     }
-    // Fallback
-    const saved = localStorage.getItem('ds_admin_email');
-    if (saved) {
-        currentUser = { email: saved };
-        document.getElementById('userEmail').textContent = saved;
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'flex';
-        loadDashboardData();
-    }
 })();
+
 
 
 // ============================================================
