@@ -1254,6 +1254,13 @@ button { font-family: var(--font-sans); }
     transform: translateY(0);
 }
 
+@media (min-width: 1025px) {
+    .cases-grid { 
+        grid-template-columns: repeat(3, 1fr) !important; 
+        gap: 2px !important;
+    }
+}
+
 @media (max-width: 1024px) {
     .cases-grid { grid-template-columns: repeat(2, 1fr); }
 }

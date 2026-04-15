@@ -697,13 +697,11 @@ body {
     color: var(--danger);
 }
 
-/* === DOCTORS & CASES GRID (PREMIUM) === */
-.doctors-grid-admin,
 .cases-grid-admin {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
-    padding-top: 10px;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 15px !important;
+    padding-top: 20px;
 }
 
 .doctor-card-admin,
