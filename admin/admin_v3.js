@@ -1340,11 +1340,7 @@ function renderCases() {
         return;
     }
 
-    let html = `
-        <div class="section-toolbar">
-            <button class="btn-primary" onclick="addCase()">+ Додати кейс</button>
-        </div>
-    `;
+    let html = '';
 
     if (cases.length === 0) {
         html += '<p class="editor-placeholder">Кейси не додані. Натисніть "+ Додати кейс"</p>';
@@ -1392,12 +1388,12 @@ function addCase() {
 
 function editCase(index) {
     editingCaseIndex = index;
-    renderPortfolioPage();
+    renderCases();
 }
 
 function closeCaseEditor() {
     editingCaseIndex = -1;
-    renderPortfolioPage();
+    renderCases();
 }
 
 function renderFullCaseEditor() {
