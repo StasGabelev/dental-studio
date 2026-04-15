@@ -8,11 +8,36 @@
     const PUBLIC_SB_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
     const PUBLIC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
     let sbClient = null;
-    if (typeof supabase !== 'undefined') {
+
+    // Helper to wait for global supabase to be ready (CDN load)
+    const waitForSupabase = (timeout = 5000) => {
+        return new Promise((resolve) => {
+            const start = Date.now();
+            const check = () => {
+                if (typeof supabase !== 'undefined') {
+                    resolve(true);
+                } else if (Date.now() - start > timeout) {
+                    resolve(false);
+                } else {
+                    setTimeout(check, 100);
+                }
+            };
+            check();
+        });
+    };
+
+    const isReady = await waitForSupabase();
+    if (isReady && typeof supabase !== 'undefined') {
         sbClient = supabase.createClient(PUBLIC_SB_URL, PUBLIC_SB_KEY);
     }
 
-    if (!sbClient) return; // Keep hardcoded content
+    if (!sbClient) {
+        console.warn('Supabase not initialized - keeping fallback content');
+        // If we are on cases grid, we must at least hide the loader
+        const loader = document.getElementById('cases-loading');
+        if (loader) loader.innerHTML = '<p style="color:#888;">Помилка завантаження бібліотеки. Спробуйте оновити сторінку.</p>';
+        return; 
+    }
 
     // --- Load text content ---
     try {
