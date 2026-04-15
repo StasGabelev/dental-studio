@@ -27,6 +27,15 @@
     };
 
     const isReady = await waitForSupabase();
+    
+    // FAIL-SAFE: If still loading after 7 seconds, clear the loader anyway
+    setTimeout(() => {
+        const loader = document.getElementById('cases-loading');
+        if (loader && loader.innerHTML.includes('ЗАВАНТАЖЕННЯ')) {
+            loader.innerHTML = '<p style="color:#999;">Перевищено час очікування. Спробуйте оновити сторінку.</p>';
+        }
+    }, 7000);
+
     if (isReady && typeof supabase !== 'undefined') {
         sbClient = supabase.createClient(PUBLIC_SB_URL, PUBLIC_SB_KEY);
     }
