@@ -1198,7 +1198,7 @@ button { font-family: var(--font-sans); }
 .cases-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 2px; /* Very thin gap for high-end look */
     background-color: var(--bg-main);
     padding-bottom: 80px;
 }
@@ -1227,25 +1227,31 @@ button { font-family: var(--font-sans); }
 .case-card__overlay {
     position: absolute;
     inset: 0;
-    background: rgba(184, 146, 74, 0.08);
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
-    border: 1px solid rgba(184, 146, 74, 0.3);
+    transition: all 0.5s var(--ease);
+    backdrop-filter: blur(2px);
 }
 
 .case-card:hover .case-card__overlay { opacity: 1; }
 
 .case-card__overlay span {
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 2px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--text-dark);
-    background: rgba(255,255,255,0.85);
-    padding: 10px 20px;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 12px 28px;
+    transition: transform 0.6s var(--ease);
+    transform: translateY(10px);
+}
+
+.case-card:hover .case-card__overlay span {
+    transform: translateY(0);
 }
 
 @media (max-width: 1024px) {

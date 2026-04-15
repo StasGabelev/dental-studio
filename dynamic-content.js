@@ -234,9 +234,22 @@
                 return;
             }
 
+            const categoryLabels = {
+                'veneers': 'ВІНІРИ',
+                'implants': 'ІМПЛАНТАЦІЯ',
+                'ortho': 'ОРТОДОНТІЯ',
+                'restoration': 'РЕСТАВРАЦІЯ',
+                'therapy': 'ТЕРАПІЯ',
+                'hygiene': 'ГІГІЄНА',
+                'military': 'ДЛЯ ВІЙСЬКОВИХ',
+                'complex': 'КОМПЛЕКСНЕ ЛІКУВАННЯ',
+                'whitening': 'ВІДБІЛЮВАННЯ',
+                'aligners': 'ЕЛАЙНЕРИ'
+            };
+
             allCases.forEach(c => {
                 const img = c.main_image_url || c.before_image_url || '';
-                const label = c.title_uk || '';
+                const label = categoryLabels[c.category] || c.category || '';
                 const card = document.createElement('div');
                 card.className = 'case-card';
                 card.dataset.category = c.category || '';
@@ -244,7 +257,7 @@
                 card.onclick = () => { location.href = `case.html?id=${c.id}`; };
                 card.innerHTML = `
                     <div class="case-card__img" style="background-image: url('${img}');"></div>
-                    <div class="case-card__overlay"><span>${label}</span></div>`;
+                    <div class="case-card__overlay"><span>${label.toUpperCase()}</span></div>`;
                 casesGridFull.appendChild(card);
             });
         }
