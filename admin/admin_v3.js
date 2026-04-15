@@ -13,7 +13,15 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
     }
 };
 
+function getSupabaseConfig() {
+    try {
+        const c = localStorage.getItem('ds_supabase');
+        return c ? JSON.parse(c) : null;
+    } catch(e) { return null; }
+}
+
 function initSupabase() {
+
     const config = getSupabaseConfig();
     const defaultUrl = 'https://ckldvntrsiacbjpiydmn.supabase.co';
     const defaultKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
