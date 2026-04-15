@@ -24,13 +24,24 @@ function initSupabase() {
     const config = getSupabaseConfig();
     if (config && config.url && config.key) {
         sb = supabase.createClient(config.url, config.key);
+        document.getElementById('setupLink').style.display = 'none';
         return true;
     }
+    document.getElementById('setupLink').style.display = 'block';
     return false;
 }
 
+
 // Try to init on load
 initSupabase();
+
+function showEmergencySetup() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'flex';
+    switchSection('setup', document.querySelector('[data-section="setup"]'));
+    showToast('⚠️ Ви в режимі аварійного налаштування');
+}
+
 
 // --- State ---
 let currentUser = null;
@@ -547,11 +558,13 @@ async function handleLogin(e) {
         return;
     }
 
-    errorEl.textContent = 'Supabase не підключено!';
+    errorEl.textContent = 'Помилка: Налаштування бази даних не знайдено. Натисніть "Налаштувати з\'єднання вручну" нижче.';
     errorEl.style.display = 'block';
+    document.getElementById('setupLink').style.display = 'block';
     btn.disabled = false;
     btn.textContent = 'Увійти';
 }
+
 
 
 async function handleLogout() {
