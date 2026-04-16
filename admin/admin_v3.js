@@ -628,9 +628,12 @@ function connectSupabase() {
 }
 
 async function testSupabase() {
+    // Зберігаємо і застосовуємо актуальні дані з інпутів перед перевіркою
+    connectSupabase();
+
     const status = document.getElementById('sbStatus');
     if (!sb) {
-        status.innerHTML = '<span style="color:var(--danger);">❌ Спочатку підключіть Supabase</span>';
+        status.innerHTML = '<span style="color:var(--danger);">❌ Помилка підключення. Перевірте URL та Anon Key</span>';
         return;
     }
 
@@ -1687,6 +1690,63 @@ async function saveAISettings() {
     }
 
     showToast('✅ Налаштування ІІ збережено');
+}
+
+async function testAIApiKey() {
+    const provider = document.getElementById('aiProvider').value;
+    const apiKey = document.getElementById('aiApiKey').value.trim();
+    const statusEl = document.getElementById('aiTestStatus');
+    const btn = document.getElementById('btnTestAI');
+    
+    if (!apiKey) {
+        statusEl.innerHTML = '<span style="color:var(--danger);">❌ Будь ласка, введіть API ключ.</span>';
+        return;
+    }
+
+    // Зберігаємо перед перевіркою
+    saveAISettings();
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Перевірка...';
+    statusEl.innerHTML = '<span style="color:var(--text-muted);">⏳ З\'єднання з сервером ' + provider + '...</span>';
+
+    try {
+        let res, data;
+        let success = false;
+
+        if (provider === 'openai' || provider === 'deepseek') {
+            const url = provider === 'openai' ? 'https://api.openai.com/v1/models' : 'https://api.deepseek.com/v1/models';
+            res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + apiKey } });
+            success = res.ok;
+        } else if (provider === 'anthropic') {
+            res = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+                body: JSON.stringify({ model: 'claude-3-haiku-20240307', max_tokens: 10, messages: [{ role: 'user', content: 'hello' }] })
+            });
+            success = res.ok;
+            if (res.status === 400 && !res.status.toString().startsWith('401')) {
+                success = true; // Key valid, just model not found or whatever
+            }
+        } else if (provider === 'google') {
+            res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+            success = res.ok;
+        } else if (provider === 'openrouter') {
+            res = await fetch('https://openrouter.ai/api/v1/auth/key', { headers: { 'Authorization': 'Bearer ' + apiKey } });
+            success = res.ok;
+        }
+
+        if (success) {
+            statusEl.innerHTML = '<span style="color:var(--success);">✅ Ключ дійсний! З\'єднання успішне.</span>';
+        } else {
+            statusEl.innerHTML = '<span style="color:var(--danger);">❌ Помилка: Ключ недійсний або заблокований (Status ' + res.status + ').</span>';
+        }
+    } catch(err) {
+        statusEl.innerHTML = `<span style="color:var(--danger);">❌ Помилка мережі: ${err.message}</span>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = '🧪 Перевірити';
 }
 
 async function handleKBUpload(event) {

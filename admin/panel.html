@@ -1,4 +1,4 @@
-﻿<!-- v1.31.11 - ADMIN & GRID FIX -->
+﻿<!-- v1.31.12 - ADMIN & GRID FIX -->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin_v3.css?v=v1.31.11">
+    <link rel="stylesheet" href="admin_v3.css?v=v1.31.12">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -81,7 +81,7 @@
                 </a>
             </nav>
             <div class="sidebar-footer">
-                <div class="version-badge" style="color: #ff4d4d; font-size: 11px; font-weight: bold; margin-bottom: 10px;">v1.31.11 - ADMIN & GRID FIX ⚡</div>
+                <div class="version-badge" style="color: #ff4d4d; font-size: 11px; font-weight: bold; margin-bottom: 10px;">v1.31.12 - ADMIN & GRID FIX ⚡</div>
                 <button class="btn-logout" onclick="handleLogout()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                     <span>Вийти</span>
@@ -158,7 +158,11 @@
                             <label>API Ключ</label>
                             <input type="password" id="aiApiKey">
                         </div>
-                        <button class="btn-primary" onclick="saveAISettings()">💾 Зберегти</button>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn-primary" onclick="saveAISettings()">💾 Зберегти</button>
+                            <button class="btn-outline" onclick="testAIApiKey()" id="btnTestAI">🧪 Перевірити</button>
+                        </div>
+                        <div id="aiTestStatus" style="margin-top:10px; font-size:13px;"></div>
                     </div>
                 </section>
 
@@ -179,7 +183,10 @@
                             <label>Anon Key</label>
                             <input type="text" id="sbAnonKey">
                         </div>
-                        <button class="btn-primary" onclick="connectSupabase()">🔌 Підключити</button>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn-primary" onclick="connectSupabase()">💾 Зберегти</button>
+                            <button class="btn-outline" onclick="testSupabase()">🧪 Перевірити</button>
+                        </div>
                         <div id="sbStatus" style="margin-top:10px;"></div>
                     </div>
                 </section>
@@ -188,6 +195,6 @@
     </div>
 
     <div id="toast" class="toast"></div>
-    <script src="admin_v3.js?v=v1.31.11"></script>
+    <script src="admin_v3.js?v=v1.31.12"></script>
 </body>
 </html>
