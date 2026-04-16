@@ -11,14 +11,23 @@ let clientContact = null;
 // Init Supabase for widget
 (function initWidgetSupabase() {
     try {
+        const defaultUrl = 'https://ckldvntrsiacbjpiydmn.supabase.co';
+        const defaultKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
+
         const c = localStorage.getItem('ds_supabase');
+        let url = defaultUrl;
+        let key = defaultKey;
+        
         if (c) {
             const config = JSON.parse(c);
-            if (config.url && config.key && typeof supabase !== 'undefined') {
-                widgetSb = supabase.createClient(config.url, config.key);
-            }
+            if (config.url) url = config.url;
+            if (config.key) key = config.key;
         }
-    } catch(e) {}
+
+        if (url && key && typeof supabase !== 'undefined') {
+            widgetSb = supabase.createClient(url, key);
+        }
+    } catch(e) { console.error('Widget init error:', e); }
 })();
 
 const PROVIDER_ENDPOINTS = {

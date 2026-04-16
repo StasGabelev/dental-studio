@@ -1601,27 +1601,36 @@ async function uploadCaseMedia(index, field) {
 // ============================================================
 
 function onProviderChange() {
-    const provider = document.getElementById('aiProvider').value;
+    const providerEl = document.getElementById('aiProvider');
+    if (!providerEl) return;
+    
+    const provider = providerEl.value;
     const modelSelect = document.getElementById('aiModel');
     const customUrlGroup = document.getElementById('customUrlGroup');
 
-    const options = MODEL_OPTIONS[provider] || [];
-    modelSelect.innerHTML = '';
-    options.forEach(opt => {
-        const o = document.createElement('option');
-        o.value = opt.value;
-        o.textContent = opt.label;
-        modelSelect.appendChild(o);
-    });
+    if (modelSelect) {
+        const options = MODEL_OPTIONS[provider] || [];
+        modelSelect.innerHTML = '';
+        options.forEach(opt => {
+            const o = document.createElement('option');
+            o.value = opt.value;
+            o.textContent = opt.label;
+            modelSelect.appendChild(o);
+        });
+    }
 
-    customUrlGroup.style.display = provider === 'custom' ? 'block' : 'none';
+    if (customUrlGroup) {
+        customUrlGroup.style.display = provider === 'custom' ? 'block' : 'none';
+    }
 
     const keyInput = document.getElementById('aiApiKey');
-    const placeholders = {
-        openai: 'sk-...', anthropic: 'sk-ant-...', google: 'AIza...',
-        deepseek: 'sk-...', openrouter: 'sk-or-...', custom: 'your-api-key',
-    };
-    keyInput.placeholder = placeholders[provider] || 'API Key';
+    if (keyInput) {
+        const placeholders = {
+            openai: 'sk-...', anthropic: 'sk-ant-...', google: 'AIza...',
+            deepseek: 'sk-...', openrouter: 'sk-or-...', custom: 'your-api-key',
+        };
+        keyInput.placeholder = placeholders[provider] || 'API Key';
+    }
 }
 
 function toggleKeyVisibility() {
@@ -1793,58 +1802,8 @@ async function handleKBUpload(event) {
 }
 
 
-// ============================================================
-// CHAT LOGS
-// ============================================================
+// loadChatLogs replaced by newer version below
 
-async function loadChatLogs() {
-    const area = document.getElementById('chatLogsArea');
-
-    if (!sb) {
-        area.innerHTML = '<p class="editor-placeholder">Підключіть Supabase для перегляду чат-логів</p>';
-        return;
-    }
-
-    area.innerHTML = '<p class="editor-placeholder">Завантаження...</p>';
-
-    // Get unique sessions, latest first
-    const { data, error } = await sb.from('chat_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(200);
-
-    if (error || !data || data.length === 0) {
-        area.innerHTML = '<p class="editor-placeholder">Чат-логи поки відсутні</p>';
-        return;
-    }
-
-    // Group by session
-    const sessions = {};
-    data.forEach(msg => {
-        if (!sessions[msg.session_id]) sessions[msg.session_id] = [];
-        sessions[msg.session_id].push(msg);
-    });
-
-    let html = '';
-    Object.entries(sessions).forEach(([sid, msgs]) => {
-        msgs.reverse(); // oldest first within session
-        const firstTime = new Date(msgs[0].created_at).toLocaleString('uk-UA');
-        html += `<div class="chat-log-item">
-            <div class="chat-log-header">
-                <span>Сесія: ${sid.slice(0, 8)}...</span>
-                <span>${firstTime}</span>
-            </div>
-            <div class="chat-log-messages">`;
-
-        msgs.forEach(m => {
-            html += `<div class="chat-log-msg ${m.role}">${escapeHtml(m.message)}</div>`;
-        });
-
-        html += `</div></div>`;
-    });
-
-    area.innerHTML = html;
-}
 
 
 // ============================================================
