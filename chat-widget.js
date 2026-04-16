@@ -193,6 +193,9 @@ window.sendAIChatMsg = async function() {
     appendMessage(msg, 'user');
     chatHistory.push({ role: 'user', content: msg });
     saveChatMessage('user', msg);
+    
+    // CRM: Auto-detect name
+    detectAndSaveName(chatSessionId, msg);
 
     const thinkingEl = showThinking();
     isThinking = true;
@@ -240,6 +243,33 @@ function getFallbackReply(msg) {
         return "\u0414\u043b\u044f \u0437\u0430\u043f\u0438\u0441\u0443 \u0437\u0430\u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0443\u0439\u0442\u0435: (077) 600 7 800 \u0430\u0431\u043e \u043d\u0430\u0442\u0438\u0441\u043d\u0456\u0442\u044c \u043a\u043d\u043e\u043f\u043a\u0443 '\u0417\u0430\u043f\u0438\u0441\u0430\u0442\u0438\u0441\u044f' \u043d\u0430 \u0441\u0430\u0439\u0442\u0456.";
     }
     return "\u0412\u0456\u0442\u0430\u044e! \u042f \u2014 AI-\u0430\u0441\u0438\u0441\u0442\u0435\u043d\u0442 Dental Studio. \u041c\u043e\u0436\u0443 \u0434\u043e\u043f\u043e\u043c\u043e\u0433\u0442\u0438 \u0437 \u043f\u0438\u0442\u0430\u043d\u043d\u044f\u043c\u0438 \u0449\u043e\u0434\u043e \u043f\u043e\u0441\u043b\u0443\u0433, \u0446\u0456\u043d \u0442\u0430 \u0437\u0430\u043f\u0438\u0441\u0443. \u0417\u0430\u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0443\u0439\u0442\u0435: (077) 600 7 800";
+}
+
+// --- CRM: Auto-detect name ---
+async function detectAndSaveName(sessionId, text) {
+    if (!widgetSb || !sessionId) return;
+    const lower = text.toLowerCase();
+    
+    // Patterns for Ukrainian/Russian names
+    // "Мене звати Сергій", "Я Сергій", "Мене звуть Сергій", "Это Сергей"
+    const patterns = [
+        /(?:мене звати|мене звуть|я|меня зовут|это)\s+([А-ЯA-Z][а-яa-z]+)/u,
+        /(?:кличуть|зови мене)\s+([А-ЯA-Z][а-яa-z]+)/u
+    ];
+
+    for (const p of patterns) {
+        const match = text.match(p);
+        if (match && match[1]) {
+            const name = match[1];
+            try {
+                await widgetSb.from('chat_sessions')
+                    .update({ client_name: name })
+                    .eq('id', sessionId);
+                console.log('CRM: Auto-detected name:', name);
+            } catch(e) {}
+            break;
+        }
+    }
 }
 
 async function callAI(settings, sysPrompt, history) {

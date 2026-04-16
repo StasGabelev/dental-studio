@@ -1884,64 +1884,168 @@ window.switchInnerTab = function(btnEl, targetId) {
 // CHAT LOGS
 // ============================================================
 
+// ============================================================
+// CHAT LOGS & CRM
+// ============================================================
+
+let currentChatStatus = 'active';
+let allSessions = [];
+
 async function loadChatLogs() {
     const area = document.getElementById('chatLogsArea');
     if (!sb) {
-        area.innerHTML = '<p class="editor-placeholder">\u041f\u0456\u0434\u043a\u043b\u044e\u0447\u0456\u0442\u044c Supabase \u0434\u043b\u044f \u043f\u0435\u0440\u0435\u0433\u043b\u044f\u0434\u0443 \u0447\u0430\u0442-\u043b\u043e\u0433\u0456\u0432</p>';
+        area.innerHTML = '<p class="editor-placeholder">Підключіть Supabase для перегляду чат-логів</p>';
         return;
     }
-
-    area.innerHTML = '<p class="editor-placeholder">\u0417\u0430\u0432\u0430\u043d\u0442\u0430\u0436\u0435\u043d\u043d\u044f...</p>';
 
     try {
         const { data: sessions, error } = await sb.from('chat_sessions')
             .select('*')
-            .order('last_message_at', { ascending: false })
-            .limit(50);
+            .eq('status', currentChatStatus)
+            .order('last_message_at', { ascending: false });
 
-        if (error) {
-            if (error.code === '42P01') {
-                area.innerHTML = '<p class="editor-placeholder">\u0422\u0430\u0431\u043b\u0438\u0446\u0456 chat_sessions \u043d\u0435 \u0437\u043d\u0430\u0439\u0434\u0435\u043d\u043e. \u0412\u0438\u043a\u043e\u043d\u0430\u0439\u0442\u0435 SQL \u0437 \u0444\u0430\u0439\u043b\u0443 chat_tables.sql</p>';
-            } else {
-                area.innerHTML = `<p class="editor-placeholder">\u041f\u043e\u043c\u0438\u043b\u043a\u0430: ${error.message}</p>`;
-            }
-            return;
-        }
+        if (error) throw error;
+        allSessions = sessions || [];
+        renderChatList(allSessions);
+    } catch(e) {
+        console.error('Load chat error:', e);
+        area.innerHTML = `<p class="editor-placeholder">Помилка: ${e.message}</p>`;
+    }
+}
 
-        if (!sessions || sessions.length === 0) {
-            area.innerHTML = '<p class="editor-placeholder">\u0427\u0430\u0442-\u043b\u043e\u0433\u0456 \u0432\u0456\u0434\u0441\u0443\u0442\u043d\u0456</p>';
-            return;
-        }
+function renderChatList(sessions) {
+    const area = document.getElementById('chatLogsArea');
+    if (!sessions || sessions.length === 0) {
+        area.innerHTML = `<p class="editor-placeholder">Чат-логи (${currentChatStatus === 'active' ? 'активні' : 'архів'}) відсутні</p>`;
+        return;
+    }
 
-        let html = '';
-        for (const session of sessions) {
+    let html = '';
+    sessions.forEach(session => {
+        const icon = session.contact_type === 'email' ? '✉️' : '📞';
+        const date = new Date(session.last_message_at || session.created_at).toLocaleString('uk-UA');
+        const displayName = (session.client_name || session.client_surname) 
+            ? `${session.client_name || ''} ${session.client_surname || ''}`.trim()
+            : session.client_contact;
+
+        html += `
+            <div class="chat-log-item" id="session-${session.id}">
+                <div class="chat-log-header">
+                    <div class="chat-log-user-info">
+                        <span class="chat-log-name">${icon} ${escapeHtml(displayName)}</span>
+                        ${(session.client_name || session.client_surname) ? `<span class="chat-log-contact">${escapeHtml(session.client_contact)}</span>` : ''}
+                    </div>
+                    <div class="chat-log-actions">
+                        <button class="chat-action-btn" title="Редагувати" onclick="openClientModal('${session.id}', '${escapeAttr(session.client_name || '')}', '${escapeAttr(session.client_surname || '')}')">✏️</button>
+                        ${session.status === 'active' 
+                            ? `<button class="chat-action-btn" title="В архів" onclick="archiveChatSession('${session.id}')">📦</button>`
+                            : `<button class="chat-action-btn" title="Відновити" onclick="restoreChatSession('${session.id}')">🔄</button>`
+                        }
+                        <button class="chat-action-btn danger" title="Видалити" onclick="deleteChatSession('${session.id}')">🗑️</button>
+                    </div>
+                    <span style="font-size:12px; color:#666;">${date}</span>
+                </div>
+                <div class="chat-log-messages" id="msgs-${session.id}" style="display:none;"></div>
+                <div class="chat-expand-trigger" onclick="toggleChatMessages('${session.id}')" style="text-align:center; padding:5px; cursor:pointer; color:#555; font-size:12px;">Показати повідомлення ▼</div>
+            </div>`;
+    });
+    area.innerHTML = html;
+}
+
+async function toggleChatMessages(sessionId) {
+    const msgArea = document.getElementById(`msgs-${sessionId}`);
+    const trigger = msgArea.nextElementSibling;
+    
+    if (msgArea.style.display === 'none') {
+        if (msgArea.innerHTML === '') {
+            msgArea.innerHTML = '<div style="padding:10px; text-align:center;">⏳ Завантаження...</div>';
             const { data: messages } = await sb.from('chat_messages')
                 .select('*')
-                .eq('session_id', session.id)
+                .eq('session_id', sessionId)
                 .order('created_at', { ascending: true });
-
-            const icon = session.contact_type === 'email' ? '\u2709\ufe0f' : '\ud83d\udcde';
-            const date = new Date(session.created_at).toLocaleString('uk-UA');
-            const msgCount = messages ? messages.length : 0;
-
-            html += `<div class="chat-log-item">
-                <div class="chat-log-header">
-                    <span>${icon} <strong>${session.client_contact}</strong></span>
-                    <span>${date} \u2022 ${msgCount} \u043f\u043e\u0432\u0456\u0434\u043e\u043c\u043b\u0435\u043d\u044c</span>
-                </div>
-                <div class="chat-log-messages">`;
-
+            
             if (messages) {
-                messages.forEach(m => {
-                    html += `<div class="chat-log-msg ${m.role}">${m.content}</div>`;
-                });
+                msgArea.innerHTML = messages.map(m => `
+                    <div class="chat-log-msg ${m.role}">${escapeHtml(m.content)}</div>
+                `).join('');
+            } else {
+                msgArea.innerHTML = '<div style="padding:10px; color:#666;">Повідомлень немає</div>';
             }
-
-            html += '</div></div>';
         }
+        msgArea.style.display = 'block';
+        trigger.textContent = 'Приховати повідомлення ▲';
+    } else {
+        msgArea.style.display = 'none';
+        trigger.textContent = 'Показати повідомлення ▼';
+    }
+}
 
-        area.innerHTML = html;
+function filterChatLogs() {
+    const query = document.getElementById('chatSearch').value.toLowerCase();
+    const filtered = allSessions.filter(s => {
+        const name = `${s.client_name || ''} ${s.client_surname || ''}`.toLowerCase();
+        const contact = (s.client_contact || '').toLowerCase();
+        return name.includes(query) || contact.includes(query);
+    });
+    renderChatList(filtered);
+}
+
+function switchChatStatus(status, btn) {
+    currentChatStatus = status;
+    document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    loadChatLogs();
+}
+
+// CRM Actions
+function openClientModal(id, name, surname) {
+    document.getElementById('editClientId').value = id;
+    document.getElementById('editClientName').value = name;
+    document.getElementById('editClientSurname').value = surname;
+    document.getElementById('editClientModal').style.display = 'flex';
+}
+
+function closeClientModal() {
+    document.getElementById('editClientModal').style.display = 'none';
+}
+
+async function saveClientInfo() {
+    const id = document.getElementById('editClientId').value;
+    const name = document.getElementById('editClientName').value;
+    const surname = document.getElementById('editClientSurname').value;
+
+    try {
+        const { error } = await sb.from('chat_sessions')
+            .update({ client_name: name, client_surname: surname })
+            .eq('id', id);
+        
+        if (error) throw error;
+        showToast('✅ Дані клієнта оновлено');
+        closeClientModal();
+        loadChatLogs();
     } catch(e) {
-        area.innerHTML = `<p class="editor-placeholder">\u041f\u043e\u043c\u0438\u043b\u043a\u0430: ${e.message}</p>`;
+        showToast('❌ Помилка оновлення');
+    }
+}
+
+async function archiveChatSession(id) {
+    if (!confirm('Перемістити цей чат в архів?')) return;
+    await sb.from('chat_sessions').update({ status: 'archived', archived_at: new Date().toISOString() }).eq('id', id);
+    showToast('📦 Чат архівовано');
+    loadChatLogs();
+}
+
+async function restoreChatSession(id) {
+    await sb.from('chat_sessions').update({ status: 'active', archived_at: null }).eq('id', id);
+    showToast('🔄 Чат відновлено');
+    loadChatLogs();
+}
+
+async function deleteChatSession(id) {
+    if (!confirm('Ви впевнені, що хочете видалити цей чат назавжди?')) return;
+    const { error } = await sb.from('chat_sessions').delete().eq('id', id);
+    if (!error) {
+        showToast('🗑️ Чат видалено');
+        loadChatLogs();
     }
 }
