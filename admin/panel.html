@@ -16,10 +16,19 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* Додатковий фікс для сітки */
+        /* СИЛОВЕ РОЗШИРЕННЯ КОНТЕЙНЕРІВ — v1.31.7 */
+        .main-content {
+            width: calc(100% - 240px) !important;
+            max-width: none !important;
+        }
+        .content-area, .section {
+            width: 100% !important;
+            max-width: none !important;
+        }
         .cases-grid-admin {
             display: grid !important;
             grid-template-columns: repeat(3, 1fr) !important;
-            gap: 30px !important;
+            gap: 40px !important;
             padding-top: 10px;
             width: 100% !important;
         }
