@@ -702,6 +702,7 @@ body {
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     padding-top: 20px;
+    width: 100%;
 }
 
 .doctor-card-admin,
@@ -725,7 +726,7 @@ body {
 .doctor-photo-admin,
 .case-photo-admin {
     width: 100%;
-    height: 280px;
+    height: 320px;
     background: var(--bg-input);
     position: relative;
     overflow: hidden;
@@ -750,7 +751,7 @@ body {
 
 .doctor-card-body,
 .case-card-body {
-    padding: 25px;
+    padding: 30px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
