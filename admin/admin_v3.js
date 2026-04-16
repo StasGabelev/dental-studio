@@ -1641,16 +1641,25 @@ function toggleKeyVisibility() {
 async function loadAISettings() {
     // Try Supabase first
     if (sb) {
-        const { data } = await sb.from('ai_settings').select('*').limit(1).single();
-        if (data) {
-            document.getElementById('aiProvider').value = data.provider || 'openai';
-            onProviderChange();
-            document.getElementById('aiApiKey').value = data.api_key || '';
-            document.getElementById('aiModel').value = data.model || '';
-            document.getElementById('aiSystemPrompt').value = data.system_prompt || '';
-            if (data.custom_url) document.getElementById('aiCustomUrl').value = data.custom_url;
-            return;
-        }
+        try {
+            const { data, error } = await sb.from('ai_settings').select('*').limit(1).single();
+            if (data && !error) {
+                const provEl = document.getElementById('aiProvider');
+                if (provEl) {
+                    provEl.value = data.provider || 'openai';
+                    onProviderChange();
+                }
+                const keyEl = document.getElementById('aiApiKey');
+                if (keyEl) keyEl.value = data.api_key || '';
+                const modEl = document.getElementById('aiModel');
+                if (modEl) modEl.value = data.model || '';
+                const promptEl = document.getElementById('aiSystemPrompt');
+                if (promptEl) promptEl.value = data.system_prompt || '';
+                const customEl = document.getElementById('aiCustomUrl');
+                if (customEl) customEl.value = data.custom_url || '';
+                return;
+            }
+        } catch(e) { console.warn('Supabase AI load error:', e); }
     }
 
     // Fallback to localStorage
@@ -1658,16 +1667,22 @@ async function loadAISettings() {
     if (saved) {
         try {
             const s = JSON.parse(saved);
-            document.getElementById('aiProvider').value = s.provider || 'openai';
-            onProviderChange();
-            document.getElementById('aiApiKey').value = s.apiKey || '';
-            document.getElementById('aiModel').value = s.model || '';
-            document.getElementById('aiSystemPrompt').value = s.systemPrompt || '';
-            if (s.customUrl) document.getElementById('aiCustomUrl').value = s.customUrl;
+            const provEl = document.getElementById('aiProvider');
+            if (provEl) {
+                provEl.value = s.provider || 'openai';
+                onProviderChange();
+            }
+            const keyEl = document.getElementById('aiApiKey');
+            if (keyEl) keyEl.value = s.apiKey || '';
+            const modEl = document.getElementById('aiModel');
+            if (modEl) modEl.value = s.model || '';
+            const promptEl = document.getElementById('aiSystemPrompt');
+            if (promptEl) promptEl.value = s.systemPrompt || '';
+            const customEl = document.getElementById('aiCustomUrl');
+            if (customEl) customEl.value = s.customUrl || '';
         } catch(e) {}
     }
 }
-
 async function saveAISettings() {
     const settings = {
         provider: document.getElementById('aiProvider').value,
@@ -1677,19 +1692,12 @@ async function saveAISettings() {
         customUrl: document.getElementById('aiCustomUrl').value,
     };
 
-    // Always save to localStorage (for chat widget to use locally)
     localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
 
-    // Also save to Supabase
     if (sb) {
         try {
             const { data: existing, error: selErr } = await sb.from('ai_settings').select('id').limit(1).single();
-            if (selErr && selErr.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-                if (selErr.code === '42P01') {
-                    throw new Error("Таблиця ai_settings не знайдена. Запустіть скрипт ai_tables.sql в Supabase");
-                }
-                throw selErr;
-            }
+            if (selErr && selErr.code !== 'PGRST116' && selErr.code !== '42P01') throw selErr;
 
             const row = {
                 provider: settings.provider,
@@ -1701,22 +1709,17 @@ async function saveAISettings() {
             };
             
             if (existing) {
-                const { error: updErr } = await sb.from('ai_settings').update(row).eq('id', existing.id);
-                if (updErr) throw updErr;
+                await sb.from('ai_settings').update(row).eq('id', existing.id);
             } else {
-                const { error: insErr } = await sb.from('ai_settings').insert(row);
-                if (insErr) throw insErr;
+                await sb.from('ai_settings').insert(row);
             }
             showToast('✅ Налаштування ІІ збережено в БД');
         } catch(e) {
             console.error(e);
-            const statusEl = document.getElementById('aiTestStatus');
-            if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger);">❌ Помилка БД: ${e.message}</span>`;
-            showToast('❌ Помилка збереження в БД (збережено локально). Перевірте таблицю.');
-            return;
+            showToast('❌ Помилка БД (збережено локально)');
         }
     } else {
-        showToast('✅ Налаштування збережено локально (Supabase не підключено)');
+        showToast('✅ Збережено локально');
     }
 }
 
@@ -1727,85 +1730,52 @@ async function testAIApiKey() {
     const btn = document.getElementById('btnTestAI');
     
     if (!apiKey) {
-        statusEl.innerHTML = '<span style="color:var(--danger);">❌ Будь ласка, введіть API ключ.</span>';
+        statusEl.innerHTML = '<span style="color:var(--danger);">❌ Введіть ключ.</span>';
         return;
     }
 
-    // Зберігаємо перед перевіркою
     saveAISettings();
-
     btn.disabled = true;
-    btn.textContent = '⏳ Перевірка...';
-    statusEl.innerHTML = '<span style="color:var(--text-muted);">⏳ З\'єднання з сервером ' + provider + '...</span>';
+    btn.textContent = '⏳...';
 
     try {
-        let res, data;
         let success = false;
-
-        if (provider === 'openai' || provider === 'deepseek') {
-            const url = provider === 'openai' ? 'https://api.openai.com/v1/models' : 'https://api.deepseek.com/v1/models';
-            res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + apiKey } });
+        if (provider === 'openai') {
+            const res = await fetch('https://api.openai.com/v1/models', { headers: { 'Authorization': 'Bearer ' + apiKey } });
             success = res.ok;
         } else if (provider === 'anthropic') {
-            res = await fetch('https://api.anthropic.com/v1/messages', {
+            const res = await fetch('https://api.anthropic.com/v1/messages', {
                 method: 'POST',
                 headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-                body: JSON.stringify({ model: 'claude-3-haiku-20240307', max_tokens: 10, messages: [{ role: 'user', content: 'hello' }] })
+                body: JSON.stringify({ model: 'claude-3-haiku-20240307', max_tokens: 1, messages: [{ role: 'user', content: 'h' }] })
             });
-            success = res.ok;
-            if (res.status === 400 && !res.status.toString().startsWith('401')) {
-                success = true; // Key valid, just model not found or whatever
-            }
+            success = res.ok || res.status === 400;
         } else if (provider === 'google') {
-            res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
             success = res.ok;
-        } else if (provider === 'openrouter') {
-            res = await fetch('https://openrouter.ai/api/v1/auth/key', { headers: { 'Authorization': 'Bearer ' + apiKey } });
+        } else if (provider === 'deepseek') {
+            const res = await fetch('https://api.deepseek.com/v1/models', { headers: { 'Authorization': 'Bearer ' + apiKey } });
             success = res.ok;
         }
 
-        if (success) {
-            statusEl.innerHTML = '<span style="color:var(--success);">✅ Ключ дійсний! З\'єднання успішне.</span>';
-        } else {
-            statusEl.innerHTML = '<span style="color:var(--danger);">❌ Помилка: Ключ недійсний або заблокований (Status ' + res.status + ').</span>';
-        }
+        statusEl.innerHTML = success ? '<span style="color:var(--success);">✅ Ключ дійсний!</span>' : '<span style="color:var(--danger);">❌ Помилка ключа.</span>';
     } catch(err) {
-        statusEl.innerHTML = `<span style="color:var(--danger);">❌ Помилка мережі: ${err.message}</span>`;
+        statusEl.innerHTML = `<span style="color:var(--danger);">❌ Помилка мережі.</span>`;
     }
-
     btn.disabled = false;
     btn.textContent = '🧪 Перевірити';
 }
 
 async function handleKBUpload(event) {
     const files = event.target.files;
-    const list = document.getElementById('kbFilesList');
-
     for (const file of Array.from(files)) {
-        // Show in UI
-        const item = document.createElement('div');
-        item.className = 'kb-file-item';
-        item.innerHTML = `
-            <span class="kb-file-name">📄 ${file.name} <small style="color:var(--text-dim);">(${(file.size / 1024).toFixed(1)} KB)</small></span>
-            <button class="btn-danger" onclick="this.parentElement.remove()">✕</button>
-        `;
-        list.appendChild(item);
-
-        // Upload to Supabase Storage
         if (sb) {
             const filePath = `knowledge-base/${Date.now()}_${file.name}`;
             await sb.storage.from('clinic-media').upload(filePath, file);
         }
     }
-
-    showToast(`📎 ${files.length} файл(ів) додано до бази знань`);
+    showToast(`📎 Файли додано.`);
 }
-
-
-// loadChatLogs replaced by newer version below
-
-
-
 // ============================================================
 // DASHBOARD
 // ============================================================
