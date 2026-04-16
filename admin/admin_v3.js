@@ -1348,7 +1348,6 @@ function renderCases() {
         return;
     }
 
-    html += '<div class="cases-grid-admin">';
     cases.forEach((c, i) => {
         const heroImg = c.main_image_url || '';
         html += `<div class="case-card-admin">
@@ -1365,7 +1364,6 @@ function renderCases() {
             </div>
         </div>`;
     });
-    html += '</div>';
 
     area.innerHTML = html;
 }
