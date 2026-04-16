@@ -188,7 +188,7 @@ window.sendAIChatMsg = async function() {
     const thinkingEl = showThinking();
     isThinking = true;
 
-    const settings = getAISettings();
+    const settings = await getAISettings();
     if (!settings || !settings.apiKey) {
         if (thinkingEl) thinkingEl.remove();
         isThinking = false;
