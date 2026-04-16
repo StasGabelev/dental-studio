@@ -1198,7 +1198,7 @@ button { font-family: var(--font-sans); }
 .cases-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 2px; /* Very thin gap for high-end look */
+    gap: 20px; /* Comfortable gap for professional look */
     background-color: var(--bg-main);
     padding-bottom: 80px;
 }
@@ -1220,20 +1220,19 @@ button { font-family: var(--font-sans); }
 }
 
 .case-card:hover .case-card__img {
-    transform: scale(1.05);
     filter: brightness(1.02);
 }
 
 .case-card__overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.45);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: all 0.5s var(--ease);
-    backdrop-filter: blur(2px);
+    transition: all 0.4s var(--ease);
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle edge to define the contour */
 }
 
 .case-card:hover .case-card__overlay { opacity: 1; }
@@ -1257,7 +1256,7 @@ button { font-family: var(--font-sans); }
 @media (min-width: 1025px) {
     .cases-grid { 
         grid-template-columns: repeat(3, 1fr) !important; 
-        gap: 2px !important;
+        gap: 20px !important;
     }
 }
 
