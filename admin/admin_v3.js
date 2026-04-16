@@ -1873,3 +1873,69 @@ window.switchInnerTab = function(btnEl, targetId) {
     const targetEl = document.getElementById(targetId);
     if (targetEl) targetEl.style.display = 'block';
 };
+
+// ============================================================
+// CHAT LOGS
+// ============================================================
+
+async function loadChatLogs() {
+    const area = document.getElementById('chatLogsArea');
+    if (!sb) {
+        area.innerHTML = '<p class="editor-placeholder">\u041f\u0456\u0434\u043a\u043b\u044e\u0447\u0456\u0442\u044c Supabase \u0434\u043b\u044f \u043f\u0435\u0440\u0435\u0433\u043b\u044f\u0434\u0443 \u0447\u0430\u0442-\u043b\u043e\u0433\u0456\u0432</p>';
+        return;
+    }
+
+    area.innerHTML = '<p class="editor-placeholder">\u0417\u0430\u0432\u0430\u043d\u0442\u0430\u0436\u0435\u043d\u043d\u044f...</p>';
+
+    try {
+        const { data: sessions, error } = await sb.from('chat_sessions')
+            .select('*')
+            .order('last_message_at', { ascending: false })
+            .limit(50);
+
+        if (error) {
+            if (error.code === '42P01') {
+                area.innerHTML = '<p class="editor-placeholder">\u0422\u0430\u0431\u043b\u0438\u0446\u0456 chat_sessions \u043d\u0435 \u0437\u043d\u0430\u0439\u0434\u0435\u043d\u043e. \u0412\u0438\u043a\u043e\u043d\u0430\u0439\u0442\u0435 SQL \u0437 \u0444\u0430\u0439\u043b\u0443 chat_tables.sql</p>';
+            } else {
+                area.innerHTML = `<p class="editor-placeholder">\u041f\u043e\u043c\u0438\u043b\u043a\u0430: ${error.message}</p>`;
+            }
+            return;
+        }
+
+        if (!sessions || sessions.length === 0) {
+            area.innerHTML = '<p class="editor-placeholder">\u0427\u0430\u0442-\u043b\u043e\u0433\u0456 \u0432\u0456\u0434\u0441\u0443\u0442\u043d\u0456</p>';
+            return;
+        }
+
+        let html = '';
+        for (const session of sessions) {
+            const { data: messages } = await sb.from('chat_messages')
+                .select('*')
+                .eq('session_id', session.id)
+                .order('created_at', { ascending: true });
+
+            const icon = session.contact_type === 'email' ? '\u2709\ufe0f' : '\ud83d\udcde';
+            const date = new Date(session.created_at).toLocaleString('uk-UA');
+            const msgCount = messages ? messages.length : 0;
+
+            html += `<div class="chat-log-item">
+                <div class="chat-log-header">
+                    <span>${icon} <strong>${session.client_contact}</strong></span>
+                    <span>${date} \u2022 ${msgCount} \u043f\u043e\u0432\u0456\u0434\u043e\u043c\u043b\u0435\u043d\u044c</span>
+                </div>
+                <div class="chat-log-messages">`;
+
+            if (messages) {
+                messages.forEach(m => {
+                    html += `<div class="chat-log-msg ${m.role}">${m.content}</div>`;
+                });
+            }
+
+            html += '</div></div>';
+        }
+
+        area.innerHTML = html;
+    } catch(e) {
+        area.innerHTML = `<p class="editor-placeholder">\u041f\u043e\u043c\u0438\u043b\u043a\u0430: ${e.message}</p>`;
+    }
+}
