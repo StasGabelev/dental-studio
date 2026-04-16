@@ -1668,28 +1668,47 @@ async function saveAISettings() {
         customUrl: document.getElementById('aiCustomUrl').value,
     };
 
-    // Always save to localStorage (for chat widget to use)
+    // Always save to localStorage (for chat widget to use locally)
     localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
 
     // Also save to Supabase
     if (sb) {
-        const { data: existing } = await sb.from('ai_settings').select('id').limit(1).single();
-        const row = {
-            provider: settings.provider,
-            api_key: settings.apiKey,
-            model: settings.model,
-            system_prompt: settings.systemPrompt,
-            custom_url: settings.customUrl,
-            updated_at: new Date().toISOString(),
-        };
-        if (existing) {
-            await sb.from('ai_settings').update(row).eq('id', existing.id);
-        } else {
-            await sb.from('ai_settings').insert(row);
-        }
-    }
+        try {
+            const { data: existing, error: selErr } = await sb.from('ai_settings').select('id').limit(1).single();
+            if (selErr && selErr.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+                if (selErr.code === '42P01') {
+                    throw new Error("Таблиця ai_settings не знайдена. Запустіть скрипт ai_tables.sql в Supabase");
+                }
+                throw selErr;
+            }
 
-    showToast('✅ Налаштування ІІ збережено');
+            const row = {
+                provider: settings.provider,
+                api_key: settings.apiKey,
+                model: settings.model,
+                system_prompt: settings.systemPrompt,
+                custom_url: settings.customUrl,
+                updated_at: new Date().toISOString(),
+            };
+            
+            if (existing) {
+                const { error: updErr } = await sb.from('ai_settings').update(row).eq('id', existing.id);
+                if (updErr) throw updErr;
+            } else {
+                const { error: insErr } = await sb.from('ai_settings').insert(row);
+                if (insErr) throw insErr;
+            }
+            showToast('✅ Налаштування ІІ збережено в БД');
+        } catch(e) {
+            console.error(e);
+            const statusEl = document.getElementById('aiTestStatus');
+            if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger);">❌ Помилка БД: ${e.message}</span>`;
+            showToast('❌ Помилка збереження в БД (збережено локально). Перевірте таблицю.');
+            return;
+        }
+    } else {
+        showToast('✅ Налаштування збережено локально (Supabase не підключено)');
+    }
 }
 
 async function testAIApiKey() {

@@ -30,11 +30,36 @@ const PROVIDER_ENDPOINTS = {
     custom: null,
 };
 
-function getAISettings() {
+async function getAISettings() {
+    // 1. Try local cache (from admin panel or previous fetch)
     try {
         const saved = localStorage.getItem('ds_ai_settings');
-        if (saved) return JSON.parse(saved);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Only return if valid (has at least provider)
+            if (parsed && (parsed.provider || parsed.apiKey)) return parsed;
+        }
     } catch(e) {}
+
+    // 2. Fetch from Supabase (for public visitors)
+    if (widgetSb) {
+        try {
+            const { data } = await widgetSb.from('ai_settings').select('*').limit(1).single();
+            if (data) {
+                const settings = {
+                    provider: data.provider,
+                    apiKey: data.api_key,
+                    model: data.model,
+                    systemPrompt: data.system_prompt,
+                    customUrl: data.custom_url
+                };
+                localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
+                return settings;
+            }
+        } catch(err) {
+            console.warn('Cannot fetch AI settings:', err.message);
+        }
+    }
     return null;
 }
 
@@ -120,6 +145,12 @@ window.submitChatContact = async function() {
 
     // Create session in Supabase
     chatSessionId = await createChatSession(contact, contactType);
+
+    // Save session locally to remember user
+    if (chatSessionId) {
+        localStorage.setItem('ds_chat_contact', contact);
+        localStorage.setItem('ds_chat_session', chatSessionId);
+    }
 
     // Hide contact form, show chat
     if (contactForm) contactForm.style.display = 'none';
@@ -337,4 +368,44 @@ document.addEventListener('DOMContentLoaded', () => {
         ].join('');
         document.body.appendChild(chatWindow);
     }
+    
+    // Auto-resume session if exists
+    setTimeout(resumeChatSession, 500);
 });
+
+async function resumeChatSession() {
+    const contact = localStorage.getItem('ds_chat_contact');
+    const sessionId = localStorage.getItem('ds_chat_session');
+    
+    if (contact && sessionId) {
+        const form = document.getElementById('chatContactForm');
+        const body = document.getElementById('aiChatBody');
+        const inputArea = document.querySelector('.ai-chat-input-area');
+        
+        if (form) form.style.display = 'none';
+        if (body) body.style.display = 'block';
+        if (inputArea) inputArea.style.display = 'flex';
+        
+        clientContact = contact;
+        chatSessionId = sessionId;
+
+        if (widgetSb) {
+            try {
+                const { data: msgs } = await widgetSb.from('chat_messages')
+                    .select('*')
+                    .eq('session_id', sessionId)
+                    .order('created_at', { ascending: true });
+                    
+                if (msgs && msgs.length > 0) {
+                    body.innerHTML = '';
+                    chatHistory = [];
+                    msgs.forEach(m => {
+                        appendMessage(m.content, m.role);
+                        chatHistory.push({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.content });
+                    });
+                }
+            } catch(e) { console.warn('Could not load chat history', e); }
+        }
+    }
+}
+
