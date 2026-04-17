@@ -59,8 +59,8 @@ async function getAISettings() {
                     provider: data.provider,
                     apiKey: data.api_key,
                     model: data.model,
-                    systemPrompt: data.system_prompt,
-                    customUrl: data.custom_url
+                    customUrl: data.custom_url,
+                    knowledgeManual: data.knowledge_base_manual
                 };
                 localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
                 return settings;
@@ -72,30 +72,48 @@ async function getAISettings() {
     return null;
 }
 
-async function getKnowledgeBase() {
-    let kb = "\u0406\u041d\u0424\u041e\u0420\u041c\u0410\u0426\u0406\u042f \u041f\u0420\u041e \u041a\u041b\u0406\u041d\u0406\u041a\u0423:\n" +
-        "\u041d\u0430\u0437\u0432\u0430: Dental Studio\n" +
-        "\u041c\u0456\u0441\u0442\u043e: \u0427\u0435\u0440\u043d\u0456\u0433\u0456\u0432, \u0423\u043a\u0440\u0430\u0457\u043d\u0430\n" +
-        "\u0410\u0434\u0440\u0435\u0441\u0430: \u043f\u0440\u043e\u0441\u043f. \u041d\u0435\u0437\u0430\u043b\u0435\u0436\u043d\u043e\u0441\u0442\u0456, 21\n" +
-        "\u0413\u0440\u0430\u0444\u0456\u043a: \u041f\u043d-\u041f\u0442, 10:00-18:00\n" +
-        "\u0422\u0435\u043b\u0435\u0444\u043e\u043d: (077) 600 7 800\n";
+async function getKnowledgeBase(settings) {
+    let kb = "ОСНОВНАЯ ИНФОРМАЦИЯ О КЛИНИКЕ DENTAL STUDIO:\n" +
+        "- Город: Чернигов, Украина\n" +
+        "- Адрес: просп. Независимости, 21\n" +
+        "- График: Пн-Пт, 10:00-18:00\n" +
+        "- Телефон: (077) 600 7 800\n";
+
+    if (settings && settings.knowledgeManual) {
+        kb += "\nСПЕЦИАЛЬНЫЕ ПРАВИЛА И ИНСТРУКЦИИ КЛИНИКИ (ПРИОРИТЕТ):\n" + settings.knowledgeManual + "\n";
+    }
 
     if (widgetSb) {
         try {
+            // 1. Prices
             const { data: prices } = await widgetSb.from('price_list')
                 .select('service_name_uk, price_display, category')
                 .eq('is_active', true).order('sort_order');
             if (prices && prices.length > 0) {
-                kb += '\n\u041f\u041e\u0421\u041b\u0423\u0413\u0418 \u0422\u0410 \u0426\u0406\u041d\u0418:\n';
-                prices.forEach(p => {
-                    kb += `- ${p.service_name_uk} (${p.category}) - ${p.price_display}\n`;
+                kb += '\nУСЛУГИ И ЦЕНЫ:\n';
+                prices.forEach(p => { 
+                    kb += `- ${p.service_name_uk} (${p.category}) - ${p.price_display}\n`; 
                 });
             }
+
+            // 2. Doctors
             const { data: docs } = await widgetSb.from('doctors')
                 .select('name_uk, specialization_uk').eq('is_active', true);
             if (docs && docs.length > 0) {
-                kb += '\n\u041b\u0406\u041a\u0410\u0420\u0406:\n';
+                kb += '\nВРАЧИ И СПЕЦИАЛИЗАЦИЯ:\n';
                 docs.forEach(d => { kb += `- ${d.name_uk} - ${d.specialization_uk}\n`; });
+            }
+
+            // 3. Portfolio/Cases
+            const { data: cases } = await widgetSb.from('treatment_cases')
+                .select('title_uk, category, doctor_name_uk')
+                .eq('is_published', true).limit(5);
+            if (cases && cases.length > 0) {
+                kb += '\nПРИМЕРЫ НАШИХ РАБОТ (КЕЙСЫ):\n';
+                cases.forEach(c => { 
+                    kb += `- ${c.title_uk} (Категория: ${c.category}, Врач: ${c.doctor_name_uk || 'Dental Studio'})\n`; 
+                });
+                kb += "\nЕсли клиент интересуется конкретными работами, упомяни, что в клинике есть детальное портфолио.\n";
             }
         } catch(e) { console.warn('KB error:', e); }
     }
@@ -167,7 +185,7 @@ window.submitChatContact = async function() {
     if (inputArea) inputArea.style.display = 'flex';
 
     // Save the greeting as bot message
-    const greeting = "\u0412\u0456\u0442\u0430\u044e! \u042f \u2014 AI-\u0430\u0441\u0438\u0441\u0442\u0435\u043d\u0442 Dental Studio. \ud83e\uddb7 \u041f\u0456\u0434\u043a\u0430\u0436\u0443 \u0432\u0456\u043b\u044c\u043d\u0438\u0439 \u0447\u0430\u0441 \u0434\u043b\u044f \u0437\u0430\u043f\u0438\u0441\u0443, \u0437\u043e\u0440\u0456\u0454\u043d\u0442\u0443\u044e \u043f\u043e \u0446\u0456\u043d\u0430\u0445 \u0456 \u0432\u0456\u0434\u043f\u043e\u0432\u0456\u043c \u043d\u0430 \u043f\u0438\u0442\u0430\u043d\u043d\u044f. \u0427\u0438\u043c \u043c\u043e\u0436\u0443 \u0434\u043e\u043f\u043e\u043c\u043e\u0433\u0442\u0438?";
+    const greeting = "Вітаю! Я — AI-асистент Dental Studio. 🦷 Підкажу вільний час для запису, зорієнтую по цінах і відповім на питання. Чим можу допомогти?";
     saveChatMessage('bot', greeting);
 };
 
@@ -212,9 +230,22 @@ window.sendAIChatMsg = async function() {
     }
 
     try {
-        const kb = await getKnowledgeBase();
-        const sysPrompt = (settings.systemPrompt || '') + '\n\n' + kb;
-        const reply = await callAI(settings, sysPrompt, chatHistory.slice(-10));
+        const kb = await getKnowledgeBase(settings);
+        const sysPrompt = `ТЫ — Ассистент Dental Studio. 
+ОСНОВНЫЕ ПРАВИЛА:
+1. ПРИОРИТЕТ: Всегда проверяй [ИНСТРУКЦИИ КЛИНИКИ]. Если там есть ответ — используй его.
+2. БАЗА ЗНАНИЙ: Используй цены и кейсы для конкретики.
+3. ТУПИКОВАЯ СИТУАЦИЯ: Если ответа нет в мануале или базе, или вопрос слишком специфичен, отвечай: "Извините, пожалуйста, на данный момент я затрудняюсь ответить на этот вопрос максимально точно. Позвольте, я передам ваш контакт нашему администратору, и он свяжется с вами в ближайшее время для детальной консультации."
+4. ЛОЯЛЬНОСТЬ: Будь вежлив и профессионален.
+5. CRM: Если в ходе беседы ты узнал имя клиента или фамилию, ОБЯЗАТЕЛЬНО добавь в самый конец сообщения скрытые теги: [[NAME:Имя]] или [[SURNAME:Фамилия]].
+
+ТЕКУЩИЕ ЗНАНИЯ:\n${kb}\n\nИНСТРУКЦИИ РАЗРАБОТЧИКА:\n${settings.systemPrompt || ''}`;
+
+        let reply = await callAI(settings, sysPrompt, chatHistory.slice(-10));
+        
+        // CRM: Process meta-tags
+        reply = await processAITags(reply, chatSessionId);
+
         if (thinkingEl) thinkingEl.remove();
         isThinking = false;
         appendMessage(reply, 'bot');
@@ -233,39 +264,61 @@ window.sendAIChatMsg = async function() {
 
 function getFallbackReply(msg) {
     const lower = msg.toLowerCase();
-    if (lower.includes('\u0446\u0456\u043d') || lower.includes('\u0432\u0430\u0440\u0442') || lower.includes('\u043a\u043e\u0448\u0442') || lower.includes('price')) {
-        return "\u0426\u0456\u043d\u0438 \u0437\u0430\u043b\u0435\u0436\u0430\u0442\u044c \u0432\u0456\u0434 \u043f\u043e\u0441\u043b\u0443\u0433\u0438 \u0442\u0430 \u0441\u043a\u043b\u0430\u0434\u043d\u043e\u0441\u0442\u0456 \u043a\u043b\u0456\u043d\u0456\u0447\u043d\u043e\u0433\u043e \u0432\u0438\u043f\u0430\u0434\u043a\u0443. \u0414\u043b\u044f \u0442\u043e\u0447\u043d\u043e\u0433\u043e \u0440\u043e\u0437\u0440\u0430\u0445\u0443\u043d\u043a\u0443 \u0437\u0430\u0445\u043e\u0434\u044c\u0442\u0435 \u043d\u0430 \u0431\u0435\u0437\u043a\u043e\u0448\u0442\u043e\u0432\u043d\u0443 \u043a\u043e\u043d\u0441\u0443\u043b\u044c\u0442\u0430\u0446\u0456\u044e \u0430\u0431\u043e \u0437\u0430\u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0443\u0439\u0442\u0435: (077) 600 7 800";
+    if (lower.includes('цін') || lower.includes('варт') || lower.includes('кошт') || lower.includes('price')) {
+        return "Ціни залежать від послуги та складності клінічного випадку. Для точного розрахунку заходьте на безкоштовну консультацію або зателефонуйте: (077) 600 7 800";
     }
-    if (lower.includes('\u0430\u0434\u0440\u0435\u0441') || lower.includes('\u0434\u0435') || lower.includes('\u0437\u043d\u0430\u0445\u043e\u0434\u0438') || lower.includes('where')) {
-        return "\u041c\u0438 \u0437\u043d\u0430\u0445\u043e\u0434\u0438\u043c\u043e\u0441\u044c: \u043f\u0440\u043e\u0441\u043f. \u041d\u0435\u0437\u0430\u043b\u0435\u0436\u043d\u043e\u0441\u0442\u0456, 21, \u0427\u0435\u0440\u043d\u0456\u0433\u0456\u0432. \u0413\u0440\u0430\u0444\u0456\u043a: \u041f\u043d-\u041f\u0442 10:00-18:00. \u0422\u0435\u043b.: (077) 600 7 800";
+    if (lower.includes('адрес') || lower.includes('де') || lower.includes('знаходи') || lower.includes('where')) {
+        return "Ми знаходимось: просп. Незалежності, 21, Чернігів. Графік: Пн-Пт 10:00-18:00. Тел.: (077) 600 7 800";
     }
-    if (lower.includes('\u0437\u0430\u043f\u0438\u0441') || lower.includes('\u0432\u0456\u043b\u044c\u043d') || lower.includes('\u0447\u0430\u0441') || lower.includes('book')) {
-        return "\u0414\u043b\u044f \u0437\u0430\u043f\u0438\u0441\u0443 \u0437\u0430\u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0443\u0439\u0442\u0435: (077) 600 7 800 \u0430\u0431\u043e \u043d\u0430\u0442\u0438\u0441\u043d\u0456\u0442\u044c \u043a\u043d\u043e\u043f\u043a\u0443 '\u0417\u0430\u043f\u0438\u0441\u0430\u0442\u0438\u0441\u044f' \u043d\u0430 \u0441\u0430\u0439\u0442\u0456.";
+    if (lower.includes('запис') || lower.includes('вільн') || lower.includes('час') || lower.includes('book')) {
+        return "Для запису зателефонуйте: (077) 600 7 800 або натисніть кнопку 'Записатися' на сайті.";
     }
-    return "\u0412\u0456\u0442\u0430\u044e! \u042f \u2014 AI-\u0430\u0441\u0438\u0441\u0442\u0435\u043d\u0442 Dental Studio. \u041c\u043e\u0436\u0443 \u0434\u043e\u043f\u043e\u043c\u043e\u0433\u0442\u0438 \u0437 \u043f\u0438\u0442\u0430\u043d\u043d\u044f\u043c\u0438 \u0449\u043e\u0434\u043e \u043f\u043e\u0441\u043b\u0443\u0433, \u0446\u0456\u043d \u0442\u0430 \u0437\u0430\u043f\u0438\u0441\u0443. \u0417\u0430\u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0443\u0439\u0442\u0435: (077) 600 7 800";
+    return "Вітаю! Я — AI-асистент Dental Studio. Можу допомогти з питаннями щодо послуг, цін та запису. Зателефонуйте: (077) 600 7 800";
 }
 
-// --- CRM: Auto-detect name ---
+// --- CRM: Parse and Save Tags from AI ---
+async function processAITags(text, sessionId) {
+    if (!text || !sessionId || !widgetSb) return text;
+
+    let cleanText = text;
+    const nameRegex = /\[\[NAME:(.*?)\]\]/i;
+    const surnameRegex = /\[\[SURNAME:(.*?)\]\]/i;
+
+    const nameMatch = cleanText.match(nameRegex);
+    const surnameMatch = cleanText.match(surnameRegex);
+
+    const updates = {};
+    if (nameMatch) {
+        updates.client_name = nameMatch[1].trim();
+        cleanText = cleanText.replace(nameRegex, '');
+    }
+    if (surnameMatch) {
+        updates.client_surname = surnameMatch[1].trim();
+        cleanText = cleanText.replace(surnameRegex, '');
+    }
+
+    if (Object.keys(updates).length > 0) {
+        try {
+            await widgetSb.from('chat_sessions').update(updates).eq('id', sessionId);
+            console.log('CRM: Updated from AI tags:', updates);
+        } catch(e) { console.error('CRM Update Error:', e); }
+    }
+
+    return cleanText.trim();
+}
+
+// Keep legacy detector for safety
 async function detectAndSaveName(sessionId, text) {
     if (!widgetSb || !sessionId) return;
-    const lower = text.toLowerCase();
-    
-    // Patterns for Ukrainian/Russian names
-    // "Мене звати Сергій", "Я Сергій", "Мене звуть Сергій", "Это Сергей"
     const patterns = [
         /(?:мене звати|мене звуть|я|меня зовут|это)\s+([А-ЯA-Z][а-яa-z]+)/u,
         /(?:кличуть|зови мене)\s+([А-ЯA-Z][а-яa-z]+)/u
     ];
-
     for (const p of patterns) {
         const match = text.match(p);
         if (match && match[1]) {
-            const name = match[1];
             try {
-                await widgetSb.from('chat_sessions')
-                    .update({ client_name: name })
-                    .eq('id', sessionId);
-                console.log('CRM: Auto-detected name:', name);
+                await widgetSb.from('chat_sessions').update({ client_name: match[1] }).eq('id', sessionId);
             } catch(e) {}
             break;
         }
@@ -376,30 +429,30 @@ document.addEventListener('DOMContentLoaded', () => {
         chatWindow.innerHTML = [
             '<div class="ai-chat-header">',
             '<div><strong style="display:block">Dental Studio AI</strong>',
-            '<span style="font-size:12px;opacity:0.7">\u0421\u043b\u0443\u0436\u0431\u0430 \u043f\u0456\u0434\u0442\u0440\u0438\u043c\u043a\u0438 24/7</span></div>',
+            '<span style="font-size:12px;opacity:0.7">Служба підтримки 24/7</span></div>',
             '<button class="ai-chat-close" onclick="window.toggleAIChat()">',
             '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">',
             '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
             '</button></div>',
             // Contact form (shown first)
             '<div id="chatContactForm">',
-            '<h4>\u0412\u043a\u0430\u0436\u0456\u0442\u044c email \u0430\u0431\u043e \u0442\u0435\u043b\u0435\u0444\u043e\u043d, \u0449\u043e\u0431 \u043f\u043e\u0447\u0430\u0442\u0438 \u0447\u0430\u0442:</h4>',
-            '<div id="chatContactError">\u0412\u043a\u0430\u0436\u0456\u0442\u044c email \u0430\u0431\u043e \u0442\u0435\u043b\u0435\u0444\u043e\u043d</div>',
+            '<h4>Вкажіть email або телефон, щоб почати чат:</h4>',
+            '<div id="chatContactError">Вкажіть email або телефон</div>',
             '<input type="email" id="chatContactEmail" placeholder="Email">',
-            '<div class="or-divider">\u0430\u0431\u043e</div>',
-            '<input type="tel" id="chatContactPhone" placeholder="\u0422\u0435\u043b\u0435\u0444\u043e\u043d">',
-            '<button onclick="window.submitChatContact()">\u041f\u043e\u0447\u0430\u0442\u0438 \u0447\u0430\u0442</button>',
+            '<div class="or-divider">або</div>',
+            '<input type="tel" id="chatContactPhone" placeholder="Телефон">',
+            '<button onclick="window.submitChatContact()">Почати чат</button>',
             '</div>',
             // Chat body (hidden until contact submitted)
             '<div class="ai-chat-body" id="aiChatBody" style="display:none;">',
-            '<div class="ai-msg bot-msg">\u0412\u0456\u0442\u0430\u044e! \u042f \u2014 AI-\u0430\u0441\u0438\u0441\u0442\u0435\u043d\u0442 Dental Studio. \ud83e\uddb7<br><br>',
-            '\u041f\u0456\u0434\u043a\u0430\u0436\u0443 \u0432\u0456\u043b\u044c\u043d\u0438\u0439 \u0447\u0430\u0441 \u0434\u043b\u044f \u0437\u0430\u043f\u0438\u0441\u0443, ',
-            '\u0437\u043e\u0440\u0456\u0454\u043d\u0442\u0443\u044e \u043f\u043e \u0446\u0456\u043d\u0430\u0445 \u0456 \u0432\u0456\u0434\u043f\u043e\u0432\u0456\u043c \u043d\u0430 \u043f\u0438\u0442\u0430\u043d\u043d\u044f. ',
-            '\u0427\u0438\u043c \u043c\u043e\u0436\u0443 \u0434\u043e\u043f\u043e\u043c\u043e\u0433\u0442\u0438?</div>',
+            '<div class="ai-msg bot-msg">Вітаю! Я — AI-асистент Dental Studio. 🦷<br><br>',
+            'Підкажу вільний час для запису, ',
+            'зорієнтую по цінах і відповім на питання. ',
+            'Чим можу допомогти?</div>',
             '</div>',
             // Input area (hidden until contact submitted)
             '<div class="ai-chat-input-area" style="display:none;">',
-            '<input type="text" id="aiChatInput" placeholder="\u041d\u0430\u043f\u0438\u0448\u0456\u0442\u044c \u0432\u0430\u0448\u0435 \u043f\u043e\u0432\u0456\u0434\u043e\u043c\u043b\u0435\u043d\u043d\u044f..." onkeypress="window.handleAIChatEnter(event)">',
+            '<input type="text" id="aiChatInput" placeholder="Напишіть ваше повідомлення..." onkeypress="window.handleAIChatEnter(event)">',
             '<button class="ai-send-btn" onclick="window.sendAIChatMsg()">',
             '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">',
             '<line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>',
@@ -447,4 +500,3 @@ async function resumeChatSession() {
         }
     }
 }
-

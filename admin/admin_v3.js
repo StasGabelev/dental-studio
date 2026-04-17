@@ -1655,6 +1655,8 @@ async function loadAISettings() {
                 if (modEl) modEl.value = data.model || '';
                 const promptEl = document.getElementById('aiSystemPrompt');
                 if (promptEl) promptEl.value = data.system_prompt || '';
+                const manualEl = document.getElementById('aiKnowledgeManual');
+                if (manualEl) manualEl.value = data.knowledge_base_manual || '';
                 const customEl = document.getElementById('aiCustomUrl');
                 if (customEl) customEl.value = data.custom_url || '';
                 return;
@@ -1678,6 +1680,8 @@ async function loadAISettings() {
             if (modEl) modEl.value = s.model || '';
             const promptEl = document.getElementById('aiSystemPrompt');
             if (promptEl) promptEl.value = s.systemPrompt || '';
+            const manualEl = document.getElementById('aiKnowledgeManual');
+            if (manualEl) manualEl.value = s.knowledgeManual || '';
             const customEl = document.getElementById('aiCustomUrl');
             if (customEl) customEl.value = s.customUrl || '';
         } catch(e) {}
@@ -1689,6 +1693,7 @@ async function saveAISettings() {
         apiKey: document.getElementById('aiApiKey').value,
         model: document.getElementById('aiModel').value,
         systemPrompt: document.getElementById('aiSystemPrompt').value,
+        knowledgeManual: document.getElementById('aiKnowledgeManual').value,
         customUrl: document.getElementById('aiCustomUrl').value,
     };
 
@@ -1704,6 +1709,7 @@ async function saveAISettings() {
                 api_key: settings.apiKey,
                 model: settings.model,
                 system_prompt: settings.systemPrompt,
+                knowledge_base_manual: settings.knowledgeManual,
                 custom_url: settings.customUrl,
                 updated_at: new Date().toISOString(),
             };
