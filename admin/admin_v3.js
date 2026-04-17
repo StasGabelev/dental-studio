@@ -1904,30 +1904,34 @@ async function loadChatLogs() {
         return;
     }
 
-        try {
-            console.log('CRM: Loading sessions with status:', currentChatStatus);
-            const { data: sessions, error } = await query
-                .or(`status.eq.${currentChatStatus},status.is.null`) // Fallback for old sessions without status
-                .order('last_message_at', { ascending: false });
-            
-            if (error) {
-                console.warn('CRM: Specific status query failed, falling back to all sessions.', error);
-                const { data: all, error: allErr } = await sb.from('chat_sessions').select('*').order('created_at', { ascending: false });
-                if (allErr) throw allErr;
-                allSessions = all || [];
-            } else {
-                console.log(`CRM: Found ${sessions?.length || 0} sessions`);
-                allSessions = sessions || [];
-            }
-        } catch(e) {
-            console.error('CRM: Fatal load error:', e);
-            const { data: all } = await sb.from('chat_sessions').select('*').order('created_at', { ascending: false });
+    try {
+        console.log('CRM: Loading sessions with status:', currentChatStatus);
+        
+        // Try filtering by status, if fails (missing col), fallback to all
+        const { data: sessions, error } = await sb.from('chat_sessions')
+            .select('*')
+            .or(`status.eq.${currentChatStatus},status.is.null`) 
+            .order('last_message_at', { ascending: false });
+        
+        if (error) {
+            console.warn('CRM: Specific status query failed, falling back to all sessions.', error);
+            const { data: all, error: allErr } = await sb.from('chat_sessions').select('*').order('created_at', { ascending: false });
+            if (allErr) throw allErr;
             allSessions = all || [];
+        } else {
+            console.log(`CRM: Found ${sessions?.length || 0} sessions`);
+            allSessions = sessions || [];
         }
         renderChatList(allSessions);
     } catch(e) {
-        console.error('Load chat error:', e);
-        area.innerHTML = `<p class="editor-placeholder">Помилка: ${e.message}</p>`;
+        console.error('CRM: Fatal load error:', e);
+        try {
+            const { data: all } = await sb.from('chat_sessions').select('*').order('created_at', { ascending: false });
+            allSessions = all || [];
+            renderChatList(allSessions);
+        } catch(innerE) {
+            area.innerHTML = `<p class="editor-placeholder">Помилка: ${e.message}</p>`;
+        }
     }
 }
 
