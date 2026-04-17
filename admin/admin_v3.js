@@ -1659,6 +1659,10 @@ async function loadAISettings() {
                 if (manualEl) manualEl.value = data.knowledge_base_manual || '';
                 const customEl = document.getElementById('aiCustomUrl');
                 if (customEl) customEl.value = data.custom_url || '';
+                const tgBotEl = document.getElementById('tgBotToken');
+                if (tgBotEl) tgBotEl.value = data.tg_bot_token || '';
+                const tgChatEl = document.getElementById('tgChatId');
+                if (tgChatEl) tgChatEl.value = data.tg_chat_id || '';
                 return;
             }
         } catch(e) { console.warn('Supabase AI load error:', e); }
@@ -1684,6 +1688,10 @@ async function loadAISettings() {
             if (manualEl) manualEl.value = s.knowledgeManual || '';
             const customEl = document.getElementById('aiCustomUrl');
             if (customEl) customEl.value = s.customUrl || '';
+            const tgBotEl = document.getElementById('tgBotToken');
+            if (tgBotEl) tgBotEl.value = s.tgBotToken || '';
+            const tgChatEl = document.getElementById('tgChatId');
+            if (tgChatEl) tgChatEl.value = s.tgChatId || '';
         } catch(e) {}
     }
 }
@@ -1695,6 +1703,8 @@ async function saveAISettings() {
         systemPrompt: document.getElementById('aiSystemPrompt').value,
         knowledgeManual: document.getElementById('aiKnowledgeManual').value,
         customUrl: document.getElementById('aiCustomUrl').value,
+        tgBotToken: document.getElementById('tgBotToken').value,
+        tgChatId: document.getElementById('tgChatId').value,
     };
 
     localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
@@ -1711,6 +1721,8 @@ async function saveAISettings() {
                 system_prompt: settings.systemPrompt,
                 knowledge_base_manual: settings.knowledgeManual,
                 custom_url: settings.customUrl,
+                tg_bot_token: settings.tgBotToken,
+                tg_chat_id: settings.tgChatId,
                 updated_at: new Date().toISOString(),
             };
             

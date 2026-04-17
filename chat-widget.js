@@ -60,7 +60,9 @@ async function getAISettings() {
                     apiKey: data.api_key,
                     model: data.model,
                     customUrl: data.custom_url,
-                    knowledgeManual: data.knowledge_base_manual
+                    knowledgeManual: data.knowledge_base_manual,
+                    tgBotToken: data.tg_bot_token,
+                    tgChatId: data.tg_chat_id
                 };
                 localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
                 return settings;
@@ -253,14 +255,20 @@ window.sendAIChatMsg = async function() {
 ОСНОВНЫЕ ПРАВИЛА:
 1. ПРИОРИТЕТ: Всегда проверяй [ИНСТРУКЦИИ КЛИНИКИ]. Если там есть ответ — используй его.
 2. БАЗА ЗНАНИЙ: Используй цены и кейсы для конкретики.
-3. ТУПИКОВАЯ СИТУАЦИЯ: Если ответа нет в мануале или базе, или вопрос слишком специфичен, отвечай: "Извините, пожалуйста, на данный момент я затрудняюсь ответить на этот вопрос максимально точно. Позвольте, я передам ваш контакт нашему администратору, и он свяжется с вами в ближайшее время для детальной консультации."
+3. ТУПИКОВАЯ СИТУАЦИЯ: Если ответа нет в мануале или базе, или вопрос слишком специфичен, отвечай: "Извините, пожалуйста, на данный момент я затрудняюсь ответить на этот вопрос максимально точно. Позвольте, я передам ваш контакт нашему администратору, и он свяжется с вами в ближайшее время для детальной консультации." и ОБЯЗАТЕЛЬНО добавь скрытую метку [[CALLBACK:TRUE]].
 4. ЛОЯЛЬНОСТЬ: Будь вежлив и профессионален.
 5. CRM: Если в ходе беседы ты узнал имя клиента или фамилию, ОБЯЗАТЕЛЬНО добавь в самый конец сообщения скрытые теги: [[NAME:Имя]] или [[SURNAME:Фамилия]].
+6. ОБРАТНЫЙ ЗВОНОК: Если пользователь прямо просит перезвонить или оставить заявку, ОБЯЗАТЕЛЬНО добавь скрытую метку [[CALLBACK:TRUE]].
 
 ТЕКУЩИЕ ЗНАНИЯ:\n${kb}\n\nИНСТРУКЦИИ РАЗРАБОТЧИКА:\n${settings.systemPrompt || ''}`;
 
         let reply = await callAI(settings, sysPrompt, chatHistory.slice(-10));
         
+        // Telegram Notification Trigger
+        if (reply.includes('[[CALLBACK:TRUE]]') || reply.includes('передам ваш контакт нашему администратору')) {
+            sendTelegramNotification(settings, chatSessionId, msg);
+        }
+
         // CRM: Process meta-tags
         reply = await processAITags(reply, chatSessionId);
 
@@ -323,6 +331,43 @@ async function processAITags(text, sessionId) {
     }
 
     return cleanText.trim();
+}
+
+// --- Telegram Notifications ---
+async function sendTelegramNotification(settings, sessionId, lastUserMsg) {
+    if (!settings || !settings.tgBotToken || !settings.tgChatId) return;
+
+    try {
+        // Prepare info (name, contact) from current session
+        let clientInfo = "Аноним";
+        let contact = "не указан";
+        
+        if (widgetSb) {
+            const { data } = await widgetSb.from('chat_sessions').select('*').eq('id', sessionId).single();
+            if (data) {
+                const name = (data.client_name || data.client_surname) 
+                    ? `${data.client_name || ''} ${data.client_surname || ''}`.trim() : "Не названо";
+                clientInfo = name;
+                contact = data.client_contact;
+            }
+        }
+
+        const adminUrl = window.location.origin + window.location.pathname.replace('index.html', '') + `admin/panel.html#session-${sessionId}`;
+        
+        const text = `🔔 *НОВЫЙ ЗАПРОС НА ЗВОНОК*\n\n👤 *Клієнт:* ${clientInfo}\n📞 *Контакт:* ${contact}\n💬 *Останнє повідомлення:* ${lastUserMsg}\n\n🔗 [Відкрити в Адмін-панелі](${adminUrl})`;
+
+        const url = `https://api.telegram.org/bot${settings.tgBotToken}/sendMessage`;
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: settings.tgChatId,
+                text: text,
+                parse_mode: 'Markdown'
+            })
+        });
+        console.log('CRM: Telegram notification sent');
+    } catch(e) { console.error('CRM: Telegram notification error:', e); }
 }
 
 // Keep legacy detector for safety
