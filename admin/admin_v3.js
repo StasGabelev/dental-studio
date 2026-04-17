@@ -1796,11 +1796,11 @@ async function loadDashboardData() {
         document.getElementById('statServices').textContent = priceItems.length;
         document.getElementById('statDoctors').textContent = doctors.length;
 
-        // Count today's chats
+        // Count today's chat sessions
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const { count } = await sb.from('chat_logs')
-            .select('session_id', { count: 'exact', head: true })
+        const { count } = await sb.from('chat_sessions')
+            .select('id', { count: 'exact', head: true })
             .gte('created_at', today.toISOString());
         document.getElementById('statChats').textContent = count || 0;
     } else {
@@ -1905,13 +1905,25 @@ async function loadChatLogs() {
     }
 
     try {
-        const { data: sessions, error } = await sb.from('chat_sessions')
-            .select('*')
-            .eq('status', currentChatStatus)
-            .order('last_message_at', { ascending: false });
-
-        if (error) throw error;
-        allSessions = sessions || [];
+        let query = sb.from('chat_sessions').select('*');
+        
+        // Try filtering by status, if fails (missing col), fallback to all
+        try {
+            const { data: sessions, error } = await query
+                .eq('status', currentChatStatus)
+                .order('last_message_at', { ascending: false });
+            
+            if (error) {
+                // If status column missing, fallback to select all
+                const { data: all } = await sb.from('chat_sessions').select('*').order('created_at', { ascending: false });
+                allSessions = all || [];
+            } else {
+                allSessions = sessions || [];
+            }
+        } catch(e) {
+            const { data: all } = await sb.from('chat_sessions').select('*').order('created_at', { ascending: false });
+            allSessions = all || [];
+        }
         renderChatList(allSessions);
     } catch(e) {
         console.error('Load chat error:', e);
