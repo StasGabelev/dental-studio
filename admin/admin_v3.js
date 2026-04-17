@@ -1904,23 +1904,23 @@ async function loadChatLogs() {
         return;
     }
 
-    try {
-        let query = sb.from('chat_sessions').select('*');
-        
-        // Try filtering by status, if fails (missing col), fallback to all
         try {
+            console.log('CRM: Loading sessions with status:', currentChatStatus);
             const { data: sessions, error } = await query
-                .eq('status', currentChatStatus)
+                .or(`status.eq.${currentChatStatus},status.is.null`) // Fallback for old sessions without status
                 .order('last_message_at', { ascending: false });
             
             if (error) {
-                // If status column missing, fallback to select all
-                const { data: all } = await sb.from('chat_sessions').select('*').order('created_at', { ascending: false });
+                console.warn('CRM: Specific status query failed, falling back to all sessions.', error);
+                const { data: all, error: allErr } = await sb.from('chat_sessions').select('*').order('created_at', { ascending: false });
+                if (allErr) throw allErr;
                 allSessions = all || [];
             } else {
+                console.log(`CRM: Found ${sessions?.length || 0} sessions`);
                 allSessions = sessions || [];
             }
         } catch(e) {
+            console.error('CRM: Fatal load error:', e);
             const { data: all } = await sb.from('chat_sessions').select('*').order('created_at', { ascending: false });
             allSessions = all || [];
         }

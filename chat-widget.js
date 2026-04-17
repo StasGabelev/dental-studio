@@ -122,30 +122,48 @@ async function getKnowledgeBase(settings) {
 
 // --- Save message to Supabase ---
 async function saveChatMessage(role, content) {
-    if (!widgetSb || !chatSessionId) return;
+    if (!widgetSb || !chatSessionId) {
+        console.warn('CRM: Cannot save message - no session:', { hasSb: !!widgetSb, sessionId: chatSessionId });
+        return;
+    }
     try {
-        await widgetSb.from('chat_messages').insert({
+        const { error: msgErr } = await widgetSb.from('chat_messages').insert({
             session_id: chatSessionId,
             role: role,
             content: content
         });
+        if (msgErr) console.error('CRM: Message save error:', msgErr);
+
         // Update last_message_at
-        await widgetSb.from('chat_sessions')
+        const { error: updateErr } = await widgetSb.from('chat_sessions')
             .update({ last_message_at: new Date().toISOString() })
             .eq('id', chatSessionId);
-    } catch(e) { console.warn('Save chat msg error:', e); }
+        if (updateErr) console.error('CRM: Update session timestamp error:', updateErr);
+    } catch(e) { console.warn('CRM: Fatal save msg error:', e); }
 }
 
 // --- Create chat session ---
 async function createChatSession(contact, contactType) {
-    if (!widgetSb) return null;
+    if (!widgetSb) {
+        console.error('CRM: Supabase not initialized in widget');
+        return null;
+    }
     try {
+        console.log('CRM: Creating session for:', contact);
         const { data, error } = await widgetSb.from('chat_sessions').insert({
             client_contact: contact,
             contact_type: contactType
         }).select('id').single();
-        if (data) return data.id;
-    } catch(e) { console.warn('Create session error:', e); }
+        
+        if (error) {
+            console.error('CRM: Session creation error:', error);
+            return null;
+        }
+        if (data) {
+            console.log('CRM: Session created successfully, ID:', data.id);
+            return data.id;
+        }
+    } catch(e) { console.error('CRM: Fatal session creation error:', e); }
     return null;
 }
 
