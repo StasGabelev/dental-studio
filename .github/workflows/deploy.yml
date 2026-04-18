@@ -8,7 +8,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH (server pulls from GitHub)
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -18,8 +18,17 @@ jobs:
           timeout: 300s
           command_timeout: 20m
           script: |
-            cd ~/domains/rozetka.space/public_html
-            wget -q "https://github.com/StasGabelev/dental-studio/archive/refs/heads/main.tar.gz" -O /tmp/ds_deploy.tar.gz
-            tar -xzf /tmp/ds_deploy.tar.gz --strip-components=1 -C ~/domains/rozetka.space/public_html/ dental-studio-main/
-            rm -f /tmp/ds_deploy.tar.gz
-            echo "Deploy complete!"
+            set -e
+            TARGET=~/domains/rozetka.space/public_html
+            TMP=/tmp/ds_deploy_$(date +%s).tar.gz
+
+            echo "Downloading from GitHub..."
+            wget -q "https://github.com/StasGabelev/dental-studio/archive/refs/heads/main.tar.gz" -O $TMP
+
+            echo "Extracting..."
+            tar -xzf $TMP --strip-components=1 -C $TARGET dental-studio-main/
+
+            echo "Cleanup..."
+            rm -f $TMP
+
+            echo "✅ Deploy complete!"
