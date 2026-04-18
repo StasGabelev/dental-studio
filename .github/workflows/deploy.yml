@@ -8,32 +8,32 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Cleanup old backups on Server
-        uses: appleboy/ssh-action@v0.1.10
-        continue-on-error: true
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: 65002
-          timeout: 60s
-          command_timeout: 5m
-          script: |
-            mkdir -p ~/backups
-            ls -t ~/backups/*.tar.gz 2>/dev/null | tail -n +3 | xargs -r rm -f --
-
       - name: Deploy to Server
-        uses: appleboy/scp-action@v0.1.3
+        uses: appleboy/ssh-action@v0.1.10
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 65002
           timeout: 300s
-          source: ".,!.git,!.github,!node_modules"
-          target: "domains/rozetka.space/public_html"
-          strip_components: 0
-          overwrite: true
+          command_timeout: 20m
+          envs: GH_TOKEN
+          script: |
+            set -e
+            TARGET=~/domains/rozetka.space/public_html
+            TMP=/tmp/ds_$(date +%s)
+            echo "Downloading..."
+            curl -fsSL \
+              -H "Authorization: token $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/StasGabelev/dental-studio/tarball/main" \
+              -o ${TMP}.tar.gz
+            echo "Extracting..."
+            mkdir -p $TMP
+            tar -xzf ${TMP}.tar.gz -C $TMP --strip-components=1
+            echo "Copying..."
+            cp -rf $TMP/. $TARGET/
+            rm -rf $TMP ${TMP}.tar.gz
+            echo "Done!"
