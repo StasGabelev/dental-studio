@@ -33,6 +33,6 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 65002
           timeout: 300s
-          source: ".,! .git,! .github,! node_modules"
+          source: ".,!.git,!.github,!node_modules"
           target: "domains/rozetka.space/public_html"
           strip_components: 0
