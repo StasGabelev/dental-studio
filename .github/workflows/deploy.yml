@@ -1,39 +1,22 @@
-name: Deploy Dental Studio
+name: Cleanup Disk Space
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Server
+      - name: Delete Massive Backups
         uses: appleboy/ssh-action@v0.1.10
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 65002
-          timeout: 300s
-          command_timeout: 20m
-          envs: GH_TOKEN
           script: |
-            set -e
-            TARGET=~/domains/rozetka.space/public_html
-            TMP=~/ds_deploy_$(date +%s)
-            echo "Downloading..."
-            curl -fsSL \
-              -H "Authorization: token $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/StasGabelev/dental-studio/tarball/main" \
-              -o ${TMP}.tar.gz
-            echo "Extracting..."
-            mkdir -p $TMP
-            tar -xzf ${TMP}.tar.gz -C $TMP --strip-components=1
-            echo "Copying..."
-            cp -rf $TMP/. $TARGET/
-            rm -rf $TMP ${TMP}.tar.gz
-            echo "Done!"
+            echo "Deleting huge backup files..."
+            rm -rf ~/backups/*.tar.gz
+            rm -rf ~/ds_deploy_*
+            echo "Disk space freed!"
