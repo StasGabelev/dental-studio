@@ -23,7 +23,7 @@ jobs:
           script: |
             set -e
             TARGET=~/domains/rozetka.space/public_html
-            TMP=/tmp/ds_$(date +%s)
+            TMP=~/ds_deploy_$(date +%s)
             echo "Downloading..."
             curl -fsSL \
               -H "Authorization: token $GH_TOKEN" \
