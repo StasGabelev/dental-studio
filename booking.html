@@ -1,100 +1,100 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>«‡ÔËÒ ÓÌÎ‡ÈÌ ó Dental Studio</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { 
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden; 
-            background: #fff;
-            font-family: 'Montserrat', sans-serif;
-        }
-        /* iOS iframe fix: wrapper prevents Safari from expanding iframe to content height */
-        .iframe-wrap {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .iframe-wrap iframe {
-            width: 1px;      /* iOS trick: prevents Safari from "flattening" */
-            min-width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
-        .back-btn {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            z-index: 999999;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            background: #fff;
-            border: none;
-            border-radius: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            cursor: pointer;
-            text-decoration: none;
-            font-family: inherit;
-        }
-        .back-btn:active {
-            transform: scale(0.95);
-        }
-        .back-btn svg {
-            width: 18px;
-            height: 18px;
-        }
-    </style>
-</head>
-<body>
-    <a class="back-btn" id="backBtn" href="javascript:void(0)" onclick="goBack()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-        Õ‡Á‡‰
-    </a>
-    <div class="iframe-wrap">
-        <iframe 
-            src="https://cliniccards.com/booking/F4GL5d_VJuiZHbRWoE-xIdr86ciDnhBJ" 
-            allow="geolocation; microphone; camera; midi; encrypted-media;"
-            scrolling="yes"
-        ></iframe>
-    </div>
-    <script>
-        function goBack() {
-            if (document.referrer && document.referrer.includes(window.location.hostname)) {
-                window.history.back();
-            } else {
-                window.location.href = 'index.html';
-            }
-        }
-
-        // Set iframe wrapper height to real viewport (not CSS 100vh)
-        function setRealHeight() {
-            document.querySelector('.iframe-wrap').style.height = window.innerHeight + 'px';
-        }
-        setRealHeight();
-        window.addEventListener('resize', setRealHeight);
-    </script>
-
-    <!-- Supabase & Dynamic Content Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="dynamic-content.js?v=v1.31.25"></script>
-    <script src="chat-widget.js?v=v1.31.25"></script>
-</body>
-</html>
-
-
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>–ó–∞–ø–∏—Å –æ–Ω–ª–∞–π–Ω ‚Äî Dental Studio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background: #fff;
+            font-family: 'Montserrat', sans-serif;
+        }
+        /* iOS iframe fix: wrapper prevents Safari from expanding iframe to content height */
+        .iframe-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .iframe-wrap iframe {
+            width: 1px;      /* iOS trick: prevents Safari from "flattening" */
+            min-width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        .back-btn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            background: #fff;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: inherit;
+        }
+        .back-btn:active {
+            transform: scale(0.95);
+        }
+        .back-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+<body>
+    <a class="back-btn" id="backBtn" href="javascript:void(0)" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        –ù–∞–∑–∞–¥
+    </a>
+    <div class="iframe-wrap">
+        <iframe 
+            src="https://cliniccards.com/booking/F4GL5d_VJuiZHbRWoE-xIdr86ciDnhBJ" 
+            allow="geolocation; microphone; camera; midi; encrypted-media;"
+            scrolling="yes"
+        ></iframe>
+    </div>
+    <script>
+        function goBack() {
+            if (document.referrer && document.referrer.includes(window.location.hostname)) {
+                window.history.back();
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Set iframe wrapper height to real viewport (not CSS 100vh)
+        function setRealHeight() {
+            document.querySelector('.iframe-wrap').style.height = window.innerHeight + 'px';
+        }
+        setRealHeight();
+        window.addEventListener('resize', setRealHeight);
+    </script>
+
+    <!-- Supabase & Dynamic Content Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="dynamic-content.js?v=v1.31.25"></script>
+    <script src="chat-widget.js?v=v1.31.25"></script>
+</body>
+</html>
+
+
