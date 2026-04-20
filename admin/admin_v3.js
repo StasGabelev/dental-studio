@@ -1663,8 +1663,12 @@ async function loadAISettings() {
                 if (tgBotEl) tgBotEl.value = data.tg_bot_token || '';
                 const tgChatEl = document.getElementById('tgChatId');
                 if (tgChatEl) tgChatEl.value = data.tg_chat_id || '';
+                const tgPatientEl = document.getElementById('tgPatientBotToken');
+                if (tgPatientEl) tgPatientEl.value = data.tg_patient_bot_token || '';
                 const viberEl = document.getElementById('viberBotToken');
                 if (viberEl) viberEl.value = data.viber_bot_token || '';
+                const waBotEl = document.getElementById('waBotToken');
+                if (waBotEl) waBotEl.value = data.wa_bot_token || '';
                 const waEl = document.getElementById('waLink');
                 if (waEl) waEl.value = data.wa_link || '';
                 return;
@@ -1696,8 +1700,12 @@ async function loadAISettings() {
             if (tgBotEl) tgBotEl.value = s.tgBotToken || '';
             const tgChatEl = document.getElementById('tgChatId');
             if (tgChatEl) tgChatEl.value = s.tgChatId || '';
+            const tgPatientEl = document.getElementById('tgPatientBotToken');
+            if (tgPatientEl) tgPatientEl.value = s.tgPatientBotToken || '';
             const viberEl = document.getElementById('viberBotToken');
             if (viberEl) viberEl.value = s.viberBotToken || '';
+            const waBotEl = document.getElementById('waBotToken');
+            if (waBotEl) waBotEl.value = s.waBotToken || '';
             const waEl = document.getElementById('waLink');
             if (waEl) waEl.value = s.waLink || '';
         } catch(e) {}
@@ -1714,6 +1722,8 @@ async function saveAISettings() {
         tgBotToken: document.getElementById('tgBotToken').value,
         tgChatId: document.getElementById('tgChatId').value,
         viberBotToken: document.getElementById('viberBotToken').value,
+        tgPatientBotToken: document.getElementById('tgPatientBotToken').value,
+        waBotToken: document.getElementById('waBotToken').value,
         waLink: document.getElementById('waLink').value,
     };
 
@@ -1734,6 +1744,8 @@ async function saveAISettings() {
                 tg_bot_token: settings.tgBotToken,
                 tg_chat_id: settings.tgChatId,
                 viber_bot_token: settings.viberBotToken,
+                tg_patient_bot_token: settings.tgPatientBotToken,
+                wa_bot_token: settings.waBotToken,
                 wa_link: settings.waLink,
                 updated_at: new Date().toISOString(),
             };

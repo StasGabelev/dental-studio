@@ -1,5 +1,7 @@
 -- Add Viber and WhatsApp configuration to ai_settings
 ALTER TABLE ai_settings ADD COLUMN IF NOT EXISTS viber_bot_token TEXT;
+ALTER TABLE ai_settings ADD COLUMN IF NOT EXISTS tg_patient_bot_token TEXT;
+ALTER TABLE ai_settings ADD COLUMN IF NOT EXISTS wa_bot_token TEXT;
 ALTER TABLE ai_settings ADD COLUMN IF NOT EXISTS wa_link TEXT;
 
 -- Descriptive comments for the database schema

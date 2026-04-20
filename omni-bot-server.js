@@ -33,10 +33,10 @@ async function refreshSettings() {
         if (error) throw error;
         aiSettings = data;
 
-        // Initialize/Re-init Telegram Bot if token provided
-        if (data.tg_bot_token && (!tgBot || tgBot.token !== data.tg_bot_token)) {
-            console.log('🤖 Initializing Telegram Bot...');
-            tgBot = new TelegramBot(data.tg_bot_token, { polling: true });
+        // Initialize/Re-init Patient Telegram Bot if token provided
+        if (data.tg_patient_bot_token && (!tgBot || tgBot.token !== data.tg_patient_bot_token)) {
+            console.log('🤖 Initializing Patient Telegram Bot...');
+            tgBot = new TelegramBot(data.tg_patient_bot_token, { polling: true });
             setupTelegramHandlers();
         }
 
