@@ -409,8 +409,9 @@ async function detectAndSaveName(sessionId, text) {
     }
 }
 
+async function callAI(settings, sysPrompt, history) {
     // NEW: Route through our VPS backend for consistency
-    const VPS_ENDPOINT = 'https://rozetka.space/api/chat'; // Replace with real VPS IP/Domain if different
+    const VPS_ENDPOINT = 'https://rozetka.space/api/chat'; 
     
     const res = await fetch(VPS_ENDPOINT, {
         method: 'POST',
