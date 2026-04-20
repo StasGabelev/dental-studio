@@ -482,8 +482,20 @@ function showThinking() {
     .ai-platform-btn:hover { background: #f0f0f0 !important; border-color: #c5a882 !important; transform: translateY(-2px); }
 
     @media (max-width: 480px) {
-        .ai-chat-window { bottom: 0; right: 0; width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
-        .ai-chat-launcher { bottom: 20px; right: 20px; width: 50px; height: 50px; }
+        .ai-chat-window { 
+            bottom: 20px; 
+            right: 5%; 
+            left: 5%; 
+            width: 90%; 
+            height: 80vh; 
+            max-height: 80vh; 
+            border-radius: 20px; 
+        }
+        .ai-chat-window.ai-chat-open {
+            display: flex;
+            transform: none; /* Avoid conflicts with centering */
+        }
+        .ai-chat-launcher { bottom: 20px; right: 20px; width: 55px; height: 55px; }
     }
     `;
     document.head.appendChild(style);
