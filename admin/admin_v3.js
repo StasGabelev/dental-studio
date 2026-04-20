@@ -402,6 +402,11 @@ const PAGE_SCHEMA = {
             "key": "filter-whitening",
             "label": "Фільтр: Відбілювання зубів",
             "type": "text"
+        },
+        {
+            "key": "filter-military",
+            "label": "Фільтр: Лікування військовослужбовців",
+            "type": "text"
         }
     ],
     "contact": [
