@@ -1450,14 +1450,6 @@ function renderFullCaseEditor() {
                             <img src="${c.main_image_url || 'https://via.placeholder.com/150?text=Hero'}" id="prev-hero">
                             <div class="media-label">Головне фото (Hero)</div>
                         </div>
-                        <div class="media-box-small" onclick="uploadCaseMedia(${editingCaseIndex}, 'before_image_url')">
-                            <img src="${c.before_image_url || 'https://via.placeholder.com/150?text=Before'}" id="prev-before">
-                            <div class="media-label">Фото ДО</div>
-                        </div>
-                        <div class="media-box-small" onclick="uploadCaseMedia(${editingCaseIndex}, 'after_image_url')">
-                            <img src="${c.after_image_url || 'https://via.placeholder.com/150?text=After'}" id="prev-after">
-                            <div class="media-label">Фото ПІСЛЯ</div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1469,6 +1461,34 @@ function renderFullCaseEditor() {
                 </div>
                 <div id="stagesList" class="stages-list-admin">
                     ${renderStages(c.stages || [], editingCaseIndex)}
+                </div>
+            </div>
+
+            <div class="stages-manager" style="margin-top: 30px;">
+                <div class="stages-header">
+                    <h3>РЕЗУЛЬТАТ (До / Після)</h3>
+                </div>
+                <div class="stages-list-admin">
+                    <div class="stage-item-admin">
+                        <div class="stage-num">ДО</div>
+                        <div class="stage-img-admin" onclick="uploadCaseMedia(${editingCaseIndex}, 'before_image_url')">
+                            <img src="${c.before_image_url || 'https://via.placeholder.com/80?text=Before'}">
+                        </div>
+                        <div class="stage-inputs">
+                            <input type="text" value="Фото ДО" disabled style="opacity:0.5;">
+                            <textarea rows="3" placeholder="Опишіть початковий стан пацієнта..." onchange="cases[${editingCaseIndex}].before_text=this.value">${escapeHtml(c.before_text || '')}</textarea>
+                        </div>
+                    </div>
+                    <div class="stage-item-admin">
+                        <div class="stage-num">ПІСЛЯ</div>
+                        <div class="stage-img-admin" onclick="uploadCaseMedia(${editingCaseIndex}, 'after_image_url')">
+                            <img src="${c.after_image_url || 'https://via.placeholder.com/80?text=After'}">
+                        </div>
+                        <div class="stage-inputs">
+                            <input type="text" value="Фото ПІСЛЯ" disabled style="opacity:0.5;">
+                            <textarea rows="3" placeholder="Опишіть отриманий результат..." onchange="cases[${editingCaseIndex}].after_text=this.value">${escapeHtml(c.after_text || '')}</textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1544,6 +1564,8 @@ async function saveCase(index) {
             main_image_url: c.main_image_url,
             before_image_url: c.before_image_url,
             after_image_url: c.after_image_url,
+            before_text: c.before_text || '',
+            after_text: c.after_text || '',
             stages: c.stages,
             is_published: true,
             sort_order: index
