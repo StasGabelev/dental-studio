@@ -800,9 +800,11 @@ button { font-family: var(--font-sans); }
 }
 
 .works__grid {
-    display: grid;
+    display: grid !important;
     grid-template-columns: repeat(2, 1fr);
     gap: 3px;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .works__item {
