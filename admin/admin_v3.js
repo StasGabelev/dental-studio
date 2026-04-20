@@ -1429,6 +1429,7 @@ function renderFullCaseEditor() {
                             <option value="implants" ${c.category === 'implants' ? 'selected' : ''}>Імплантація</option>
                             <option value="surgery" ${c.category === 'surgery' ? 'selected' : ''}>Хірургія</option>
                             <option value="ortho" ${c.category === 'ortho' ? 'selected' : ''}>Ортодонтія</option>
+                            <option value="military" ${c.category === 'military' ? 'selected' : ''}>Лікування військовослужбовців</option>
                         </select>
                     </div>
                     <div class="card-field-group">
