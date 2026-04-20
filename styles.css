@@ -1197,9 +1197,9 @@ button { font-family: var(--font-sans); }
 }
 
 .cases-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 40px; /* Comfortable gap for professional look */
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 50px !important; /* Increased gap for visual clarity */
     background-color: var(--bg-main);
     padding-bottom: 80px;
 }
@@ -3508,131 +3508,6 @@ main {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Base Case Elements */
-.cases-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 40px;
-}
-
-.case-card {
-    position: relative;
-    cursor: pointer;
-    overflow: hidden;
-    height: 600px;
-}
-
-.case-card__img {
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.case-card:hover .case-card__img {
-    transform: scale(1.05);
-}
-
-.case-card__overlay {
-    position: absolute;
-    bottom: 40px;
-    left: 40px;
-    color: #fff;
-    z-index: 2;
-}
-
-.case-card__overlay span {
-    font-size: 11px;
-    letter-spacing: 3px;
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(5px);
-    padding: 8px 20px;
-    text-transform: uppercase;
-    border-radius: 2px;
-}
-
-.case-hero {
-    height: 90vh;
-    position: relative;
-    display: flex;
-    align-items: flex-end;
-    padding-bottom: 100px;
-    overflow: hidden;
-}
-
-.case-hero__img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    z-index: -1;
-}
-
-.case-hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.6));
-    z-index: 0;
-}
-
-.case-hero__content {
-    position: relative;
-    z-index: 2;
-    padding-left: 80px;
-}
-
-.case-title-main {
-    font-family: var(--font-serif);
-    font-size: 64px;
-    color: #fff;
-    margin-bottom: 40px;
-    letter-spacing: 2px;
-}
-
-.case-results {
-    padding: 120px 0;
-    background: #fff;
-}
-
-.results-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.result-img-box {
-    position: relative;
-}
-
-.result-img-box img {
-    width: 100%;
-    display: block;
-}
-
-.result-img-box .label {
-    position: absolute;
-    bottom: 30px;
-    left: 30px;
-    background: #fff;
-    color: #000;
-    padding: 6px 15px;
-    font-size: 11px;
-    letter-spacing: 2px;
-    font-weight: 500;
-}
-
-@media (max-width: 768px) {
-    .cases-grid { grid-template-columns: 1fr; }
-    .case-card { height: 450px; }
-    .case-title-main { font-size: 36px; }
-    .case-hero__content { padding-left: 20px; }
-    .results-grid { grid-template-columns: 1fr; gap: 20px; }
-}
 
 /* ============================================================
    AI CHAT WIDGET
