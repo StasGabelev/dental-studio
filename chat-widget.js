@@ -62,7 +62,9 @@ async function getAISettings() {
                     customUrl: data.custom_url,
                     knowledgeManual: data.knowledge_base_manual,
                     tgBotToken: data.tg_bot_token,
-                    tgChatId: data.tg_chat_id
+                    tgChatId: data.tg_chat_id,
+                    viberBotToken: data.viber_bot_token,
+                    waLink: data.wa_link
                 };
                 localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
                 return settings;
@@ -205,8 +207,27 @@ window.submitChatContact = async function() {
     if (inputArea) inputArea.style.display = 'flex';
 
     // Save the greeting as bot message
-    const greeting = "Вітаю! Я — AI-асистент Dental Studio. 🦷 Підкажу вільний час для запису, зорієнтую по цінах і відповім на питання. Чим можу допомогти?";
+    const greeting = "Вітаю! Я — AI-асистент Dental Studio. 🦷 Оберіть зручний для Вас месенджер или продовжте спілкування тут.";
     saveChatMessage('bot', greeting);
+};
+
+// NEW: Handlers for Messenger Choice
+window.startWebChat = function() {
+    const selector = document.getElementById('chatPlatformSelector');
+    const form = document.getElementById('chatContactForm');
+    if (selector) selector.style.display = 'none';
+    if (form) form.style.display = 'block';
+};
+
+window.openMessenger = function(platform) {
+    getAISettings().then(settings => {
+        let url = '';
+        if (platform === 'telegram') url = `https://t.me/${settings.tgBotUsername || 'dentalstudioche'}`;
+        if (platform === 'viber') url = `viber://pa?chatURI=dentalstudioai`; // Example URI
+        if (platform === 'whatsapp') url = settings.waLink || 'https://wa.me/380776007800';
+        
+        if (url) window.open(url, '_blank');
+    });
 };
 
 // --- Toggle Chat Window ---
@@ -388,51 +409,19 @@ async function detectAndSaveName(sessionId, text) {
     }
 }
 
-async function callAI(settings, sysPrompt, history) {
-    const provider = settings.provider || 'openrouter';
-    const model = settings.model || 'gpt-4o-mini';
-    const apiKey = settings.apiKey;
-
-    const messages = [{ role: 'system', content: sysPrompt }, ...history];
-
-    let url = PROVIDER_ENDPOINTS[provider] || PROVIDER_ENDPOINTS.openrouter;
-    if (provider === 'google') url = url.replace('{model}', model);
-
-    const headers = { 'Content-Type': 'application/json' };
-
-    if (provider === 'anthropic') {
-        headers['x-api-key'] = apiKey;
-        headers['anthropic-version'] = '2023-06-01';
-        const res = await fetch(url, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ model, max_tokens: 1024, messages: history, system: sysPrompt })
-        });
-        const data = await res.json();
-        return data.content?.[0]?.text || 'Error';
-    }
-
-    if (provider === 'google') {
-        const res = await fetch(url + '?key=' + apiKey, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ contents: history.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })) })
-        });
-        const data = await res.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Error';
-    }
-
-    // OpenAI-compatible (openai, deepseek, openrouter, custom)
-    headers['Authorization'] = 'Bearer ' + apiKey;
-    if (provider === 'openrouter') {
-        headers['HTTP-Referer'] = 'https://rozetka.space';
-        headers['X-Title'] = 'Dental Studio AI';
-    }
-
-    const body = { model, messages, temperature: 0.7, max_tokens: 1024 };
-    const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+    // NEW: Route through our VPS backend for consistency
+    const VPS_ENDPOINT = 'https://rozetka.space/api/chat'; // Replace with real VPS IP/Domain if different
+    
+    const res = await fetch(VPS_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            message: history[history.length - 1].content,
+            sessionId: chatSessionId
+        })
+    });
     const data = await res.json();
-    return data.choices?.[0]?.message?.content || 'Error';
+    return data.reply || 'Error';
 }
 
 function appendMessage(text, role) {
@@ -497,8 +486,24 @@ document.addEventListener('DOMContentLoaded', () => {
             '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">',
             '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
             '</button></div>',
-            // Contact form (shown first)
-            '<div id="chatContactForm">',
+            
+            // NEW: Platform Selector
+            '<div id="chatPlatformSelector" style="padding: 20px;">',
+            '<h4 style="margin-bottom:15px; font-size:15px; text-align:center;">Де Вам зручно спілкуватися?</h4>',
+            '<div class="ai-platform-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">',
+            '<button class="ai-platform-btn" onclick="window.startWebChat()" style="display:flex; flex-direction:column; align-items:center; padding:15px; background:#f9f9f9; border:1px solid #eee; border-radius:12px; cursor:pointer;">',
+            '<span style="font-size:24px; margin-bottom:5px;">🌐</span><span style="font-size:12px; font-weight:600;">На сайті</span></button>',
+            '<button class="ai-platform-btn" onclick="window.openMessenger(\'telegram\')" style="display:flex; flex-direction:column; align-items:center; padding:15px; background:#f9f9f9; border:1px solid #eee; border-radius:12px; cursor:pointer;">',
+            '<span style="font-size:24px; margin-bottom:5px;">✈️</span><span style="font-size:12px; font-weight:600;">Telegram</span></button>',
+            '<button class="ai-platform-btn" onclick="window.openMessenger(\'viber\')" style="display:flex; flex-direction:column; align-items:center; padding:15px; background:#f9f9f9; border:1px solid #eee; border-radius:12px; cursor:pointer;">',
+            '<span style="font-size:24px; margin-bottom:5px;">💜</span><span style="font-size:12px; font-weight:600;">Viber</span></button>',
+            '<button class="ai-platform-btn" onclick="window.openMessenger(\'whatsapp\')" style="display:flex; flex-direction:column; align-items:center; padding:15px; background:#f9f9f9; border:1px solid #eee; border-radius:12px; cursor:pointer;">',
+            '<span style="font-size:24px; margin-bottom:5px;">🟢</span><span style="font-size:12px; font-weight:600;">WhatsApp</span></button>',
+            '</div>',
+            '</div>',
+
+            // Contact form (hidden initially)
+            '<div id="chatContactForm" style="display:none;">',
             '<h4>Вкажіть email або телефон, щоб почати чат:</h4>',
             '<div id="chatContactError">Вкажіть email або телефон</div>',
             '<input type="email" id="chatContactEmail" placeholder="Email">',

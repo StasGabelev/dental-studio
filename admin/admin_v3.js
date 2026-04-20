@@ -1663,6 +1663,10 @@ async function loadAISettings() {
                 if (tgBotEl) tgBotEl.value = data.tg_bot_token || '';
                 const tgChatEl = document.getElementById('tgChatId');
                 if (tgChatEl) tgChatEl.value = data.tg_chat_id || '';
+                const viberEl = document.getElementById('viberBotToken');
+                if (viberEl) viberEl.value = data.viber_bot_token || '';
+                const waEl = document.getElementById('waLink');
+                if (waEl) waEl.value = data.wa_link || '';
                 return;
             }
         } catch(e) { console.warn('Supabase AI load error:', e); }
@@ -1692,6 +1696,10 @@ async function loadAISettings() {
             if (tgBotEl) tgBotEl.value = s.tgBotToken || '';
             const tgChatEl = document.getElementById('tgChatId');
             if (tgChatEl) tgChatEl.value = s.tgChatId || '';
+            const viberEl = document.getElementById('viberBotToken');
+            if (viberEl) viberEl.value = s.viberBotToken || '';
+            const waEl = document.getElementById('waLink');
+            if (waEl) waEl.value = s.waLink || '';
         } catch(e) {}
     }
 }
@@ -1705,6 +1713,8 @@ async function saveAISettings() {
         customUrl: document.getElementById('aiCustomUrl').value,
         tgBotToken: document.getElementById('tgBotToken').value,
         tgChatId: document.getElementById('tgChatId').value,
+        viberBotToken: document.getElementById('viberBotToken').value,
+        waLink: document.getElementById('waLink').value,
     };
 
     localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
@@ -1723,6 +1733,8 @@ async function saveAISettings() {
                 custom_url: settings.customUrl,
                 tg_bot_token: settings.tgBotToken,
                 tg_chat_id: settings.tgChatId,
+                viber_bot_token: settings.viberBotToken,
+                wa_link: settings.waLink,
                 updated_at: new Date().toISOString(),
             };
             
