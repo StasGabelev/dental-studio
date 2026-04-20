@@ -1198,7 +1198,7 @@ button { font-family: var(--font-sans); }
 .cases-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px; /* Comfortable gap for professional look */
+    gap: 40px; /* Comfortable gap for professional look */
     background-color: var(--bg-main);
     padding-bottom: 80px;
 }
@@ -1256,7 +1256,7 @@ button { font-family: var(--font-sans); }
 @media (min-width: 1025px) {
     .cases-grid { 
         grid-template-columns: repeat(3, 1fr) !important; 
-        gap: 20px !important;
+        gap: 40px !important;
     }
 }
 
