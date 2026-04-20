@@ -194,6 +194,7 @@
     // --- Load dynamic cases ---
     try {
         // Homepage preview (works__grid on index.html)
+        /* 
         const worksGrid = document.querySelector('.works__grid');
         if (worksGrid) {
             const { data: homeCases } = await sbClient.from('treatment_cases')
@@ -212,6 +213,7 @@
                 if (html) worksGrid.innerHTML = html;
             }
         }
+        */
 
         // Full cases page — render from Supabase
         const casesGridFull = document.querySelector('.cases-grid');
