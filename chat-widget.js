@@ -454,7 +454,7 @@ function showThinking() {
     .ai-chat-launcher:hover { transform: scale(1.1); }
     .ai-chat-window { position: fixed; bottom: 100px; right: 30px; width: 380px; height: 600px; max-height: calc(100vh - 120px); background: #fff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: none; flex-direction: column; overflow: hidden; z-index: 10001; font-family: 'Montserrat', sans-serif; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; transform: translateY(20px); }
     .ai-chat-window.ai-chat-open { display: flex; opacity: 1; transform: translateY(0); }
-    .ai-chat-header { background: #1a1a1a; color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .ai-chat-header { background: #000000; color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #c5a882; border-top-left-radius: 16px; border-top-right-radius: 16px; }
     .ai-chat-header strong { font-weight: 600; letter-spacing: 1px; }
     .ai-chat-close { background: none; border: none; color: #fff; cursor: pointer; opacity: 0.7; }
     .ai-chat-close:hover { opacity: 1; }
