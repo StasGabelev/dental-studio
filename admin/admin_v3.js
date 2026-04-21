@@ -2206,13 +2206,13 @@ function renderAIHubTasks(tasks) {
     }
 
     area.innerHTML = tasks.map(task => `
-        <div class="glass" style="padding: 12px; border-radius: var(--radius-sm); border-left: 3px solid ${task.status === 'pending' ? 'var(--accent)' : 'var(--success)'}; font-size: 13px;">
+        <div class="glass ${task.status === 'pending' ? 'pulse-gold-border' : ''}" style="padding: 12px; border-radius: var(--radius-sm); border-left: 3px solid ${task.status === 'pending' ? 'var(--accent)' : 'var(--success)'}; font-size: 13px; margin-bottom: 10px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                 <span style="font-weight:600;">${escapeHtml(task.task_type || 'Запит')}</span>
                 <span style="font-size:10px; color:var(--text-muted);">${new Date(task.created_at).toLocaleTimeString()}</span>
             </div>
             <div style="color: var(--text); margin-bottom: 8px;">${escapeHtml(task.description)}</div>
-            <div style="display:flex; gap:5px;">
+            <div id="task-actions-${task.id}" style="display:flex; gap:5px;">
                 ${task.status === 'pending' ? `
                     <button class="btn-primary" style="font-size:10px; padding:4px 10px;" onclick="handleTask('${task.id}', 'approve')">Схвалити</button>
                     <button class="btn-outline" style="font-size:10px; padding:4px 10px;" onclick="handleTask('${task.id}', 'reject')">Відхилити</button>
@@ -2220,6 +2220,35 @@ function renderAIHubTasks(tasks) {
             </div>
         </div>
     `).join('');
+}
+
+async function handleTask(taskId, action) {
+    if (!confirm(`Бажаєте ${action === 'approve' ? 'схвалити' : 'відхилити'} це завдання?`)) return;
+    
+    showToast('⏳ Обробка...');
+    const btnBox = document.getElementById(`task-actions-${taskId}`);
+    if (btnBox) btnBox.innerHTML = '<span style="font-size:10px;">⏳ Обробка...</span>';
+
+    try {
+        const serverUrl = localStorage.getItem('ds_bot_server_url') || window.location.origin.replace('admin', '');
+        const response = await fetch(`${serverUrl}/api/admin/task-action`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ taskId, action })
+        });
+        
+        const res = await response.json();
+        if (res.success) {
+            showToast('✅ Виконано та пацієнта сповіщено');
+            loadAIHubTasks();
+        } else {
+            throw new Error(res.error || 'Помилка сервера');
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('❌ Помилка: ' + e.message);
+        loadAIHubTasks();
+    }
 }
 
 function updateSyncStatusUI() {
@@ -2269,7 +2298,55 @@ async function sendToAIHub() {
     }, 1000);
 }
 
-function syncNow() {
+async function syncNow() {
+    const ccToken = document.getElementById('ccApiToken')?.value;
+    const ccId = document.getElementById('ccClinicId')?.value;
+    
+    if (!ccToken || !ccId) {
+        showToast('❌ Спочатку введіть API Token та Clinic ID');
+        return;
+    }
+
     showToast('⏳ Початок синхронізації з Cliniccards...');
-    setTimeout(() => showToast('✅ База дзеркальована успішно'), 2000);
+    const serverUrl = localStorage.getItem('ds_bot_server_url') || window.location.origin.replace('/admin', '');
+    
+    try {
+        // 1. Fetch Patients via Proxy
+        const response = await fetch(`${serverUrl}/api/proxy/cliniccards`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                endpoint: `https://cliniccards.com/api/public/v1/patients?clinic_id=${ccId}`,
+                token: ccToken
+            })
+        });
+
+        const res = await response.json();
+        if (res.result === 'success' && res.data) {
+            const patients = res.data;
+            showToast(`📥 Отримано ${patients.length} пацієнтів. Оновлюємо базу...`);
+
+            // 2. Upsert to Supabase
+            for (const p of patients) {
+                const row = {
+                    cc_id: String(p.id),
+                    first_name: p.first_name || '',
+                    last_name: p.last_name || '',
+                    phone: p.phone || '',
+                    birthday: p.birthday || null,
+                    comment: p.comment || '',
+                    last_sync_at: new Date().toISOString()
+                };
+                await sb.from('cc_patients').upsert(row, { onConflict: 'cc_id' });
+            }
+            
+            showToast('✅ База дзеркальована успішно');
+            updateSyncStatusUI();
+        } else {
+            throw new Error(res.error || 'Невірний формат відповіді');
+        }
+    } catch (e) {
+        console.error('Sync Error:', e);
+        showToast('❌ Помилка синхронізації: ' + e.message);
+    }
 }

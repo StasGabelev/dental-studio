@@ -20,6 +20,15 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const app = express();
 app.use(bodyParser.json());
 
+// --- Manual CORS Middleware ---
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Token');
+    if (req.method === 'OPTIONS') return res.sendStatus(200);
+    next();
+});
+
 // --- State ---
 let aiSettings = null;
 let knowledgeBase = "";
@@ -227,6 +236,72 @@ app.post('/api/chat', async (req, res) => {
     await saveMessage(sessionId, 'bot', reply);
 
     res.json({ reply });
+});
+
+// --- 6. Admin API (AI Hub Integration) ---
+
+// Proxy to bypass CORS for Cliniccards
+app.post('/api/proxy/cliniccards', async (req, res) => {
+    const { endpoint, token, method = 'GET', body = null } = req.body;
+    if (!endpoint || !token) return res.status(400).json({ error: 'Endpoint and Token required' });
+
+    console.log(`📡 PROXY: ${method} to Cliniccards -> ${endpoint}`);
+
+    try {
+        const response = await fetch(endpoint, {
+            method,
+            headers: {
+                'Token': token,
+                'Content-Type': 'application/json'
+            },
+            body: body ? JSON.stringify(body) : null
+        });
+        const data = await response.json();
+        res.json(data);
+    } catch (e) {
+        console.error('Proxy Error:', e);
+        res.status(500).json({ error: 'Cliniccards API Error: ' + e.message });
+    }
+});
+
+// Notify patient when Admin performs action
+app.post('/api/admin/task-action', async (req, res) => {
+    const { taskId, action, message } = req.body;
+    if (!taskId || !action) return res.status(400).json({ error: 'TaskId and Action required' });
+
+    try {
+        // 1. Get Task & Session
+        const { data: task, error: tErr } = await supabase.from('admin_tasks').select('*').eq('id', taskId).single();
+        if (tErr || !task) throw new Error('Task not found');
+
+        // 2. Find associated messenger user
+        const { data: mUser } = await supabase.from('messenger_users')
+            .select('*')
+            .eq('session_id', task.metadata?.session_id)
+            .single();
+        
+        if (mUser && mUser.platform_user_id) {
+            const replyMsg = message || (action === 'approve' ? '✅ Ваш запит схвалено! Ми зв\'яжемося з вами найближчим часом.' : '❌ На жаль, ваш запит було відхилено. Оберіть інший час.');
+
+            if (mUser.platform === 'telegram' && tgBot) {
+                await tgBot.sendMessage(mUser.platform_user_id, replyMsg);
+            } else if (mUser.platform === 'viber' && viberBot) {
+                const TextMessage = require('viber-bot').Message.Text;
+                await viberBot.sendMessage({ id: mUser.platform_user_id }, [new TextMessage(replyMsg)]);
+            }
+        }
+
+        // 3. Update task status in DB
+        await supabase.from('admin_tasks').update({ 
+            status: action === 'approve' ? 'completed' : 'rejected',
+            updated_at: new Date().toISOString()
+        }).eq('id', taskId);
+
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Admin Action Error:', e);
+        res.status(500).json({ error: e.message });
+    }
 });
 
 // Start Server

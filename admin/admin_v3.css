@@ -361,6 +361,28 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* --- AI Hub Animations --- */
+.pulse-gold-border {
+    animation: pulse-gold 2s infinite;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes pulse-gold {
+    0% { box-shadow: 0 0 0 0 rgba(197, 168, 130, 0.4); border-color: rgba(197, 168, 130, 0.4); }
+    50% { box-shadow: 0 0 20px 0 rgba(197, 168, 130, 0.7); border-color: rgba(197, 168, 130, 1); }
+    100% { box-shadow: 0 0 0 0 rgba(197, 168, 130, 0.4); border-color: rgba(197, 168, 130, 0.4); }
+}
+
+.ai-msg {
+    animation: fadeInSlide 0.3s ease-out forwards;
+}
+
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* Quick Actions */
 .quick-actions h3 {
     font-size: 16px;
