@@ -314,11 +314,22 @@ async function saveMessage(sessionId, role, content) {
 }
 
 async function triggerAdminAlert(platform, userName, lastMsg, sessionId) {
-    if (!aiSettings?.tg_bot_token || !aiSettings?.tg_chat_id) return;
-    
-    const alertBot = new TelegramBot(aiSettings.tg_bot_token);
-    const text = `🚨 *ТУТПИКОВА СИТУАЦІЯ (${platform})*\n\n👤 Клієнт: ${userName}\n💬 Питання: ${lastMsg}\n\nПотрібне втручання адміністратора!`;
-    alertBot.sendMessage(aiSettings.tg_chat_id, text, { parse_mode: 'Markdown' });
+    // 1. Send push to Telegram
+    if (aiSettings?.tg_bot_token && aiSettings?.tg_chat_id) {
+        const alertBot = new TelegramBot(aiSettings.tg_bot_token);
+        const text = `🚨 *ТУТПИКОВА СИТУАЦІЯ (${platform})*\n\n👤 Клієнт: ${userName}\n💬 Питання: ${lastMsg}\n\nПотрібне втручання адміністратора!`;
+        alertBot.sendMessage(aiSettings.tg_chat_id, text, { parse_mode: 'Markdown' });
+    }
+
+    // 2. Also put it in Admin UI Task Queue
+    try {
+        await supabase.from('admin_tasks').insert({
+            task_type: 'Тупик / Питання',
+            description: `Клієнт ${userName} пише: "${lastMsg}"`,
+            status: 'pending',
+            metadata: { session_id: sessionId, platform }
+        });
+    } catch(e) { console.error('Failed to save fallback task:', e); }
 }
 
 // --- 5. Web API for Widget ---
