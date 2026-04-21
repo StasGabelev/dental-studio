@@ -685,7 +685,6 @@ const SECTION_TITLES = {
     'doctors': 'Лікарі',
     'cases': 'Кейси',
     'ai-settings': 'Налаштування ІІ',
-    'ai-hub': 'AI HUB — Управління клінікою',
     'chat-logs': 'Чат-логи',
     'setup': 'Supabase',
 };
@@ -706,7 +705,6 @@ function switchSection(sectionId, navEl) {
     if (sectionId === 'doctors') loadDoctors();
     if (sectionId === 'portfolio') loadCases();
     if (sectionId === 'ai-settings') loadAISettings();
-    if (sectionId === 'ai-hub') loadAIHub();
     if (sectionId === 'chat-logs') loadChatLogs();
     if (sectionId === 'setup') loadSetupForm();
 }
@@ -1701,17 +1699,6 @@ async function loadAISettings() {
                 if (waBotEl) waBotEl.value = data.wa_bot_token || '';
                 const waEl = document.getElementById('waLink');
                 if (waEl) waEl.value = data.wa_link || '';
-                
-                // Cliniccards & URIs
-                const ccTokenEl = document.getElementById('ccApiToken');
-                if (ccTokenEl) ccTokenEl.value = data.cc_api_token || '';
-                const ccIdEl = document.getElementById('ccClinicId');
-                if (ccIdEl) ccIdEl.value = data.cc_clinic_id || '';
-                const tgUserEl = document.getElementById('tgBotUsername');
-                if (tgUserEl) tgUserEl.value = data.tg_bot_username || '';
-                const viberUriEl = document.getElementById('viberBotUri');
-                if (viberUriEl) viberUriEl.value = data.viber_bot_uri || '';
-
                 return;
             }
         } catch(e) { console.warn('Supabase AI load error:', e); }
@@ -1766,10 +1753,6 @@ async function saveAISettings() {
         tgPatientBotToken: document.getElementById('tgPatientBotToken').value,
         waBotToken: document.getElementById('waBotToken').value,
         waLink: document.getElementById('waLink').value,
-        ccApiToken: document.getElementById('ccApiToken').value,
-        ccClinicId: document.getElementById('ccClinicId').value,
-        tgBotUsername: document.getElementById('tgBotUsername').value,
-        viberBotUri: document.getElementById('viberBotUri').value,
     };
 
     localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
@@ -1792,10 +1775,6 @@ async function saveAISettings() {
                 tg_patient_bot_token: settings.tgPatientBotToken,
                 wa_bot_token: settings.waBotToken,
                 wa_link: settings.waLink,
-                cc_api_token: settings.ccApiToken,
-                cc_clinic_id: settings.ccClinicId,
-                tg_bot_username: settings.tgBotUsername,
-                viber_bot_uri: settings.viberBotUri,
                 updated_at: new Date().toISOString(),
             };
             
@@ -2164,112 +2143,4 @@ async function deleteChatSession(id) {
         showToast('🗑️ Чат видалено');
         loadChatLogs();
     }
-}
-
-// ============================================================
-// AI HUB LOGIC
-// ============================================================
-
-let aiHubTaskInterval = null;
-
-async function loadAIHub() {
-    console.log('AI HUB: Loading status and tasks...');
-    updateSyncStatusUI();
-    loadAIHubTasks();
-    
-    // Start polling for new tasks if not already running
-    if (!aiHubTaskInterval) {
-        aiHubTaskInterval = setInterval(loadAIHubTasks, 10000); // Check every 10s
-    }
-}
-
-async function loadAIHubTasks() {
-    if (!sb) return;
-    try {
-        const { data: tasks, error } = await sb.from('admin_tasks')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(20);
-        
-        if (error) throw error;
-        renderAIHubTasks(tasks);
-    } catch (e) {
-        console.error('AI HUB: Task load error', e);
-    }
-}
-
-function renderAIHubTasks(tasks) {
-    const area = document.getElementById('aiHubTasksArea');
-    if (!tasks || tasks.length === 0) {
-        area.innerHTML = '<p class="editor-placeholder" style="font-size:12px;">Нових завдань немає</p>';
-        return;
-    }
-
-    area.innerHTML = tasks.map(task => `
-        <div class="glass" style="padding: 12px; border-radius: var(--radius-sm); border-left: 3px solid ${task.status === 'pending' ? 'var(--accent)' : 'var(--success)'}; font-size: 13px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span style="font-weight:600;">${escapeHtml(task.task_type || 'Запит')}</span>
-                <span style="font-size:10px; color:var(--text-muted);">${new Date(task.created_at).toLocaleTimeString()}</span>
-            </div>
-            <div style="color: var(--text); margin-bottom: 8px;">${escapeHtml(task.description)}</div>
-            <div style="display:flex; gap:5px;">
-                ${task.status === 'pending' ? `
-                    <button class="btn-primary" style="font-size:10px; padding:4px 10px;" onclick="handleTask('${task.id}', 'approve')">Схвалити</button>
-                    <button class="btn-outline" style="font-size:10px; padding:4px 10px;" onclick="handleTask('${task.id}', 'reject')">Відхилити</button>
-                ` : `<span style="color:var(--success); font-size:10px;">✅ Виконано</span>`}
-            </div>
-        </div>
-    `).join('');
-}
-
-function updateSyncStatusUI() {
-    const box = document.getElementById('syncStatusBox');
-    const ccToken = document.getElementById('ccApiToken')?.value;
-    
-    if (ccToken) {
-        box.innerHTML = `
-            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;">
-                <span>Статус:</span>
-                <span style="color: var(--success);">Підключено до CRM</span>
-            </div>
-            <div style="font-size:10px; color:var(--text-muted); margin-bottom:10px;">Остання синхронізація: Щойно</div>
-            <button class="btn-outline" style="width:100%; font-size:11px; padding:8px;" onclick="syncNow()">Синхронізувати зараз</button>
-        `;
-    }
-}
-
-async function handleAIHubEnter(e) {
-    if (e.key === 'Enter') sendToAIHub();
-}
-
-async function sendToAIHub() {
-    const input = document.getElementById('aiHubInput');
-    const msg = input.value.trim();
-    if (!msg) return;
-
-    const history = document.getElementById('aiHubChatHistory');
-    
-    // Add user message to UI
-    history.innerHTML += `
-        <div class="ai-msg user-msg" style="align-self: flex-end; background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); padding: 10px 15px; border-radius: 15px 15px 0 15px; max-width: 80%; font-size: 13px;">
-            ${escapeHtml(msg)}
-        </div>
-    `;
-    input.value = '';
-    history.scrollTop = history.scrollHeight;
-
-    // Simulate AI thinking
-    setTimeout(() => {
-        history.innerHTML += `
-            <div class="ai-msg bot-msg" style="align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 10px 15px; border-radius: 15px 15px 15px 0; max-width: 80%; font-size: 13px;">
-                Отримав завдання: "<i>${escapeHtml(msg)}</i>". <br><br> Зараз я проаналізую базу підключеної системи Cliniccards та підготую звіт.
-            </div>
-        `;
-        history.scrollTop = history.scrollHeight;
-    }, 1000);
-}
-
-function syncNow() {
-    showToast('⏳ Початок синхронізації з Cliniccards...');
-    setTimeout(() => showToast('✅ База дзеркальована успішно'), 2000);
 }
