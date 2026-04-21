@@ -1711,6 +1711,8 @@ async function loadAISettings() {
                 if (tgUserEl) tgUserEl.value = data.tg_bot_username || '';
                 const viberUriEl = document.getElementById('viberBotUri');
                 if (viberUriEl) viberUriEl.value = data.viber_bot_uri || '';
+                const autoBookEl = document.getElementById('aiAutonomousBooking');
+                if (autoBookEl) autoBookEl.checked = data.autonomous_booking || false;
 
                 return;
             }
@@ -1770,6 +1772,7 @@ async function saveAISettings() {
         ccClinicId: document.getElementById('ccClinicId').value,
         tgBotUsername: document.getElementById('tgBotUsername').value,
         viberBotUri: document.getElementById('viberBotUri').value,
+        autonomousBooking: document.getElementById('aiAutonomousBooking').checked
     };
 
     localStorage.setItem('ds_ai_settings', JSON.stringify(settings));
@@ -1796,6 +1799,7 @@ async function saveAISettings() {
                 cc_clinic_id: settings.ccClinicId,
                 tg_bot_username: settings.tgBotUsername,
                 viber_bot_uri: settings.viberBotUri,
+                autonomous_booking: settings.autonomousBooking,
                 updated_at: new Date().toISOString(),
             };
             

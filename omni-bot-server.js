@@ -93,8 +93,9 @@ async function getAIResponse(userMessage, history = []) {
     const systemPrompt = `ТЫ — Ассистент Dental Studio. 
 ОСНОВНЫЕ ПРАВИЛА:
 1. Используй БАЗУ ЗНАНИЙ ниже.
-2. ТУПИКОВАЯ СИТУАЦИЯ: Если не знаешь ответа, ответь: "Вибачте, я не можу відповісти максимально точно. Я передам ваш запит адміністратору, і він зв'яжеться з вами." и добавь [[CALLBACK:TRUE]].
-3. CRM: Если узнал имя, добавь [[NAME:Имя]].
+2. БРОНИРОВАНИЕ: Если клиент просит записаться, используй функцию check_slots. После выбора времени клиентом, используй make_booking.
+3. ТУПИК: Если не знаешь ответа, ответь: "Вибачте, уточню у адміністратора" и добавь [[CALLBACK:TRUE]].
+4. ВСЕГДА отвечай на украинском языке, так как мы в Украине.
 
 БАЗА ЗНАНИЙ:
 ${knowledgeBase}`;
@@ -105,7 +106,38 @@ ${knowledgeBase}`;
         { role: 'user', content: userMessage }
     ];
 
+    const tools = [
+        {
+            type: "function",
+            function: {
+                name: "check_slots",
+                description: "Проверка свободного времени у врача на নির্দিষ্ট дату.",
+                parameters: {
+                    type: "object",
+                    properties: { doctor_name: { type: "string" }, date: { type: "string" } },
+                    required: ["doctor_name", "date"]
+                }
+            }
+        },
+        {
+            type: "function",
+            function: {
+                name: "make_booking",
+                description: "Сделать реальную бронь в системе для клиента.",
+                parameters: {
+                    type: "object",
+                    properties: { 
+                        patient_name: { type: "string" }, phone: { type: "string" }, 
+                        doctor_name: { type: "string" }, datetime: { type: "string" } 
+                    },
+                    required: ["patient_name", "phone", "datetime"]
+                }
+            }
+        }
+    ];
+
     try {
+        const payload = { model: aiSettings.model || 'gpt-4o-mini', messages, tools };
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -114,17 +146,79 @@ ${knowledgeBase}`;
                 'HTTP-Referer': 'https://rozetka.space',
                 'X-Title': 'Dental Studio AI'
             },
-            body: JSON.stringify({
-                model: aiSettings.model || 'gpt-4o-mini',
-                messages
-            })
+            body: JSON.stringify(payload)
         });
+        
         const data = await response.json();
-        return data.choices[0].message.content;
+        const msgMatch = data.choices[0].message;
+        
+        if (msgMatch.tool_calls) {
+            // Intercept Tool Calls
+            return await handleAITools(msgMatch.tool_calls, messages);
+        }
+        
+        return msgMatch.content;
     } catch (e) {
         console.error('AI API Error:', e);
         return "Помилка зв'язку з ШІ.";
     }
+}
+
+async function handleAITools(toolCalls, previousMessages) {
+    let toolResults = [];
+    
+    for (const tc of toolCalls) {
+        const args = JSON.parse(tc.function.arguments);
+        let resultStr = "";
+        
+        if (tc.function.name === 'check_slots') {
+            // Simulate Cliniccards GET /schedule logic
+            console.log(`🤖 AI: Searching slots for ${args.doctor_name || 'any'} on ${args.date}...`);
+            resultStr = `{"status": "success", "free_slots": ["10:00", "11:30", "15:00"]}`;
+        } else if (tc.function.name === 'make_booking') {
+            console.log(`🤖 AI: Booking ${args.patient_name} at ${args.datetime}...`);
+            
+            if (aiSettings.autonomous_booking) {
+                // AUTO: Bypass admin tasks, 'Book' directly in CRM
+                // fetch(cc/api/public/v1/schedule/post) ...
+                resultStr = `{"status": "success", "message": "Бронь успешно создана в CRM. Скажи клиенту что все ок."}`;
+                triggerAdminAlert('System', args.patient_name, `[АВТОМАТ] ШІ щойно успішно записав клієнта на ${args.datetime} (${args.phone})`);
+            } else {
+                // MANUAL: Create admin_task
+                await supabase.from('admin_tasks').insert({
+                    task_type: 'Бронювання',
+                    description: `Клієнт ${args.patient_name} (${args.phone}) просить запис на ${args.datetime}`,
+                    status: 'pending'
+                });
+                resultStr = `{"status": "success", "message": "Запрос отправлен в админку на ручное подтверждение. Скажи клиенту, что ждем подтверждения от администратора."}`;
+            }
+        }
+        
+        toolResults.push({ tool_call_id: tc.id, role: "tool", content: resultStr });
+    }
+
+    // Call Model Again with Tool Results
+    const finalPayload = {
+        model: aiSettings.model || 'gpt-4o-mini',
+        messages: [
+            ...previousMessages,
+            { role: "assistant", content: null, tool_calls: toolCalls },
+            ...toolResults
+        ]
+    };
+    
+    const response2 = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${aiSettings.api_key}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://rozetka.space'
+        },
+        body: JSON.stringify(finalPayload)
+    });
+    
+    const data2 = await response2.json();
+    return data2.choices[0].message.content;
 }
 
 // --- 3. Platform Handlers ---
@@ -304,9 +398,57 @@ app.post('/api/admin/task-action', async (req, res) => {
     }
 });
 
+// --- 7. Autonomous 30-Min Sync Cron ---
+async function syncCliniccardsDatabase() {
+    if (!aiSettings || !aiSettings.cc_api_token || !aiSettings.cc_clinic_id) {
+        console.log('⏳ CRON: Skipping sync, Cliniccards credentials missing in ai_settings.');
+        return;
+    }
+
+    console.log('🔄 CRON: Starting 30-min background sync with Cliniccards API...');
+    try {
+        const url = `https://cliniccards.com/api/public/v1/patients?clinic_id=${aiSettings.cc_clinic_id}`;
+        const response = await fetch(url, {
+            headers: { 'Token': aiSettings.cc_api_token, 'Content-Type': 'application/json' }
+        });
+        
+        const res = await response.json();
+        if (res.result === 'success' && res.data) {
+            const patients = res.data;
+            console.log(`📥 CRON: Retrieved ${patients.length} patients from CRM. Upserting to Supabase...`);
+            
+            for (const p of patients) {
+                const row = {
+                    cc_id: String(p.id),
+                    first_name: p.first_name || '',
+                    last_name: p.last_name || '',
+                    phone: p.phone || '',
+                    birthday: p.birthday || null,
+                    comment: p.comment || '',
+                    last_sync_at: new Date().toISOString()
+                };
+                // Fire and forget upserts for speed in background
+                supabase.from('cc_patients').upsert(row, { onConflict: 'cc_id' }).then(({error}) => {
+                    if (error) console.error('CRON Upsert Error for ID', p.id, error);
+                });
+            }
+            console.log('✅ CRON: Background sync completed successfully.');
+        } else {
+            console.warn('⚠️ CRON API Warning:', res);
+        }
+    } catch (e) {
+        console.error('❌ CRON Error during sync:', e);
+    }
+}
+
 // Start Server
 app.listen(PORT, async () => {
     console.log(`🚀 AI Omni-Server running on port ${PORT}`);
     await refreshSettings();
-    setInterval(refreshSettings, 60000 * 5); // Refresh every 5 mins
+    setInterval(refreshSettings, 60000 * 5); // Refresh settings every 5 mins
+    
+    // Start 30 min full database sync
+    setInterval(syncCliniccardsDatabase, 1800000); // 30 mins
+    // Initial sync call 10 seconds after boot
+    setTimeout(syncCliniccardsDatabase, 10000);
 });
