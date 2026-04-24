@@ -611,8 +611,11 @@ async function resumeChatSession() {
         const body = document.getElementById('aiChatBody');
         const inputArea = document.querySelector('.ai-chat-input-area');
         
-        if (selector) selector.style.display = 'none';
-        if (form) form.style.display = 'none';
+        // Hide EVERYTHING login-related
+        if (selector) selector.setAttribute('style', 'display: none !important');
+        if (form) form.setAttribute('style', 'display: none !important');
+        
+        // Show chat interface
         if (body) body.style.display = 'block';
         if (inputArea) inputArea.style.display = 'flex';
         
@@ -648,4 +651,15 @@ async function resumeChatSession() {
             } catch(e) { console.warn('Could not load chat history', e); }
         }
     }
+}
+
+function getFallbackReply(text) {
+    const t = text.toLowerCase();
+    if (t.includes('привет') || t.includes('вітаю') || t.includes('добрий')) {
+        return "Вітаю! Я — AI-асистент Dental Studio. 👋 Чим можу бути корисним?";
+    }
+    if (t.includes('цін') || t.includes('вартість') || t.includes('скільки')) {
+        return "Вартість лікування залежить від складності випадку. Орієнтовні ціни є на сайті в розділі 'Послуги'. Бажаєте записатися на консультацію для точного розрахунку?";
+    }
+    return "Вибачте, сталася невелика помилка зв'язку. 🔄 Будь ласка, спробуйте пізніше або зателефонуйте нам прямо зараз за номером (077) 600 7 800.";
 }
