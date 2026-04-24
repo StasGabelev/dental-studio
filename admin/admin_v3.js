@@ -193,13 +193,13 @@ const PAGE_SCHEMA = {
             "type": "text"
         },
         {
-            "key": "map-hours-label",
-            "label": "\u0413\u0440\u0430\u0444\u0456\u043A: \u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A",
+            "key": "footer-hours-title",
+            "label": "Графік: Заголовок",
             "type": "text"
         },
         {
-            "key": "footer-hours",
-            "label": "\u0413\u0440\u0430\u0444\u0456\u043A: \u0420\u043E\u0431\u043E\u0447\u0456 \u0433\u043E\u0434\u0438\u043D\u0438",
+            "key": "footer-hours-days",
+            "label": "Графік: Робочі години",
             "type": "text"
         }
     ],
@@ -796,8 +796,8 @@ async function loadPageEditor(pageSlug) {
             "btn-contact-hub": "ЗВ'ЯЗАТИСЯ З НАМИ",
             "map-title": "ДЕ НАС ЗНАЙТИ",
             "map-open-btn": "Відкрити карту",
-            "map-hours-label": "ГРАФІК РОБОТИ",
-            "footer-hours": "Пн — Пт, 10:00 — 18:00"
+            "footer-hours-title": "ГРАФІК РОБОТИ",
+            "footer-hours-days": "Пн — Пт, 10:00 — 18:00"
         },
         "about": {
             "about-page-title": "Про клініку — Dental Studio",
