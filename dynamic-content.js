@@ -61,10 +61,22 @@
                 if (item.content_type === 'text' && item.value_uk) {
                     // Find elements with matching data-i18n or data-cms attribute
                     const elements = document.querySelectorAll(
-                        `[data-i18n="${item.section_key}"], [data-cms="${item.section_key}"]`
+                        `[data-i18n="${item.section_key}"], [data-cms="${item.section_key}"], [data-cms-href="${item.section_key}"]`
                     );
                     elements.forEach(el => {
-                        el.innerHTML = item.value_uk;
+                        // 1. If it's a data-cms-href target, update the href
+                        if (el.hasAttribute('data-cms-href') && el.getAttribute('data-cms-href') === item.section_key) {
+                            el.href = item.value_uk;
+                        } else {
+                            // 2. Standard innerHTML update
+                            el.innerHTML = item.value_uk;
+                            
+                            // 3. Auto-update tel: links if this is a phone number
+                            if (el.tagName === 'A' && (el.innerHTML.includes('(') || el.innerHTML.includes('+'))) {
+                                const cleanPhone = el.innerHTML.replace(/\D/g, '');
+                                el.href = `tel:+${cleanPhone}`;
+                            }
+                        }
                     });
                 } else if ((item.content_type === 'image' || item.content_type === 'video') && item.media_url) {
                     // Update media sources

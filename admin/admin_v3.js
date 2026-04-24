@@ -536,7 +536,14 @@ const PAGE_SCHEMA = {
         { "key": "nav-works", "label": "Меню: Наші роботи", "type": "text" },
         { "key": "nav-about", "label": "Меню: Про нас", "type": "text" },
         { "key": "nav-contacts", "label": "Меню: Контакти", "type": "text" },
-        { "key": "header-instagram-url", "label": "Посилання на Instagram", "type": "text" }
+        { "key": "header-instagram-url", "label": "Посилання: Instagram", "type": "text" },
+        { "key": "header-location-url", "label": "Посилання: Карта (Google Maps)", "type": "text" }
+    ],
+    "social": [
+        { "label": "МЕСЕНДЖЕРИ (CONTACT HUB)", "type": "heading" },
+        { "key": "whatsapp-phone", "label": "WhatsApp: Номер (без +)", "type": "text" },
+        { "key": "viber-phone", "label": "Viber: Номер (або URI)", "type": "text" },
+        { "key": "telegram-username", "label": "Telegram: Username (без @)", "type": "text" }
     ]
 };
 
@@ -942,7 +949,13 @@ async function loadPageEditor(pageSlug) {
             "nav-works": "Наші роботи",
             "nav-about": "Про нас",
             "nav-contacts": "Контакти",
-            "header-instagram-url": "https://www.instagram.com/dental_studio_che/"
+            "header-instagram-url": "https://www.instagram.com/dental_studio_che/",
+            "header-location-url": "https://maps.google.com/?q=Chernihiv,+Nezalezhnosti+21"
+        },
+        "social": {
+            "whatsapp-phone": "380776007800",
+            "viber-phone": "380776007800",
+            "telegram-username": "dentalstudioche"
         }
     };
 

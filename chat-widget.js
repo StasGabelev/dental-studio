@@ -220,11 +220,23 @@ window.startWebChat = function() {
 };
 
 window.openMessenger = function(platform) {
-    getAISettings().then(settings => {
+    getAISettings().then(async settings => {
         let url = '';
-        if (platform === 'telegram') url = `https://t.me/${settings.tgBotUsername || 'dentalstudioche'}`;
-        if (platform === 'viber') url = `viber://pa?chatURI=dentalstudioai`; // Example URI
-        if (platform === 'whatsapp') url = settings.waLink || 'https://wa.me/380776007800';
+        let socialData = {};
+        if (widgetSb) {
+            try {
+                const { data } = await widgetSb.from('site_content').select('section_key, value_uk').eq('page_slug', 'social');
+                if (data) data.forEach(item => { socialData[item.section_key] = item.value_uk; });
+            } catch(e) {}
+        }
+
+        const waPhone = socialData['whatsapp-phone'] || '380776007800';
+        const vPhone = socialData['viber-phone'] || '380776007800';
+        const tgUser = socialData['telegram-username'] || (settings ? settings.tgBotUsername : null) || 'dentalstudioche';
+
+        if (platform === 'telegram') url = `https://t.me/${tgUser.replace('@','')}`;
+        if (platform === 'viber') url = `viber://add?number=${vPhone.replace(/\D/g, '')}`;
+        if (platform === 'whatsapp') url = `https://wa.me/${waPhone.replace(/\D/g, '')}`;
         
         if (url) window.open(url, '_blank');
     });
@@ -233,7 +245,24 @@ window.openMessenger = function(platform) {
 // --- Toggle Chat Window ---
 window.toggleAIChat = function() {
     const chatWindow = document.getElementById('aiChatWindow');
-    if (chatWindow) chatWindow.classList.toggle('ai-chat-open');
+    if (chatWindow) {
+        const isOpen = chatWindow.classList.toggle('ai-chat-open');
+        if (isOpen) {
+            // Mobile Keyboard Fix: Force focus on the active input
+            setTimeout(() => {
+                const visibleInput = [
+                    document.getElementById('aiChatInput'),
+                    document.getElementById('chatContactPhone'),
+                    document.getElementById('chatContactEmail')
+                ].find(el => el && el.offsetParent !== null);
+                if (visibleInput) {
+                    visibleInput.focus();
+                    // Some mobile browsers need a second nudge
+                    setTimeout(() => visibleInput.focus(), 50);
+                }
+            }, 350);
+        }
+    }
 };
 
 // --- Handle Enter Key ---
@@ -463,15 +492,15 @@ function showThinking() {
     .bot-msg { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
     .user-msg { background: #c5a882; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
     .ai-chat-input-area { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; background: #fff; }
-    .ai-chat-input-area input { flex: 1; border: 1px solid #ddd; padding: 10px 15px; border-radius: 24px; outline: none; font-family: inherit; font-size: 14px; }
+    .ai-chat-input-area input { flex: 1; border: 1px solid #ddd; padding: 10px 15px; border-radius: 24px; outline: none; font-family: inherit; font-size: 14px; pointer-events: auto !important; }
     .ai-send-btn { background: #c5a882; color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .thinking-dots span { animation: blink 1.4s infinite; font-size: 24px; line-height: 1; }
     .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
     .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes blink { 0%, 20% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
-    #chatContactForm { padding: 20px; }
+    #chatContactForm { padding: 20px; position: relative; z-index: 10002; }
     #chatContactForm h4 { margin-bottom: 12px; font-size: 14px; color: #333; }
-    #chatContactForm input { width: 100%; padding: 10px 12px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+    #chatContactForm input { width: 100%; padding: 10px 12px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; box-sizing: border-box; pointer-events: auto !important; -webkit-user-select: text; }
     #chatContactForm input:focus { border-color: #c5a882; outline: none; }
     #chatContactForm .or-divider { text-align: center; color: #999; font-size: 12px; margin: 4px 0; }
     #chatContactForm button { width: 100%; padding: 10px; background: #c5a882; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
@@ -576,10 +605,12 @@ async function resumeChatSession() {
     const sessionId = localStorage.getItem('ds_chat_session');
     
     if (contact && sessionId) {
+        const selector = document.getElementById('chatPlatformSelector');
         const form = document.getElementById('chatContactForm');
         const body = document.getElementById('aiChatBody');
         const inputArea = document.querySelector('.ai-chat-input-area');
         
+        if (selector) selector.style.display = 'none';
         if (form) form.style.display = 'none';
         if (body) body.style.display = 'block';
         if (inputArea) inputArea.style.display = 'flex';
@@ -601,6 +632,17 @@ async function resumeChatSession() {
                         appendMessage(m.content, m.role);
                         chatHistory.push({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.content });
                     });
+
+                    // Logic: If user was the last to speak, or it's a "Welcome back" situation
+                    const lastMsg = msgs[msgs.length - 1];
+                    const hoursSinceLast = (new Date() - new Date(lastMsg.created_at)) / 3600000;
+
+                    if (lastMsg.role === 'user' || hoursSinceLast > 12) {
+                        const welcomeBack = "Раді знову Вас бачити! 👋 Якщо у Вас з'явилися нові запитання або Ви хочете уточнити деталі попередньої розмови — ми завжди на зв'язку.";
+                        appendMessage(welcomeBack, 'bot');
+                        chatHistory.push({ role: 'assistant', content: welcomeBack });
+                        saveChatMessage('bot', welcomeBack);
+                    }
                 }
             } catch(e) { console.warn('Could not load chat history', e); }
         }

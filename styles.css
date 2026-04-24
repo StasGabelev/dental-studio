@@ -1752,7 +1752,7 @@ button { font-family: var(--font-sans); }
     margin-bottom: 18px;
 }
 
-.box-address, .box-hours {
+.box-address, .box-hours, .box-text {
     font-family: var(--font-serif);
     font-size: 26px;
     font-weight: 400;
