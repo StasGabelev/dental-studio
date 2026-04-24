@@ -354,6 +354,10 @@ async function triggerAdminAlert(platform, userName, lastMsg, sessionId) {
 }
 
 // --- 5. Web API for Widget ---
+app.get('/health_check_unique', (req, res) => {
+    res.json({ status: 'ok', message: 'Unique endpoint reached!' });
+});
+
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString(), provider: aiSettings?.provider || 'not set' });
 });
