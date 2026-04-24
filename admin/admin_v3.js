@@ -1901,6 +1901,9 @@ async function testAIApiKey() {
         } else if (provider === 'deepseek') {
             const res = await fetch('https://api.deepseek.com/v1/models', { headers: { 'Authorization': 'Bearer ' + apiKey } });
             success = res.ok;
+        } else if (provider === 'openrouter') {
+            const res = await fetch('https://openrouter.ai/api/v1/models', { headers: { 'Authorization': 'Bearer ' + apiKey } });
+            success = res.ok;
         }
 
         statusEl.innerHTML = success ? '<span style="color:var(--success);">✅ Ключ дійсний!</span>' : '<span style="color:var(--danger);">❌ Помилка ключа.</span>';
