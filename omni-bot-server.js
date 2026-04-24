@@ -354,17 +354,27 @@ async function triggerAdminAlert(platform, userName, lastMsg, sessionId) {
 }
 
 // --- 5. Web API for Widget ---
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', time: new Date().toISOString(), provider: aiSettings?.provider || 'not set' });
+});
+
 app.post('/api/chat', async (req, res) => {
+    console.log('📩 Incoming chat request:', req.body);
     const { message, sessionId } = req.body;
     if (!sessionId) return res.status(400).send('Session ID required');
 
-    const history = await getChatHistory(sessionId);
-    const reply = await getAIResponse(message, history);
+    try {
+        const history = await getChatHistory(sessionId);
+        const reply = await getAIResponse(message, history);
 
-    await saveMessage(sessionId, 'user', message);
-    await saveMessage(sessionId, 'bot', reply);
+        await saveMessage(sessionId, 'user', message);
+        await saveMessage(sessionId, 'bot', reply);
 
-    res.json({ reply });
+        res.json({ reply });
+    } catch (err) {
+        console.error('❌ Chat Handler Error:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // --- 6. Admin API (AI Hub Integration) ---
