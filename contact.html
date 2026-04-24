@@ -1,77 +1,151 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="contacts-page-title">Контакти — Dental Studio</title>
-    <link rel="stylesheet" href="styles.css?v=v1.31.43">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
-</head>
-<body class="bg-white">
-    <div id="header-placeholder"></div>
-
-    <main class="page-container">
-        <section class="contact-hero">
-            <div class="container--narrow">
-                <div class="contact-form-wrap reveal" style="text-align: center;">
-                    <h1 class="section-title-alt" style="margin-bottom: 24px;" data-i18n="contacts-hero-title">КОНТАКТИ ТА ЗАПИС</h1>
-                    <p class="contact-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;" data-i18n="contacts-hero-subtitle">
-                        Виберіть онлайн-запис для миттєвого бронювання часу,<br>або зв'яжіться з нами напряму.
-                    </p>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto 60px;">
-                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase; cursor: pointer;" data-i18n="btn-online-booking">ОНЛАЙН ЗАПИС</button>
-                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; cursor: pointer; font-family: var(--font-sans); transition: all 0.3s ease;" data-i18n="btn-contact-hub">ЗВ'ЯЗАТИСЯ З НАМИ</button>
-                    </div>
-
-                    <div class="contact-direct-call">
-                        <span data-i18n="form-phone-label">Зв'язатися з нами для консультації:</span>
-                        <a href="tel:+380776007800" class="btn--call" data-i18n="footer-phone-1">(077) 600 7 800 ЗАТЕЛЕФОНУВАТИ</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="contact-info-section">
-            <div class="container-full">
-                <div class="contact-info-grid">
-                    <div class="contact-info-box">
-                        <h3 class="box-title" data-i18n="footer-find-us">ДЕ НАС ЗНАЙТИ</h3>
-                        <p class="box-address" data-i18n="map-address">ВУЛИЦЯ НЕЗАЛЕЖНОСТІ, 21, ЧЕРНІГІВ, УКРАЇНА</p>
-                        <a href="https://maps.google.com/?q=Chernihiv,+Nezalezhnosti+21" target="_blank" class="btn--map-pin" data-i18n="footer-map-btn">ЗНАЙТИ НАС НА КАРТІ</a>
-                    </div>
-                    <div class="contact-info-box">
-                        <h3 class="box-title" data-i18n="footer-hours-title">ГРАФІК РОБОТИ</h3>
-                        <p class="box-hours" data-i18n="footer-hours-days">ПН — ПТ, 10:00 — 18:00</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section style="height:460px; overflow:hidden; border-top: 1px solid rgba(184,146,74,0.2);">
-            <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2500.0!2d31.285!3d51.498!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46d5495aa1a47275%3A0x5f0e26c7aa39f8cf!2z0JLRg9C70LjRhtGPINCd0LXQt9Cw0LvQtdC20L3QvtGB0YLRliAyMSwg0KfQtdGA0L3RltCz0ZbQsiwg0KfQtdGA0L3RltCz0ZbQstGB0YzQutCwINC-0LHQu9Cw0YHRgtGM!5e0!3m2!1suk!2sua!4v1234567890"
-                width="100%" height="460" style="border:0; display:block;"
-                filter="saturate(0.3)"
-                allowfullscreen="" loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-        </section>
-    </main>
-
-    <div id="footer-placeholder"></div>
-
+<!DOCTYPE html>
+
+<html lang="uk">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title data-i18n="contacts-page-title">Контакти — Dental Studio</title>
+
+    <link rel="stylesheet" href="styles.css?v=v1.31.43">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="bg-white">
+
+    <div id="header-placeholder"></div>
+
+
+
+    <main class="page-container">
+
+        <section class="contact-hero">
+
+            <div class="container--narrow">
+
+                <div class="contact-form-wrap reveal" style="text-align: center;">
+
+                    <h1 class="section-title-alt" style="margin-bottom: 24px;" data-i18n="contacts-hero-title">КОНТАКТИ ТА ЗАПИС</h1>
+
+                    <p class="contact-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;" data-i18n="contacts-hero-subtitle">
+
+                        Виберіть онлайн-запис для миттєвого бронювання часу,<br>або зв'яжіться з нами напряму.
+
+                    </p>
+
+                    
+
+                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto 60px;">
+
+                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase; cursor: pointer;" data-i18n="btn-online-booking">ОНЛАЙН ЗАПИС</button>
+
+                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; cursor: pointer; font-family: var(--font-sans); transition: all 0.3s ease;" data-i18n="btn-contact-hub">ЗВ'ЯЗАТИСЯ З НАМИ</button>
+
+                    </div>
+
+
+
+                    <div class="contact-direct-call">
+
+                        <span data-i18n="form-phone-label">Зв'язатися з нами для консультації:</span>
+
+                        <a href="tel:+380776007800" class="btn--call" data-i18n="footer-phone-1">(077) 600 7 800 ЗАТЕЛЕФОНУВАТИ</a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <section class="contact-info-section">
+
+            <div class="container-full">
+
+                <div class="contact-info-grid">
+
+                    <div class="contact-info-box">
+
+                        <h3 class="box-title" data-i18n="footer-find-us">ДЕ НАС ЗНАЙТИ</h3>
+
+                        <p class="box-address" data-i18n="map-address">ВУЛИЦЯ НЕЗАЛЕЖНОСТІ, 21, ЧЕРНІГІВ, УКРАЇНА</p>
+
+                        <a href="https://maps.google.com/?q=Chernihiv,+Nezalezhnosti+21" target="_blank" class="btn--map-pin" data-i18n="footer-map-btn">ЗНАЙТИ НАС НА КАРТІ</a>
+
+                    </div>
+
+                    <div class="contact-info-box">
+
+                        <h3 class="box-title" data-i18n="footer-hours-title">ГРАФІК РОБОТИ</h3>
+
+                        <p class="box-hours" data-i18n="footer-hours-days">ПН — ПТ, 10:00 — 18:00</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <section style="height:460px; overflow:hidden; border-top: 1px solid rgba(184,146,74,0.2);">
+
+            <iframe
+
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2500.0!2d31.285!3d51.498!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46d5495aa1a47275%3A0x5f0e26c7aa39f8cf!2z0JLRg9C70LjRhtGPINCd0LXQt9Cw0LvQtdC20L3QvtGB0YLRliAyMSwg0KfQtdGA0L3RltCz0ZbQsiwg0KfQtdGA0L3RltCz0ZbQstGB0YzQutCwINC-0LHQu9Cw0YHRgtGM!5e0!3m2!1suk!2sua!4v1234567890"
+
+                width="100%" height="460" style="border:0; display:block;"
+
+                filter="saturate(0.3)"
+
+                allowfullscreen="" loading="lazy"
+
+                referrerpolicy="no-referrer-when-downgrade">
+
+            </iframe>
+
+        </section>
+
+    </main>
+
+
+
+    <div id="footer-placeholder"></div>
+
+
+
     <script src="translations.js?v=v1.31.43"></script>
     <script src="components.js?v=v1.31.43"></script>
-    <script src="main.js?v=v1.31.43"></script>
-
-    <!-- Supabase & Dynamic Content Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js?v=v1.31.43"></script>
+
+
+
+    <!-- Supabase & Dynamic Content Engine -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="dynamic-content.js?v=v1.31.43"></script>
-    <script src="chat-widget.js?v=v1.31.43"></script>
-</body>
-</html>
-
-
+    <script src="chat-widget.js?v=v1.31.45"></script>
+
+</body>
+
+</html>
+
+
+
+
+

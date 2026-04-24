@@ -1,94 +1,185 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="about-page-title">Про клініку — Dental Studio</title>
-    <link rel="stylesheet" href="styles.css?v=v1.31.43">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
-</head>
-<body class="bg-white">
-    <div id="header-placeholder"></div>
-
-    <main class="page-container">
-        <!-- Hero Section -->
-        <section class="about-hero">
-            <div id="about-hero-img" class="about-hero__img" style="background-image: url('assets/dental-2.png')"></div>
-            <div class="about-hero__overlay"></div>
-        </section>
-
-        <!-- Mission -->
-        <section class="about-section">
-            <div class="container-full">
-                <div class="about-row reveal">
-                    <div class="about-col about-col--img">
-                        <img id="about-secondary-img" src="assets/dental-2.png" alt="Dental Studio">
-                    </div>
-                    <div class="about-col about-col--text">
-                        <p class="section-tag" data-i18n="about-section-tag">ПРО КЛІНІКУ</p>
-                        <h2 class="section-title-alt" data-i18n="about-p1">Ми доповнюємо вашу красу</h2>
-                        <p class="about-desc" data-i18n="about-p2">
-                            Ми надаємо широкий спектр стоматологічних послуг найвищого рівня, в основі якого цифрова стоматологія та часть душі кожного з наших лікарів.
-                        </p>
-                        <div class="about-links">
-                            <a href="cases.html" class="btn btn--cta" data-i18n="nav-works">НАШІ РОБОТИ</a>
-                            <a href="services.html" class="btn btn--outline-gold" data-i18n="nav-services">ПОСЛУГИ</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Team Accordion -->
-        <section class="team-section">
-            <div class="container-full">
-                <h2 class="section-heading reveal" data-i18n="about-team-title">НАША КОМАНДА</h2>
-                <div class="team-accordion">
-                    <!-- Dynamic team members will be injected here via dynamic-content.js -->
-                </div>
-            </div>
-        </section>
-        <!-- =======================================
-             CONTACT CHOICE SECTION
-        ======================================= -->
-        <section id="contact-choice" class="appointment" style="padding: 100px 0; background: #fff; border-top: 1px solid rgba(0,0,0,0.03);">
-            <div class="container--narrow">
-                <div class="appointment__inner reveal" style="text-align: center;">
-                    <h2 class="section-title-alt" style="margin-bottom: 24px;" data-i18n="contact-choice-title">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</h2>
-                    <p class="appointment-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;" data-i18n="contact-choice-subtitle">
-                        Виберіть онлайн-запис для миттєвого бронювання часу,<br>або напишіть нам у месенджер для консультації.
-                    </p>
-                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto;">
-                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase; cursor: pointer;" data-i18n="btn-online-booking">ОНЛАЙН ЗАПИС</button>
-                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; cursor: pointer; font-family: var(--font-sans); transition: all 0.3s ease;" data-i18n="btn-contact-hub">ЗВ'ЯЗАТИСЯ З НАМИ</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div id="footer-placeholder"></div>
-
+<!DOCTYPE html>
+
+<html lang="uk">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title data-i18n="about-page-title">Про клініку — Dental Studio</title>
+
+    <link rel="stylesheet" href="styles.css?v=v1.31.43">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="bg-white">
+
+    <div id="header-placeholder"></div>
+
+
+
+    <main class="page-container">
+
+        <!-- Hero Section -->
+
+        <section class="about-hero">
+
+            <div id="about-hero-img" class="about-hero__img" style="background-image: url('assets/dental-2.png')"></div>
+
+            <div class="about-hero__overlay"></div>
+
+        </section>
+
+
+
+        <!-- Mission -->
+
+        <section class="about-section">
+
+            <div class="container-full">
+
+                <div class="about-row reveal">
+
+                    <div class="about-col about-col--img">
+
+                        <img id="about-secondary-img" src="assets/dental-2.png" alt="Dental Studio">
+
+                    </div>
+
+                    <div class="about-col about-col--text">
+
+                        <p class="section-tag" data-i18n="about-section-tag">ПРО КЛІНІКУ</p>
+
+                        <h2 class="section-title-alt" data-i18n="about-p1">Ми доповнюємо вашу красу</h2>
+
+                        <p class="about-desc" data-i18n="about-p2">
+
+                            Ми надаємо широкий спектр стоматологічних послуг найвищого рівня, в основі якого цифрова стоматологія та часть душі кожного з наших лікарів.
+
+                        </p>
+
+                        <div class="about-links">
+
+                            <a href="cases.html" class="btn btn--cta" data-i18n="nav-works">НАШІ РОБОТИ</a>
+
+                            <a href="services.html" class="btn btn--outline-gold" data-i18n="nav-services">ПОСЛУГИ</a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- Team Accordion -->
+
+        <section class="team-section">
+
+            <div class="container-full">
+
+                <h2 class="section-heading reveal" data-i18n="about-team-title">НАША КОМАНДА</h2>
+
+                <div class="team-accordion">
+
+                    <!-- Dynamic team members will be injected here via dynamic-content.js -->
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =======================================
+
+             CONTACT CHOICE SECTION
+
+        ======================================= -->
+
+        <section id="contact-choice" class="appointment" style="padding: 100px 0; background: #fff; border-top: 1px solid rgba(0,0,0,0.03);">
+
+            <div class="container--narrow">
+
+                <div class="appointment__inner reveal" style="text-align: center;">
+
+                    <h2 class="section-title-alt" style="margin-bottom: 24px;" data-i18n="contact-choice-title">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</h2>
+
+                    <p class="appointment-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;" data-i18n="contact-choice-subtitle">
+
+                        Виберіть онлайн-запис для миттєвого бронювання часу,<br>або напишіть нам у месенджер для консультації.
+
+                    </p>
+
+                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto;">
+
+                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase; cursor: pointer;" data-i18n="btn-online-booking">ОНЛАЙН ЗАПИС</button>
+
+                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; cursor: pointer; font-family: var(--font-sans); transition: all 0.3s ease;" data-i18n="btn-contact-hub">ЗВ'ЯЗАТИСЯ З НАМИ</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <div id="footer-placeholder"></div>
+
+
+
     <script src="translations.js?v=v1.31.43"></script>
     <script src="components.js?v=v1.31.43"></script>
-    <script src="main.js?v=v1.31.43"></script>
-    <script>
-        // Team Accordion functionality
-        document.querySelectorAll('.team-member').forEach(member => {
-            member.addEventListener('mouseenter', () => {
-                document.querySelector('.team-member.active').classList.remove('active');
-                member.classList.add('active');
-            });
-        });
-    </script>
-
-    <!-- Supabase & Dynamic Content Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js?v=v1.31.43"></script>
+
+    <script>
+
+        // Team Accordion functionality
+
+        document.querySelectorAll('.team-member').forEach(member => {
+
+            member.addEventListener('mouseenter', () => {
+
+                document.querySelector('.team-member.active').classList.remove('active');
+
+                member.classList.add('active');
+
+            });
+
+        });
+
+    </script>
+
+
+
+    <!-- Supabase & Dynamic Content Engine -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="dynamic-content.js?v=v1.31.43"></script>
-    <script src="chat-widget.js?v=v1.31.43"></script>
-</body>
-</html>
-
-
+    <script src="chat-widget.js?v=v1.31.45"></script>
+
+</body>
+
+</html>
+
+
+
+
+

@@ -1,1056 +1,2110 @@
-<!DOCTYPE html>
-<html lang="uk">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Послуги — Dental Studio</title>
-    <link rel="stylesheet" href="styles.css?v=v1.31.43">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
-    <script src="translations.js?v=v1.31.43"></script>
-    <style>
-        /* 1:1 Original Hero Replica */
-        .service-fullscreen-hero {
-            position: relative;
-            min-height: 100vh;
-            background-color: #fff;
-            display: flex;
-            align-items: stretch;
-            padding-top: 100px;
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-
-        .service-hero-left {
-            flex: 0 0 50%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-left: 10%;
-            z-index: 2;
-        }
-
-        .service-hero-right {
-            flex: 0 0 50%;
-            position: relative;
-            z-index: 1;
-            background: #fff;
-        }
-
-        .service-hero-right img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center top;
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 1) 20%);
-            mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 1) 20%);
-        }
-
-        .service-huge-title {
-            font-family: 'Bodoni Moda', serif;
-            font-size: 64px;
-            font-weight: 400;
-            color: #1A1A1A;
-            line-height: 1.0;
-            margin-bottom: 36px;
-            letter-spacing: -0.5px;
-        }
-
-        .btn-nude {
-            background: linear-gradient(135deg, #D4AF72 0%, #B8924A 50%, #9A7A3E 100%);
-            color: #fff;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            padding: 16px 40px;
-            border: none;
-            border-radius: 2px;
-            cursor: pointer;
-            width: max-content;
-            text-decoration: none;
-            transition: all 0.34s ease;
-            box-shadow: 0 4px 20px rgba(184, 146, 74, 0.25);
-        }
-        .btn-nude:hover {
-            box-shadow: 0 6px 30px rgba(184, 146, 74, 0.4);
-            transform: translateY(-1px);
-        }
-
-        @media (max-width: 900px) {
-            .service-fullscreen-hero {
-                flex-direction: column;
-                padding-top: 80px;
-            }
-
-            .service-hero-left {
-                flex: none;
-                height: 50vh;
-                padding: 0 20px;
-                text-align: center;
-                align-items: center;
-                justify-content: flex-end;
-                padding-bottom: 40px;
-            }
-
-            .service-hero-right {
-                flex: none;
-                height: 50vh;
-                order: -1;
-            }
-
-            .service-huge-title {
-                font-size: 34px;
-            }
-        }
-    </style>
-</head>
-
-<body class="bg-white">
-    <div id="header-placeholder"></div>
-
-    <main>
-        <section class="service-fullscreen-hero">
-            <div class="service-hero-left">
-                <h1 class="service-huge-title" data-i18n="feat-aesthetic">Естетична стоматологія</h1>
-                <a href="#form" class="btn-nude" data-i18n="btn-book">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</a>
-            </div>
-            <div class="service-hero-right">
-                <img src="https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/preview.jpg"
-                    alt="Естетична стоматологія">
-            </div>
-        </section>
-
-        <section class="services-details-section">
-            <div class="container-full">
-                <div class="services-tabs-row">
-                    <button class="tab-btn-outline active" data-target="content-aesthetic" data-i18n="feat-aesthetic">ЕСТЕТИЧНА
-                        СТОМАТОЛОГІЯ</button>
-                    <button class="tab-btn-outline" data-target="content-therapy" data-i18n="feat-therapy">Лікування зубів</button>
-                    <button class="tab-btn-outline" data-target="content-surgery" data-i18n="feat-surgery">Хірургія</button>
-                    <button class="tab-btn-outline" data-target="content-ortho" data-i18n="feat-ortho">Ортодонтія</button>
-                </div>
-
-                <div class="services-accordion-box">
-                    <div class="accordion-panel active" id="content-aesthetic">
-
-                        <!-- 1. Консультація -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-                                            <path
-                                                d="M12 2C8.5 2 6 5 6 9c0 2-1 3.5-3 4.5v1.5h18v-1.5c-2-1-3-2.5-3-4.5 0-4-2.5-7-6-7z" />
-                                            <path
-                                                d="M16 4.5c1 0 1.5.5 1.5 1.5m-7 0c0-1 .5-1.5 1.5-1.5M19 18v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2" />
-                                        </svg>
-                                    </div>
-                                    <span class="accordion-title" data-i18n="svc-consult-title">Консультація</span>
-                                </div>
-                                <div class="accordion-arrow">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="1.2">
-                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-consult-desc">
-                                        Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає
-                                        зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу
-                                        роботи.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source
-                                                src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4"
-                                                type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-consult-general">Загальна консультація</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-general-val">2000 ?</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-consult-modjaw">Функціональна діагностика MODJAW</span> <i>i</i></div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-modjaw-val">400 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-consult-checkup">Стоматологічний CHECK-UP</span> <i>i</i></div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-checkup-val">4900 ?</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 2. Композитні вініри та реставрації -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-                                            <circle cx="12" cy="12" r="8" />
-                                            <path d="M12 8v8m-4-4h8" />
-                                        </svg>
-                                    </div>
-                                    <span class="accordion-title" data-i18n="svc-composite-veneer-title">Композитні вініри та реставрації</span>
-                                </div>
-                                <div class="accordion-arrow">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="1.2">
-                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-composite-veneer-desc">
-                                        Високоестетичне покращення та відтворення природньої форми та рельєфу зубів
-                                        композитним матеріалом без препарування власних тканин зуба із терміном служби 5
-                                        років.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source
-                                                src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4"
-                                                type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-frontal-restoration">Реставрація фронтального зуба</span> <i>i</i></div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-frontal-restoration-val">230 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-art-restoration">Художня реставрація - по ключу</span> <i>i</i></div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-art-restoration-val">350 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. Керамічні реставрації -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
-                                            <circle cx="12" cy="12" r="8" />
-                                            <path d="M12 8v8m-4-4h8" />
-                                        </svg>
-                                    </div>
-                                    <span class="accordion-title" data-i18n="svc-ceramic-restoration-title">Керамічні реставрації (вініри, коронки,
-                                        накладки)</span>
-                                </div>
-                                <div class="accordion-arrow">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="1.2">
-                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-ceramic-restoration-desc">
-                                        Відтворення природності, рельєфу та структури зуба керамічними вінірами, зміна
-                                        кольору посмішки на більш яскравішу, відновлення функції зубного ряду із
-                                        терміном служби 15 років.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source
-                                                src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4"
-                                                type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-veneer-digital">Керамічний вінір (digital)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-veneer-digital-val">600 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-veneer-layering">Керамічний вінір (digital + нашарування)</span> <i>i</i>
-                                        </div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-veneer-layering-val">750 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-veneer-handmade">Керамічний вінір (hand made, полевошпат)</span> <i>i</i>
-                                        </div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-veneer-handmade-val">850 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-veneer-rework">Переробка керамічного вініра чужої роботи (за зуб)
-                                        </div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-veneer-rework-val">1200 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-veneer-single">Керамічний вінір - одиночний центральний різець</span>
-                                            <i>i</i></div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-veneer-single-val">1500 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-crown-digital">Керамічна коронка на імплантаті (digital)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-crown-digital-val">680 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-crown-layering">Керамічна коронка на імплантаті (digital +
-                                            нашарування)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-crown-layering-val">850 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-crown-handmade">Керамічна коронка на імплантаті (hand made,
-                                            полевошпат)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-crown-handmade-val">950 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="accordion-panel" id="content-therapy">
-
-                        <!-- 1. Консультація -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="1.2">
-                                            <path
-                                                d="M12 2C8.5 2 6 5 6 9c0 2-1 3.5-3 4.5v1.5h18v-1.5c-2-1-3-2.5-3-4.5 0-4-2.5-7-6-7z" />
-                                            <path
-                                                d="M16 4.5c1 0 1.5.5 1.5 1.5m-7 0c0-1 .5-1.5 1.5-1.5M19 18v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2" />
-                                        </svg></div>
-                                    <span class="accordion-title" data-i18n="svc-consult-title">Консультація</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="1.2">
-                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
-                                    </svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-consult-desc">
-                                        Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає
-                                        зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу
-                                        роботи.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source
-                                                src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4"
-                                                type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-consult-general">Загальна консультація</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-general-val">2000 ?</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-consult-checkup">Стоматологічний CHECK-UP</span> <i>i</i></div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-checkup-val">4900 ?</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 2. Ендодонтія -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="1.2">
-                                            <path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z" />
-                                        </svg></div>
-                                    <span class="accordion-title" data-i18n="svc-endo-title">Ендодонтія</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="1.2">
-                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
-                                    </svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-endo-desc">
-                                        Ювелірна робота вузького спеціаліста по збереженню зуба. Первинне та вторинне лікування кореневих каналів, вилучення уламків інструментів та лікування запальних процесів на верхівці кореня зуба із використанням мікроскопа.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-endo-incisor">Лікування кореневих каналів (різці, ікла)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-endo-incisor-val">285 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-endo-premolar">Лікування кореневих каналів (премоляри)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-endo-premolar-val">320 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-endo-molar">Лікування кореневих каналів (моляри)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-endo-molar-val">440 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. Лікування карієсу -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="1.2">
-                                            <path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z" />
-                                        </svg></div>
-                                    <span class="accordion-title" data-i18n="svc-caries-title">Лікування карієсу</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="1.2">
-                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
-                                    </svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-caries-desc">
-                                        Видалення уражених тканин зуба із подальшим відновленням його природньої форми та морфології композитним матеріалом за сучасними протоколами із використанням операційного мікроскопу.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-caries-1">Лікування карієсу - І рівень складності</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-caries-1-val">130 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-caries-2">Лікування карієсу - ІI рівень складності</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-caries-2-val">150 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-caries-3">Лікування карієсу - ІII рівень складності</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-caries-3-val">170 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 4. Пародонтологічне лікування -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="1.2">
-                                            <path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z" />
-                                        </svg></div>
-                                    <span class="accordion-title" data-i18n="svc-periodontal-title">Пародонтологічне лікування</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="1.2">
-                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
-                                    </svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-periodontal-desc">
-                                        Зняття надясенних та підясенних зубних відкладень. Очищення кореня від зубного каменю із використанням ручних інструментів Hu-Friedy. Антисептична обробка пародонтальних кишень. Заповнення пародонтологічної карти. Урок гігієни.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-periodont-1">Лікування пародонтиту - І ступінь</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-periodont-1-val">140 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-periodont-2">Лікування пародонтиту - ІІ ступінь</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-periodont-2-val">280 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-periodont-3">Лікування пародонтиту - ІІI ступінь</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-periodont-3-val">400 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 5. Професійна гігієна зубів -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="1.2">
-                                            <path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z" />
-                                        </svg></div>
-                                    <span class="accordion-title" data-i18n="svc-hygiene-title">Професійна гігієна зубів</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="1.2">
-                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
-                                    </svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-hygiene-desc">
-                                        Контроль гігієни ротової порожнини. Зняття твердих зубних відкладень за допомогою ультразвукового скейлера та ручних інструментів. Зняття м’якого зубного нальоту повітряно-абразивною обробкою Prophyflex.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-hygiene">Професійна гігієна</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-hygiene-val">100 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-hygiene-smoker">Професійна гігієна (наліт курця)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-hygiene-smoker-val">140 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 6. Відбілювання зубів -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z"/></svg></div>
-                                    <span class="accordion-title" data-i18n="svc-whitening-title">Відбілювання зубів</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-whitening-desc">
-                                        Безпечна та високоефективна процедура клінічного відбілювання системою Beyond за допомогою гелю та спеціального лазерного світла для досягнення білішого та здоровішого вигляду зубів.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-whitening">Відбілювання</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-whitening-val">150 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="accordion-panel" id="content-surgery">
-                        <!-- 1. Консультація -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C8.5 2 6 5 6 9c0 2-1 3.5-3 4.5v1.5h18v-1.5c-2-1-3-2.5-3-4.5 0-4-2.5-7-6-7z"/><path d="M16 4.5c1 0 1.5.5 1.5 1.5m-7 0c0-1 .5-1.5 1.5-1.5M19 18v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2"/></svg></div>
-                                    <span class="accordion-title" data-i18n="svc-consult-title">Консультація</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-consult-desc">
-                                        Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу роботи.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-consult-general">Загальна консультація</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-general-val">2000 ?</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-consult-checkup">Стоматологічний CHECK-UP</span> <i>i</i></div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-checkup-val">4900 ?</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 2. Імплантація -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2v20M5 7l14 0M5 12l14 0M5 17l14 0"/></svg></div>
-                                    <span class="accordion-title" data-i18n="svc-implant-title">Імплантація</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-implant-desc">
-                                        Імплантація відсутніх зубів із використанням швейцарських імплантатів Straumann та спеціальних хірургічних шаблонів, які виготовляються для кожного пацієнта індивідуально.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-implant-neodent">Імплант NEODENT (Бразилія)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-implant-neodent-val">550 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-implant-sla">Імплант STRAUMANN SLA (Швейцарія)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-implant-sla-val">780 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-implant-slactive">Імплант STRAUMANN SLACTIVE (Швейцарія)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-implant-slactive-val">980 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-crown-monolit">Коронка на імпланті (monolit)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-crown-monolit-val">650 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-crown-aesthetic">Коронка на імпланті (платформа + абатмент + керамічний вінір)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-crown-aesthetic-val">850 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. Видалення зубів -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z"/></svg></div>
-                                    <span class="accordion-title" data-i18n="svc-extraction-title">Видалення зубів</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-extraction-desc">
-                                        Майстерне видалення зубів під місцевою анастезією або в медикаментозному сні (седація). Седація – це занурення пацієнта в глибокий або поверхневий природний сон под контролем лікаря-анастезіолога.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-extraction">Видалення зуба</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-extraction-val">100 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-extraction-atypical-1">Атипове видалення (просте)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-extraction-atypical-1-val">150 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-extraction-atypical-2">Атипове видалення (складне)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-extraction-atypical-2-val">220 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-sedation">Медикаментозний сон (седація) - 1 година</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-sedation-val">140 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 4. Закриття рецесій, хірургічне подовження клінічної коронки зуба, усунення ясеневої посмішки -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2v20M5 7l14 0M5 12l14 0M5 17l14 0"/></svg></div>
-                                    <span class="accordion-title" data-i18n="svc-gum-surgery-title">Закриття рецесій, хірургічне подовження клінічної коронки зуба, усунення ясеневої посмішки</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-gum-surgery-desc">
-                                        Високоестетичні хірургічні операції із яснами (корекція ясен) для створення нової естетики посмішки пацієнта в комбінації із керамічними вінірами.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-gum-smile">Операція усунення ясенної посмішки (10 зубів)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-gum-smile-val">1950 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-recession">Закриття рецесій біля одного зуба</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-recession-val">290 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-gum-extension">Видовження ясен біля одного зуба</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-gum-extension-val">160 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="accordion-panel" id="content-ortho">
-                        <!-- 1. Консультація -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C8.5 2 6 5 6 9c0 2-1 3.5-3 4.5v1.5h18v-1.5c-2-1-3-2.5-3-4.5 0-4-2.5-7-6-7z"/><path d="M16 4.5c1 0 1.5.5 1.5 1.5m-7 0c0-1 .5-1.5 1.5-1.5M19 18v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2"/></svg></div>
-                                    <span class="accordion-title" data-i18n="svc-consult-title">Консультація</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-consult-desc">
-                                        Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу роботи.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-consult-general">Загальна консультація</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-general-val">2000 ?</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-consult-modjaw">Функціональна діагностика MODJAW</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-modjaw-val">400 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name"><span data-i18n="price-consult-checkup">Стоматологічний CHECK-UP</span> <i>i</i></div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-consult-checkup-val">4900 ?</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 2. Лікування брекет-системою -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z"/></svg></div>
-                                    <span class="accordion-title" data-i18n="svc-braces-title">Лікування брекет-системою</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-braces-desc">
-                                        Повернення пацієнту не лише краси та естетики посмішки, а й відновлення правильного функціонування зубо-щелепної системи за допомогою лікування брекет системою.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-braces-metal">Лікування брекет-системою (метал)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-braces-metal-val">2600 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-braces-ceramic">Лікування брекет-системою (кераміка)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-braces-ceramic-val">3100 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-braces-self-metal">Лікування брекет-системою (самолігуючі, метал)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-braces-self-metal-val">3900 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-ortho-visit">Щомісячний контрольний візит до ортодонта</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-ortho-visit-val">65 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-braces-self-ceramic">Лікування брекет-системою (самолігуючі, кераміка)</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-braces-self-ceramic-val">4640 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. Лікування елайнерами -->
-                        <div class="accordion-item-box">
-                            <div class="accordion-item-box-header">
-                                <div class="accordion-header-box">
-                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2v20M5 7l14 0M5 12l14 0M5 17l14 0"/></svg></div>
-                                    <span class="accordion-title" data-i18n="svc-aligners-title">Лікування елайнерами</span>
-                                </div>
-                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
-                            </div>
-                            <div class="accordion-item-content">
-                                <div class="accordion-content-grid">
-                                    <div class="accordion-content-text" data-i18n="svc-aligners-desc">
-                                        Повернення пацієнту не лише краси та естетики посмішки, а й відновлення правильного функціонування зубо-щелепної системи за допомогою лікування елайнерами. Елайнери - індивідуальний комплект прозорих кап, які непомітно для оточуючих вирівнюють зуби.
-                                    </div>
-                                    <div class="accordion-content-media">
-                                        <video autoplay muted loop playsinline>
-                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <div class="accordion-price-list">
-                                    <div class="accordion-price-item">
-                                        <div class="price-item-name" data-i18n="price-aligners">Лікування елайнерами</div>
-                                        <div class="price-item-right">
-                                            <span class="price-item-value" data-i18n="price-aligners-val">3900 €</span>
-                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-        <!-- =======================================
-             CONTACT CHOICE SECTION
-        ======================================= -->
-        <section id="contact-choice" class="appointment" style="padding: 100px 0; background: #fff; border-top: 1px solid rgba(0,0,0,0.03);">
-            <div class="container--narrow">
-                <div class="appointment__inner reveal" style="text-align: center;">
-                    <h2 class="section-title-alt" style="margin-bottom: 24px;" data-i18n="contact-choice-title">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</h2>
-                    <p class="appointment-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;" data-i18n="contact-choice-subtitle">
-                        Виберіть онлайн-запис для миттєвого бронювання часу,<br>або напишіть нам у месенджер для консультації.
-                    </p>
-                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto;">
-                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase; cursor: pointer;" data-i18n="btn-online-booking">ОНЛАЙН ЗАПИС</button>
-                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; cursor: pointer; font-family: var(--font-sans); transition: all 0.3s ease;" data-i18n="btn-contact-hub">ЗВ'ЯЗАТИСЯ З НАМИ</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div id="footer-placeholder"></div>
-
+<!DOCTYPE html>
+
+<html lang="uk">
+
+
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Послуги — Dental Studio</title>
+
+    <link rel="stylesheet" href="styles.css?v=v1.31.43">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
     <script src="translations.js?v=v1.31.43"></script>
-    <script src="components.js?v=v1.31.43"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('.tab-btn-outline');
-            const panels = document.querySelectorAll('.accordion-panel');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    panels.forEach(p => p.classList.remove('active'));
-                    tab.classList.add('active');
-                    const targetPanel = document.getElementById(tab.getAttribute('data-target'));
-                    if (targetPanel) targetPanel.classList.add('active');
-                });
-            });
-
-            // Accordion toggle logic within panels
-            const accordionHeaders = document.querySelectorAll('.accordion-item-box-header');
-            accordionHeaders.forEach(header => {
-                header.addEventListener('click', () => {
-                    const box = header.closest('.accordion-item-box');
-                    const isActive = box.classList.contains('active');
-
-                    // Close all siblings in the same panel
-                    const siblings = box.parentElement.querySelectorAll('.accordion-item-box');
-                    siblings.forEach(sibling => {
-                        sibling.classList.remove('active');
-                    });
-
-                    // If it wasn't active, open it
-                    if (!isActive) {
-                        box.classList.add('active');
-                    }
-                });
-            });
-        });
-    </script>
-    <script src="main.js?v=v1.31.43"></script>
-
-    <!-- Supabase & Dynamic Content Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        /* 1:1 Original Hero Replica */
+
+        .service-fullscreen-hero {
+
+            position: relative;
+
+            min-height: 100vh;
+
+            background-color: #fff;
+
+            display: flex;
+
+            align-items: stretch;
+
+            padding-top: 100px;
+
+            overflow: hidden;
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        .service-hero-left {
+
+            flex: 0 0 50%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            padding-left: 10%;
+
+            z-index: 2;
+
+        }
+
+
+
+        .service-hero-right {
+
+            flex: 0 0 50%;
+
+            position: relative;
+
+            z-index: 1;
+
+            background: #fff;
+
+        }
+
+
+
+        .service-hero-right img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            object-position: center top;
+
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 1) 20%);
+
+            mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 1) 20%);
+
+        }
+
+
+
+        .service-huge-title {
+
+            font-family: 'Bodoni Moda', serif;
+
+            font-size: 64px;
+
+            font-weight: 400;
+
+            color: #1A1A1A;
+
+            line-height: 1.0;
+
+            margin-bottom: 36px;
+
+            letter-spacing: -0.5px;
+
+        }
+
+
+
+        .btn-nude {
+
+            background: linear-gradient(135deg, #D4AF72 0%, #B8924A 50%, #9A7A3E 100%);
+
+            color: #fff;
+
+            font-family: 'Montserrat', sans-serif;
+
+            font-size: 11px;
+
+            font-weight: 500;
+
+            text-transform: uppercase;
+
+            letter-spacing: 2px;
+
+            padding: 16px 40px;
+
+            border: none;
+
+            border-radius: 2px;
+
+            cursor: pointer;
+
+            width: max-content;
+
+            text-decoration: none;
+
+            transition: all 0.34s ease;
+
+            box-shadow: 0 4px 20px rgba(184, 146, 74, 0.25);
+
+        }
+
+        .btn-nude:hover {
+
+            box-shadow: 0 6px 30px rgba(184, 146, 74, 0.4);
+
+            transform: translateY(-1px);
+
+        }
+
+
+
+        @media (max-width: 900px) {
+
+            .service-fullscreen-hero {
+
+                flex-direction: column;
+
+                padding-top: 80px;
+
+            }
+
+
+
+            .service-hero-left {
+
+                flex: none;
+
+                height: 50vh;
+
+                padding: 0 20px;
+
+                text-align: center;
+
+                align-items: center;
+
+                justify-content: flex-end;
+
+                padding-bottom: 40px;
+
+            }
+
+
+
+            .service-hero-right {
+
+                flex: none;
+
+                height: 50vh;
+
+                order: -1;
+
+            }
+
+
+
+            .service-huge-title {
+
+                font-size: 34px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body class="bg-white">
+
+    <div id="header-placeholder"></div>
+
+
+
+    <main>
+
+        <section class="service-fullscreen-hero">
+
+            <div class="service-hero-left">
+
+                <h1 class="service-huge-title" data-i18n="feat-aesthetic">Естетична стоматологія</h1>
+
+                <a href="#form" class="btn-nude" data-i18n="btn-book">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</a>
+
+            </div>
+
+            <div class="service-hero-right">
+
+                <img src="https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/preview.jpg"
+
+                    alt="Естетична стоматологія">
+
+            </div>
+
+        </section>
+
+
+
+        <section class="services-details-section">
+
+            <div class="container-full">
+
+                <div class="services-tabs-row">
+
+                    <button class="tab-btn-outline active" data-target="content-aesthetic" data-i18n="feat-aesthetic">ЕСТЕТИЧНА
+
+                        СТОМАТОЛОГІЯ</button>
+
+                    <button class="tab-btn-outline" data-target="content-therapy" data-i18n="feat-therapy">Лікування зубів</button>
+
+                    <button class="tab-btn-outline" data-target="content-surgery" data-i18n="feat-surgery">Хірургія</button>
+
+                    <button class="tab-btn-outline" data-target="content-ortho" data-i18n="feat-ortho">Ортодонтія</button>
+
+                </div>
+
+
+
+                <div class="services-accordion-box">
+
+                    <div class="accordion-panel active" id="content-aesthetic">
+
+
+
+                        <!-- 1. Консультація -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon">
+
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+
+                                            <path
+
+                                                d="M12 2C8.5 2 6 5 6 9c0 2-1 3.5-3 4.5v1.5h18v-1.5c-2-1-3-2.5-3-4.5 0-4-2.5-7-6-7z" />
+
+                                            <path
+
+                                                d="M16 4.5c1 0 1.5.5 1.5 1.5m-7 0c0-1 .5-1.5 1.5-1.5M19 18v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2" />
+
+                                        </svg>
+
+                                    </div>
+
+                                    <span class="accordion-title" data-i18n="svc-consult-title">Консультація</span>
+
+                                </div>
+
+                                <div class="accordion-arrow">
+
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+
+                                        stroke-width="1.2">
+
+                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
+
+                                    </svg>
+
+                                </div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-consult-desc">
+
+                                        Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає
+
+                                        зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу
+
+                                        роботи.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source
+
+                                                src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4"
+
+                                                type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-consult-general">Загальна консультація</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-general-val">2000 ?</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-consult-modjaw">Функціональна діагностика MODJAW</span> <i>i</i></div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-modjaw-val">400 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-consult-checkup">Стоматологічний CHECK-UP</span> <i>i</i></div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-checkup-val">4900 ?</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 2. Композитні вініри та реставрації -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon">
+
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+
+                                            <circle cx="12" cy="12" r="8" />
+
+                                            <path d="M12 8v8m-4-4h8" />
+
+                                        </svg>
+
+                                    </div>
+
+                                    <span class="accordion-title" data-i18n="svc-composite-veneer-title">Композитні вініри та реставрації</span>
+
+                                </div>
+
+                                <div class="accordion-arrow">
+
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+
+                                        stroke-width="1.2">
+
+                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
+
+                                    </svg>
+
+                                </div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-composite-veneer-desc">
+
+                                        Високоестетичне покращення та відтворення природньої форми та рельєфу зубів
+
+                                        композитним матеріалом без препарування власних тканин зуба із терміном служби 5
+
+                                        років.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source
+
+                                                src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4"
+
+                                                type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-frontal-restoration">Реставрація фронтального зуба</span> <i>i</i></div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-frontal-restoration-val">230 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-art-restoration">Художня реставрація - по ключу</span> <i>i</i></div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-art-restoration-val">350 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 3. Керамічні реставрації -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon">
+
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+
+                                            <circle cx="12" cy="12" r="8" />
+
+                                            <path d="M12 8v8m-4-4h8" />
+
+                                        </svg>
+
+                                    </div>
+
+                                    <span class="accordion-title" data-i18n="svc-ceramic-restoration-title">Керамічні реставрації (вініри, коронки,
+
+                                        накладки)</span>
+
+                                </div>
+
+                                <div class="accordion-arrow">
+
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+
+                                        stroke-width="1.2">
+
+                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
+
+                                    </svg>
+
+                                </div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-ceramic-restoration-desc">
+
+                                        Відтворення природності, рельєфу та структури зуба керамічними вінірами, зміна
+
+                                        кольору посмішки на більш яскравішу, відновлення функції зубного ряду із
+
+                                        терміном служби 15 років.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source
+
+                                                src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4"
+
+                                                type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-veneer-digital">Керамічний вінір (digital)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-veneer-digital-val">600 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-veneer-layering">Керамічний вінір (digital + нашарування)</span> <i>i</i>
+
+                                        </div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-veneer-layering-val">750 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-veneer-handmade">Керамічний вінір (hand made, полевошпат)</span> <i>i</i>
+
+                                        </div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-veneer-handmade-val">850 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-veneer-rework">Переробка керамічного вініра чужої роботи (за зуб)
+
+                                        </div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-veneer-rework-val">1200 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-veneer-single">Керамічний вінір - одиночний центральний різець</span>
+
+                                            <i>i</i></div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-veneer-single-val">1500 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-crown-digital">Керамічна коронка на імплантаті (digital)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-crown-digital-val">680 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-crown-layering">Керамічна коронка на імплантаті (digital +
+
+                                            нашарування)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-crown-layering-val">850 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-crown-handmade">Керамічна коронка на імплантаті (hand made,
+
+                                            полевошпат)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-crown-handmade-val">950 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="accordion-panel" id="content-therapy">
+
+
+
+                        <!-- 1. Консультація -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
+
+                                            stroke="currentColor" stroke-width="1.2">
+
+                                            <path
+
+                                                d="M12 2C8.5 2 6 5 6 9c0 2-1 3.5-3 4.5v1.5h18v-1.5c-2-1-3-2.5-3-4.5 0-4-2.5-7-6-7z" />
+
+                                            <path
+
+                                                d="M16 4.5c1 0 1.5.5 1.5 1.5m-7 0c0-1 .5-1.5 1.5-1.5M19 18v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2" />
+
+                                        </svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-consult-title">Консультація</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+
+                                        stroke="currentColor" stroke-width="1.2">
+
+                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
+
+                                    </svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-consult-desc">
+
+                                        Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає
+
+                                        зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу
+
+                                        роботи.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source
+
+                                                src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4"
+
+                                                type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-consult-general">Загальна консультація</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-general-val">2000 ?</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-consult-checkup">Стоматологічний CHECK-UP</span> <i>i</i></div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-checkup-val">4900 ?</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 2. Ендодонтія -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
+
+                                            stroke="currentColor" stroke-width="1.2">
+
+                                            <path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z" />
+
+                                        </svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-endo-title">Ендодонтія</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+
+                                        stroke="currentColor" stroke-width="1.2">
+
+                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
+
+                                    </svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-endo-desc">
+
+                                        Ювелірна робота вузького спеціаліста по збереженню зуба. Первинне та вторинне лікування кореневих каналів, вилучення уламків інструментів та лікування запальних процесів на верхівці кореня зуба із використанням мікроскопа.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-endo-incisor">Лікування кореневих каналів (різці, ікла)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-endo-incisor-val">285 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-endo-premolar">Лікування кореневих каналів (премоляри)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-endo-premolar-val">320 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-endo-molar">Лікування кореневих каналів (моляри)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-endo-molar-val">440 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 3. Лікування карієсу -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
+
+                                            stroke="currentColor" stroke-width="1.2">
+
+                                            <path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z" />
+
+                                        </svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-caries-title">Лікування карієсу</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+
+                                        stroke="currentColor" stroke-width="1.2">
+
+                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
+
+                                    </svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-caries-desc">
+
+                                        Видалення уражених тканин зуба із подальшим відновленням його природньої форми та морфології композитним матеріалом за сучасними протоколами із використанням операційного мікроскопу.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-caries-1">Лікування карієсу - І рівень складності</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-caries-1-val">130 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-caries-2">Лікування карієсу - ІI рівень складності</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-caries-2-val">150 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-caries-3">Лікування карієсу - ІII рівень складності</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-caries-3-val">170 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 4. Пародонтологічне лікування -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
+
+                                            stroke="currentColor" stroke-width="1.2">
+
+                                            <path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z" />
+
+                                        </svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-periodontal-title">Пародонтологічне лікування</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+
+                                        stroke="currentColor" stroke-width="1.2">
+
+                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
+
+                                    </svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-periodontal-desc">
+
+                                        Зняття надясенних та підясенних зубних відкладень. Очищення кореня від зубного каменю із використанням ручних інструментів Hu-Friedy. Антисептична обробка пародонтальних кишень. Заповнення пародонтологічної карти. Урок гігієни.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-periodont-1">Лікування пародонтиту - І ступінь</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-periodont-1-val">140 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-periodont-2">Лікування пародонтиту - ІІ ступінь</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-periodont-2-val">280 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-periodont-3">Лікування пародонтиту - ІІI ступінь</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-periodont-3-val">400 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 5. Професійна гігієна зубів -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none"
+
+                                            stroke="currentColor" stroke-width="1.2">
+
+                                            <path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z" />
+
+                                        </svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-hygiene-title">Професійна гігієна зубів</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+
+                                        stroke="currentColor" stroke-width="1.2">
+
+                                        <path d="M7 10l5 5 5-5M7 6l5 5 5-5" />
+
+                                    </svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-hygiene-desc">
+
+                                        Контроль гігієни ротової порожнини. Зняття твердих зубних відкладень за допомогою ультразвукового скейлера та ручних інструментів. Зняття м’якого зубного нальоту повітряно-абразивною обробкою Prophyflex.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-hygiene">Професійна гігієна</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-hygiene-val">100 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-hygiene-smoker">Професійна гігієна (наліт курця)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-hygiene-smoker-val">140 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 6. Відбілювання зубів -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z"/></svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-whitening-title">Відбілювання зубів</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-whitening-desc">
+
+                                        Безпечна та високоефективна процедура клінічного відбілювання системою Beyond за допомогою гелю та спеціального лазерного світла для досягнення білішого та здоровішого вигляду зубів.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-whitening">Відбілювання</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-whitening-val">150 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="accordion-panel" id="content-surgery">
+
+                        <!-- 1. Консультація -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C8.5 2 6 5 6 9c0 2-1 3.5-3 4.5v1.5h18v-1.5c-2-1-3-2.5-3-4.5 0-4-2.5-7-6-7z"/><path d="M16 4.5c1 0 1.5.5 1.5 1.5m-7 0c0-1 .5-1.5 1.5-1.5M19 18v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2"/></svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-consult-title">Консультація</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-consult-desc">
+
+                                        Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу роботи.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-consult-general">Загальна консультація</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-general-val">2000 ?</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-consult-checkup">Стоматологічний CHECK-UP</span> <i>i</i></div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-checkup-val">4900 ?</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 2. Імплантація -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2v20M5 7l14 0M5 12l14 0M5 17l14 0"/></svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-implant-title">Імплантація</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-implant-desc">
+
+                                        Імплантація відсутніх зубів із використанням швейцарських імплантатів Straumann та спеціальних хірургічних шаблонів, які виготовляються для кожного пацієнта індивідуально.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-implant-neodent">Імплант NEODENT (Бразилія)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-implant-neodent-val">550 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-implant-sla">Імплант STRAUMANN SLA (Швейцарія)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-implant-sla-val">780 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-implant-slactive">Імплант STRAUMANN SLACTIVE (Швейцарія)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-implant-slactive-val">980 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-crown-monolit">Коронка на імпланті (monolit)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-crown-monolit-val">650 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-crown-aesthetic">Коронка на імпланті (платформа + абатмент + керамічний вінір)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-crown-aesthetic-val">850 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 3. Видалення зубів -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z"/></svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-extraction-title">Видалення зубів</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-extraction-desc">
+
+                                        Майстерне видалення зубів під місцевою анастезією або в медикаментозному сні (седація). Седація – це занурення пацієнта в глибокий або поверхневий природний сон под контролем лікаря-анастезіолога.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-extraction">Видалення зуба</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-extraction-val">100 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-extraction-atypical-1">Атипове видалення (просте)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-extraction-atypical-1-val">150 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-extraction-atypical-2">Атипове видалення (складне)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-extraction-atypical-2-val">220 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-sedation">Медикаментозний сон (седація) - 1 година</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-sedation-val">140 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 4. Закриття рецесій, хірургічне подовження клінічної коронки зуба, усунення ясеневої посмішки -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2v20M5 7l14 0M5 12l14 0M5 17l14 0"/></svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-gum-surgery-title">Закриття рецесій, хірургічне подовження клінічної коронки зуба, усунення ясеневої посмішки</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-gum-surgery-desc">
+
+                                        Високоестетичні хірургічні операції із яснами (корекція ясен) для створення нової естетики посмішки пацієнта в комбінації із керамічними вінірами.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-gum-smile">Операція усунення ясенної посмішки (10 зубів)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-gum-smile-val">1950 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-recession">Закриття рецесій біля одного зуба</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-recession-val">290 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-gum-extension">Видовження ясен біля одного зуба</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-gum-extension-val">160 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="accordion-panel" id="content-ortho">
+
+                        <!-- 1. Консультація -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C8.5 2 6 5 6 9c0 2-1 3.5-3 4.5v1.5h18v-1.5c-2-1-3-2.5-3-4.5 0-4-2.5-7-6-7z"/><path d="M16 4.5c1 0 1.5.5 1.5 1.5m-7 0c0-1 .5-1.5 1.5-1.5M19 18v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2"/></svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-consult-title">Консультація</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-consult-desc">
+
+                                        Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу роботи.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-consult-general">Загальна консультація</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-general-val">2000 ?</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-consult-modjaw">Функціональна діагностика MODJAW</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-modjaw-val">400 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name"><span data-i18n="price-consult-checkup">Стоматологічний CHECK-UP</span> <i>i</i></div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-consult-checkup-val">4900 ?</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 2. Лікування брекет-системою -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z"/></svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-braces-title">Лікування брекет-системою</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-braces-desc">
+
+                                        Повернення пацієнту не лише краси та естетики посмішки, а й відновлення правильного функціонування зубо-щелепної системи за допомогою лікування брекет системою.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-braces-metal">Лікування брекет-системою (метал)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-braces-metal-val">2600 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-braces-ceramic">Лікування брекет-системою (кераміка)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-braces-ceramic-val">3100 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-braces-self-metal">Лікування брекет-системою (самолігуючі, метал)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-braces-self-metal-val">3900 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-ortho-visit">Щомісячний контрольний візит до ортодонта</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-ortho-visit-val">65 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-braces-self-ceramic">Лікування брекет-системою (самолігуючі, кераміка)</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-braces-self-ceramic-val">4640 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- 3. Лікування елайнерами -->
+
+                        <div class="accordion-item-box">
+
+                            <div class="accordion-item-box-header">
+
+                                <div class="accordion-header-box">
+
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2v20M5 7l14 0M5 12l14 0M5 17l14 0"/></svg></div>
+
+                                    <span class="accordion-title" data-i18n="svc-aligners-title">Лікування елайнерами</span>
+
+                                </div>
+
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+
+                            </div>
+
+                            <div class="accordion-item-content">
+
+                                <div class="accordion-content-grid">
+
+                                    <div class="accordion-content-text" data-i18n="svc-aligners-desc">
+
+                                        Повернення пацієнту не лише краси та естетики посмішки, а й відновлення правильного функціонування зубо-щелепної системи за допомогою лікування елайнерами. Елайнери - індивідуальний комплект прозорих кап, які непомітно для оточуючих вирівнюють зуби.
+
+                                    </div>
+
+                                    <div class="accordion-content-media">
+
+                                        <video autoplay muted loop playsinline>
+
+                                            <source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4">
+
+                                        </video>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="accordion-price-list">
+
+                                    <div class="accordion-price-item">
+
+                                        <div class="price-item-name" data-i18n="price-aligners">Лікування елайнерами</div>
+
+                                        <div class="price-item-right">
+
+                                            <span class="price-item-value" data-i18n="price-aligners-val">3900 €</span>
+
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+        <!-- =======================================
+
+             CONTACT CHOICE SECTION
+
+        ======================================= -->
+
+        <section id="contact-choice" class="appointment" style="padding: 100px 0; background: #fff; border-top: 1px solid rgba(0,0,0,0.03);">
+
+            <div class="container--narrow">
+
+                <div class="appointment__inner reveal" style="text-align: center;">
+
+                    <h2 class="section-title-alt" style="margin-bottom: 24px;" data-i18n="contact-choice-title">ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ</h2>
+
+                    <p class="appointment-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;" data-i18n="contact-choice-subtitle">
+
+                        Виберіть онлайн-запис для миттєвого бронювання часу,<br>або напишіть нам у месенджер для консультації.
+
+                    </p>
+
+                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto;">
+
+                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase; cursor: pointer;" data-i18n="btn-online-booking">ОНЛАЙН ЗАПИС</button>
+
+                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; cursor: pointer; font-family: var(--font-sans); transition: all 0.3s ease;" data-i18n="btn-contact-hub">ЗВ'ЯЗАТИСЯ З НАМИ</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <div id="footer-placeholder"></div>
+
+
+
+    <script src="translations.js?v=v1.31.43"></script>
+    <script src="components.js?v=v1.31.43"></script>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const tabs = document.querySelectorAll('.tab-btn-outline');
+
+            const panels = document.querySelectorAll('.accordion-panel');
+
+            tabs.forEach(tab => {
+
+                tab.addEventListener('click', () => {
+
+                    tabs.forEach(t => t.classList.remove('active'));
+
+                    panels.forEach(p => p.classList.remove('active'));
+
+                    tab.classList.add('active');
+
+                    const targetPanel = document.getElementById(tab.getAttribute('data-target'));
+
+                    if (targetPanel) targetPanel.classList.add('active');
+
+                });
+
+            });
+
+
+
+            // Accordion toggle logic within panels
+
+            const accordionHeaders = document.querySelectorAll('.accordion-item-box-header');
+
+            accordionHeaders.forEach(header => {
+
+                header.addEventListener('click', () => {
+
+                    const box = header.closest('.accordion-item-box');
+
+                    const isActive = box.classList.contains('active');
+
+
+
+                    // Close all siblings in the same panel
+
+                    const siblings = box.parentElement.querySelectorAll('.accordion-item-box');
+
+                    siblings.forEach(sibling => {
+
+                        sibling.classList.remove('active');
+
+                    });
+
+
+
+                    // If it wasn't active, open it
+
+                    if (!isActive) {
+
+                        box.classList.add('active');
+
+                    }
+
+                });
+
+            });
+
+        });
+
+    </script>
+
+    <script src="main.js?v=v1.31.43"></script>
+
+
+
+    <!-- Supabase & Dynamic Content Engine -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="dynamic-content.js?v=v1.31.43"></script>
-    <script src="chat-widget.js?v=v1.31.43"></script>
-</body>
-
-</html>
-
+    <script src="chat-widget.js?v=v1.31.45"></script>
+
+</body>
+
+
+
+</html>
+
+
+
