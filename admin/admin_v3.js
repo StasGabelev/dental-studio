@@ -379,13 +379,28 @@ const PAGE_SCHEMA = {
             "type": "text"
         },
         {
-            "key": "filter-composite",
+            "key": "filter-composite-veneers",
             "label": "Фільтр: Композитні вініри",
             "type": "text"
         },
         {
-            "key": "filter-restoration",
+            "key": "filter-restorations",
             "label": "Фільтр: Композитні реставрації",
+            "type": "text"
+        },
+        {
+            "key": "filter-caries",
+            "label": "Фільтр: Лікування карієсу",
+            "type": "text"
+        },
+        {
+            "key": "filter-endo",
+            "label": "Фільтр: Лікування каналів",
+            "type": "text"
+        },
+        {
+            "key": "filter-periodontal",
+            "label": "Фільтр: Пародонтологія",
             "type": "text"
         },
         {
@@ -394,8 +409,23 @@ const PAGE_SCHEMA = {
             "type": "text"
         },
         {
-            "key": "filter-ortho",
-            "label": "Фільтр: Ортодонтія",
+            "key": "filter-recessions",
+            "label": "Фільтр: Закриття рецесій",
+            "type": "text"
+        },
+        {
+            "key": "filter-gum-extension",
+            "label": "Фільтр: Видовження ясен",
+            "type": "text"
+        },
+        {
+            "key": "filter-braces",
+            "label": "Фільтр: Брекет-системи",
+            "type": "text"
+        },
+        {
+            "key": "filter-aligners",
+            "label": "Фільтр: Елайнери",
             "type": "text"
         },
         {
@@ -403,18 +433,19 @@ const PAGE_SCHEMA = {
             "label": "Фільтр: Відбілювання зубів",
             "type": "text"
         },
-        {
-            "key": "filter-military",
-            "label": "Фільтр: Лікування військовослужбовців",
-            "type": "text"
-        }
+        { "key": "filter-military", "label": "Фільтр: Лікування військовослужбовців", "type": "text" },
+        { "label": "СТОРІНКА ОКРЕМОГО КЕЙСУ", "type": "heading" },
+        { "key": "case-plan-title", "label": "Заголовок: План лікування", "type": "text" },
+        { "key": "case-result-title", "label": "Заголовок: Результат", "type": "text" },
+        { "key": "case-before-label", "label": "Лейбл: ДО", "type": "text" },
+        { "key": "case-after-label", "label": "Лейбл: ПІСЛЯ", "type": "text" },
+        { "key": "case-cta-title", "label": "CTA: Заголовок (внизу)", "type": "text" },
+        { "key": "case-cta-subtitle", "label": "CTA: Підзаголовок (внизу)", "type": "textarea" }
     ],
     "contact": [
-        {
-            "key": "contacts-page-title",
-            "label": "SEO Title сторінки",
-            "type": "text"
-        },
+        { "key": "contacts-page-title", "label": "SEO Title сторінки", "type": "text" },
+        { "key": "contacts-hero-title", "label": "Hero: Заголовок", "type": "text" },
+        { "key": "contacts-hero-subtitle", "label": "Hero: Підзаголовок", "type": "textarea" },
         {
             "key": "form-title",
             "label": "Форма: Заголовок",
@@ -482,51 +513,27 @@ const PAGE_SCHEMA = {
         }
     ],
     "footer": [
-        {
-            "key": "footer-find-us",
-            "label": "Де нас знайти",
-            "type": "text"
-        },
-        {
-            "key": "footer-location",
-            "label": "Місто",
-            "type": "text"
-        },
-        {
-            "key": "footer-address-street",
-            "label": "Вулиця та номер",
-            "type": "text"
-        },
-        {
-            "key": "footer-map-btn",
-            "label": "Кнопка: Карта",
-            "type": "text"
-        },
-        {
-            "key": "footer-tagline",
-            "label": "Слоган (з емодзі)",
-            "type": "text"
-        },
-        {
-            "key": "footer-hours-title",
-            "label": "Графік: Заголовок",
-            "type": "text"
-        },
-        {
-            "key": "footer-hours-days",
-            "label": "Графік: Години роботи",
-            "type": "text"
-        },
-        {
-            "key": "footer-copyright",
-            "label": "Копірайт",
-            "type": "text"
-        },
-        {
-            "key": "btn-book",
-            "label": "Кнопка: Записатися",
-            "type": "text"
-        }
+        { "key": "footer-find-us", "label": "Де нас знайти", "type": "text" },
+        { "key": "footer-location", "label": "Місто", "type": "text" },
+        { "key": "footer-address-street", "label": "Вулиця та номер", "type": "text" },
+        { "key": "footer-phone-1", "label": "Телефон 1", "type": "text" },
+        { "key": "footer-phone-2", "label": "Телефон 2", "type": "text" },
+        { "key": "footer-map-btn", "label": "Кнопка: Карта", "type": "text" },
+        { "key": "footer-tagline", "label": "Слоган (з емодзі)", "type": "text" },
+        { "key": "footer-hours-title", "label": "Графік: Заголовок", "type": "text" },
+        { "key": "footer-hours-days", "label": "Графік: Години роботи", "type": "text" },
+        { "key": "footer-copyright", "label": "Копірайт", "type": "text" },
+        { "key": "btn-book", "label": "Кнопка: Записатися", "type": "text" }
+    ],
+    "header": [
+        { "key": "logo-text-top", "label": "Логотип (Верхній рядок)", "type": "text" },
+        { "key": "logo-text-bottom", "label": "Логотип (Нижній рядок)", "type": "text" },
+        { "key": "nav-home", "label": "Меню: Головна", "type": "text" },
+        { "key": "nav-services", "label": "Меню: Послуги", "type": "text" },
+        { "key": "nav-works", "label": "Меню: Наші роботи", "type": "text" },
+        { "key": "nav-about", "label": "Меню: Про нас", "type": "text" },
+        { "key": "nav-contacts", "label": "Меню: Контакти", "type": "text" },
+        { "key": "header-instagram-url", "label": "Посилання на Instagram", "type": "text" }
     ]
 };
 
@@ -813,13 +820,26 @@ async function loadPageEditor(pageSlug) {
         "cases": {
             "cases-page-title": "Наші роботи — Dental Studio",
             "cases-hero-title": "НАШІ РОБОТИ",
-            "filter-all": "Всі роботи",
+            "filter-all": "Усі роботи",
             "filter-veneers": "Керамічні вініри",
-            "filter-composite": "Композитні вініри",
-            "filter-restoration": "Композитні реставрації",
+            "filter-composite-veneers": "Композитні вініри",
+            "filter-restorations": "Композитні реставрації",
+            "filter-caries": "Лікування карієсу",
+            "filter-endo": "Лікування кореневих каналів",
+            "filter-periodontal": "Пародонтологічне лікування",
             "filter-implants": "Імплантація",
-            "filter-ortho": "Ортодонтія",
-            "filter-whitening": "Відбілювання зубів"
+            "filter-recessions": "Закриття рецесій",
+            "filter-gum-extension": "Видовження ясен",
+            "filter-braces": "Лікування брекет-системою",
+            "filter-aligners": "Лікування елайнерами",
+            "filter-whitening": "Відбілювання зубів",
+            "filter-military": "Лікування військовослужбовців",
+            "case-plan-title": "ПЛАН ЛІКУВАННЯ",
+            "case-result-title": "РЕЗУЛЬТАТ",
+            "case-before-label": "ДО",
+            "case-after-label": "ПІСЛЯ",
+            "case-cta-title": "БАЖАЄТЕ ТАКИЙ ЖЕ РЕЗУЛЬТАТ?",
+            "case-cta-subtitle": "Запишіться на консультацію в Dental Studio вже сьогодні."
         },
         "services": {
             "feat-aesthetic": "Естетична стоматологія",
@@ -882,8 +902,8 @@ async function loadPageEditor(pageSlug) {
         },
         "contact": {
             "contacts-page-title": "Контакти — Dental Studio",
-            "form-title": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ",
-            "form-subtitle": "Залишіть заявку й адміністратор зв'яжеться з Вами, або зателефонуйте нам особисто",
+            "contacts-hero-title": "КОНТАКТИ ТА ЗАПИС",
+            "contacts-hero-subtitle": "Виберіть онлайн-запис для миттєвого бронювання часу, або зв'яжіться з нами напряму.",
             "form-phone-label": "Зв'язатися з нами для консультації:",
             "form-name-placeholder": "Прізвище та ім'я",
             "form-comment-placeholder": "Коментар",
@@ -900,12 +920,24 @@ async function loadPageEditor(pageSlug) {
             "footer-find-us": "ДЕ НАС ЗНАЙТИ",
             "footer-location": "Чернігів, Україна",
             "footer-address-street": "Вулиця Незалежності, 21",
+            "footer-phone-1": "(077) 600 7 800",
+            "footer-phone-2": "(073) 600 7 800",
             "footer-map-btn": "ЗНАЙТИ НАС НА КАРТІ",
             "footer-tagline": "ІННОВАЦІЇ, ЕСТЕТИКА, КОМФОРТ🤍",
             "footer-hours-title": "ГРАФІК РОБОТИ",
             "footer-hours-days": "Пн — Пт, 10:00 — 18:00",
             "footer-copyright": "Copyright © 2026. Dental Studio. Всі права захищені.",
             "btn-book": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ"
+        },
+        "header": {
+            "logo-text-top": "DENTAL",
+            "logo-text-bottom": "Studio",
+            "nav-home": "Головна",
+            "nav-services": "Послуги",
+            "nav-works": "Наші роботи",
+            "nav-about": "Про нас",
+            "nav-contacts": "Контакти",
+            "header-instagram-url": "https://www.instagram.com/dental_studio_che/"
         }
     };
 

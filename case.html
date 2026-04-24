@@ -61,7 +61,7 @@
         <section class="case-plan" style="padding: 120px 0;">
             <div class="container--narrow">
                 <div class="reveal">
-                    <h2 class="section-title-alt" style="margin-bottom: 60px;">ПЛАН ЛІКУВАННЯ</h2>
+                    <h2 class="section-title-alt" style="margin-bottom: 60px;" data-i18n="case-plan-title">ПЛАН ЛІКУВАННЯ</h2>
                     
                     <div class="stages-tabs" id="stages-tabs-container">
                         <!-- Dynamic Tabs -->
@@ -78,7 +78,7 @@
         <section class="case-results" style="padding: 120px 0; background: #fafafa;">
             <div class="container--narrow">
                 <div class="reveal">
-                    <h2 class="section-title-alt" style="margin-bottom: 60px; text-align: center;">РЕЗУЛЬТАТ</h2>
+                    <h2 class="section-title-alt" style="margin-bottom: 60px; text-align: center;" data-i18n="case-result-title">РЕЗУЛЬТАТ</h2>
                     
                     <div class="ba-slider" id="ba-slider">
                         <div class="ba-slider__img ba-slider__before" id="img-before" style="background-image: url('');"></div>
@@ -90,11 +90,11 @@
 
                     <div id="result-texts" style="display:none; margin-top: 40px; grid-template-columns: 1fr 1fr; gap: 40px;">
                         <div style="text-align: center;">
-                            <span style="font-family: var(--font-sans); letter-spacing: 2px; font-size: 11px; font-weight: 500; color: #888;">ДО</span>
+                            <span style="font-family: var(--font-sans); letter-spacing: 2px; font-size: 11px; font-weight: 500; color: #888;" data-i18n="case-before-label">ДО</span>
                             <p id="before-text-display" style="margin-top: 12px; font-size: 14px; line-height: 1.8; color: #555;"></p>
                         </div>
                         <div style="text-align: center;">
-                            <span style="font-family: var(--font-sans); letter-spacing: 2px; font-size: 11px; font-weight: 500; color: #888;">ПІСЛЯ</span>
+                            <span style="font-family: var(--font-sans); letter-spacing: 2px; font-size: 11px; font-weight: 500; color: #888;" data-i18n="case-after-label">ПІСЛЯ</span>
                             <p id="after-text-display" style="margin-top: 12px; font-size: 14px; line-height: 1.8; color: #555;"></p>
                         </div>
                     </div>
@@ -106,13 +106,13 @@
         <section id="contact-choice" class="appointment" style="padding: 100px 0; background: #fff; border-top: 1px solid rgba(0,0,0,0.03);">
             <div class="container--narrow">
                 <div class="appointment__inner reveal" style="text-align: center;">
-                    <h2 class="section-title-alt" style="margin-bottom: 24px;">БАЖАЄТЕ ТАКИЙ ЖЕ РЕЗУЛЬТАТ?</h2>
-                    <p class="appointment-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;">
+                    <h2 class="section-title-alt" style="margin-bottom: 24px;" data-i18n="case-cta-title">БАЖАЄТЕ ТАКИЙ ЖЕ РЕЗУЛЬТАТ?</h2>
+                    <p class="appointment-subtitle" style="margin-bottom: 48px; color: #888; font-size: 14px; letter-spacing: 1.5px; line-height: 1.8;" data-i18n="case-cta-subtitle">
                         Запишіться на консультацію в Dental Studio вже сьогодні.
                     </p>
                     <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 440px; margin: 0 auto;">
-                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase;">ОНЛАЙН ЗАПИС</button>
-                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; font-family: var(--font-sans);">ЗВ'ЯЗАТИСЯ З НАМИ</button>
+                        <button onclick="openOnlineBooking()" class="btn btn--cta" style="width: 100%; padding: 22px; font-size: 12px; font-family: var(--font-sans); letter-spacing: 2px; text-transform: uppercase;" data-i18n="btn-online-booking">ОНЛАЙН ЗАПИС</button>
+                        <button onclick="openContactHub()" style="width: 100%; padding: 20px; border: 1px solid var(--gold); background: transparent; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; font-size: 11px; font-family: var(--font-sans);" data-i18n="btn-contact-hub">ЗВ'ЯЗАТИСЯ З НАМИ</button>
                     </div>
                 </div>
             </div>
@@ -125,6 +125,7 @@
     <script src="translations.js?v=v1.31.43"></script>
     <script src="components.js?v=v1.31.43"></script>
     <script src="main.js?v=v1.31.43"></script>
+    <script src="dynamic-content.js?v=v1.31.43"></script>
 
     <!-- Supabase Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
