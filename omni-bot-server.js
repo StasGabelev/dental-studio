@@ -140,18 +140,39 @@ ${knowledgeBase}`;
     ];
 
     try {
+        let apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+        const provider = aiSettings.provider || 'openrouter';
+        const headers = {
+            'Authorization': `Bearer ${aiSettings.api_key}`,
+            'Content-Type': 'application/json'
+        };
+
+        if (provider === 'openai') {
+            apiUrl = 'https://api.openai.com/v1/chat/completions';
+        } else if (provider === 'deepseek') {
+            apiUrl = 'https://api.deepseek.com/v1/chat/completions';
+        } else if (provider === 'google') {
+            apiUrl = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'; // OpenAI compatibility layer
+        } else if (provider === 'openrouter') {
+            headers['HTTP-Referer'] = 'https://rozetka.space';
+            headers['X-Title'] = 'Dental Studio AI';
+        } else if (provider === 'custom' && aiSettings.custom_url) {
+            apiUrl = aiSettings.custom_url;
+        }
+
         const payload = { model: aiSettings.model || 'gpt-4o-mini', messages, tools };
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const response = await fetch(apiUrl, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${aiSettings.api_key}`,
-                'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://rozetka.space',
-                'X-Title': 'Dental Studio AI'
-            },
+            headers: headers,
             body: JSON.stringify(payload)
         });
         
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`AI API Error (${response.status}):`, errorText);
+            return "Вибачте, сталася помилка зв'язку з ШІ-сервісом. 🔄 Спробуйте пізніше.";
+        }
+
         const data = await response.json();
         const msgMatch = data.choices[0].message;
         
