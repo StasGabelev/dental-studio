@@ -87,6 +87,7 @@ const MODEL_OPTIONS = {
 // --- Page content schema ---
 const PAGE_SCHEMA = {
     "home": [
+        { "key": "home-page-title", "label": "Заголовок сторінки (SEO)", "type": "text" },
         {
             "key": "hero-video",
             "label": "\u0413\u043E\u043B\u043E\u0432\u043D\u0435 \u0432\u0456\u0434\u0435\u043E",
@@ -221,6 +222,8 @@ const PAGE_SCHEMA = {
         { "key": "svc-consult-desc", "label": "Консультація — Опис", "type": "textarea" },
         { "key": "price-consult-general", "label": "Назва: Загальна консультація", "type": "text" },
         { "key": "price-consult-general-val", "label": "💰 Ціна: Загальна консультація", "type": "text" },
+        { "key": "price-consult-modjaw", "label": "Назва: Діагностика MODJAW", "type": "text" },
+        { "key": "price-consult-modjaw-val", "label": "💰 Ціна: Діагностика MODJAW", "type": "text" },
         { "key": "price-consult-checkup", "label": "Назва: Стоматологічний CHECK-UP", "type": "text" },
         { "key": "price-consult-checkup-val", "label": "💰 Ціна: Стоматологічний CHECK-UP", "type": "text" },
 
@@ -782,6 +785,7 @@ async function loadPageEditor(pageSlug) {
 
     const PAGE_DEFAULTS = {
         "home": {
+            "home-page-title": "Dental Studio — Стоматологічна клініка в Чернігові",
             "hero-video": "https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4",
             "interior-video": "assets/dental2.mp4",
             "hero-title": "ІННОВАЦІЇ.\nЕСТЕТИКА.\nКОМФОРТ🤍",
@@ -850,6 +854,7 @@ async function loadPageEditor(pageSlug) {
             "svc-consult-title": "Консультація",
             "svc-consult-desc": "Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу.",
             "price-consult-general": "Загальна консультація",
+            "price-consult-modjaw": "Функціональна діагностика MODJAW",
             "btn-book-short": "Записатися",
             "form-name-placeholder": "Прізвище та ім'я",
             "form-comment-placeholder": "Коментар",
