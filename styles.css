@@ -1014,6 +1014,7 @@ button { font-family: var(--font-sans); }
     font-size: 13px;
     font-weight: 300;
     color: var(--text-muted);
+    white-space: pre-line;
 }
 
 .map-iframe-wrap {
@@ -1056,6 +1057,7 @@ button { font-family: var(--font-sans); }
     margin-bottom: 6px;
     color: var(--text-muted);
     line-height: 1.7;
+    white-space: pre-line;
 }
 
 .footer-phone {
@@ -1758,6 +1760,7 @@ button { font-family: var(--font-sans); }
     margin-bottom: 20px;
     max-width: 400px;
     color: var(--text-dark);
+    white-space: pre-line;
 }
 
 .contact-map-full {

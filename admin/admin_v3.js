@@ -201,7 +201,7 @@ const PAGE_SCHEMA = {
         {
             "key": "footer-hours-days",
             "label": "Графік: Робочі години",
-            "type": "text"
+            "type": "textarea"
         }
     ],
     "about": [
@@ -512,7 +512,7 @@ const PAGE_SCHEMA = {
         {
             "key": "footer-hours-days",
             "label": "Графік: Години роботи",
-            "type": "text"
+            "type": "textarea"
         }
     ],
     "footer": [
@@ -524,7 +524,7 @@ const PAGE_SCHEMA = {
         { "key": "footer-map-btn", "label": "Кнопка: Карта", "type": "text" },
         { "key": "footer-tagline", "label": "Слоган (з емодзі)", "type": "text" },
         { "key": "footer-hours-title", "label": "Графік: Заголовок", "type": "text" },
-        { "key": "footer-hours-days", "label": "Графік: Години роботи", "type": "text" },
+        { "key": "footer-hours-days", "label": "Графік: Години роботи", "type": "textarea" },
         { "key": "footer-copyright", "label": "Копірайт", "type": "text" },
         { "key": "btn-book", "label": "Кнопка: Записатися", "type": "text" }
     ],
@@ -808,7 +808,7 @@ async function loadPageEditor(pageSlug) {
             "map-title": "ДЕ НАС ЗНАЙТИ",
             "map-open-btn": "Відкрити карту",
             "footer-hours-title": "ГРАФІК РОБОТИ",
-            "footer-hours-days": "Пн — Пт, 10:00 — 18:00"
+            "footer-hours-days": "Пн — Пт, 09:00 — 19:00\nСб — Нд, 09:00 — 16:00"
         },
         "about": {
             "about-page-title": "Про клініку — Dental Studio",
@@ -919,7 +919,7 @@ async function loadPageEditor(pageSlug) {
             "map-address": "ВУЛИЦЯ НЕЗАЛЕЖНОСТІ, 21, ЧЕРНІГІВ, УКРАЇНА",
             "footer-map-btn": "ЗНАЙТИ НАС НА КАРТІ",
             "footer-hours-title": "ГРАФІК РОБОТИ",
-            "footer-hours-days": "ПН — ПТ, 10:00 — 18:00"
+            "footer-hours-days": "Пн — Пт, 09:00 — 19:00\nСб — Нд, 09:00 — 16:00"
         },
         "footer": {
             "footer-find-us": "ДЕ НАС ЗНАЙТИ",
@@ -930,7 +930,7 @@ async function loadPageEditor(pageSlug) {
             "footer-map-btn": "ЗНАЙТИ НАС НА КАРТІ",
             "footer-tagline": "ІННОВАЦІЇ, ЕСТЕТИКА, КОМФОРТ🤍",
             "footer-hours-title": "ГРАФІК РОБОТИ",
-            "footer-hours-days": "Пн — Пт, 10:00 — 18:00",
+            "footer-hours-days": "Пн — Пт, 09:00 — 19:00\nСб — Нд, 09:00 — 16:00",
             "footer-copyright": "Copyright © 2026. Dental Studio. Всі права захищені.",
             "btn-book": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ"
         },
