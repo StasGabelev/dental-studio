@@ -1,5 +1,5 @@
 // ============================================================
-// DENTAL STUDIO - PREMIUM AI CHAT WIDGET v2.0
+// DENTAL STUDIO - PREMIUM AI CHAT WIDGET v2.1
 // ============================================================
 
 (function() {
@@ -7,36 +7,32 @@
     let isThinking = false;
     let widgetSb = null;
     let chatSessionId = null;
-    
-    const COLORS = {
-        accent: '#c5a882',
-        accentDark: '#b39670',
-        bg: '#ffffff',
-        text: '#1a1a1a',
-        textDim: '#666666',
-        botMsg: '#f2f2f2',
-        userMsg: '#c5a882',
-        border: 'rgba(197, 168, 130, 0.2)'
-    };
 
-    // --- 1. Supabase Init ---
-    function initSupabase() {
-        try {
-            const defaultUrl = 'https://ckldvntrsiacbjpiydmn.supabase.co';
-            const defaultKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
-            if (typeof supabase !== 'undefined') {
-                widgetSb = supabase.createClient(defaultUrl, defaultKey);
-            }
-        } catch(e) { console.error('Widget: Supabase init failed', e); }
+    const SUPABASE_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
+
+    // --- 1. Supabase Init (with retry) ---
+    function getSb() {
+        if (!widgetSb && typeof supabase !== 'undefined') {
+            try { widgetSb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) {}
+        }
+        return widgetSb;
     }
-    initSupabase();
+    getSb();
 
-    // --- 2. Styles Injection (Premium UI) ---
+    // --- 2. Contact Validation ---
+    function validateContact(val) {
+        const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        const phoneRe = /^[\+]?[\d\s\-\(\)]{7,15}$/;
+        return emailRe.test(val) || phoneRe.test(val);
+    }
+
+    // --- 3. Styles Injection ---
     function injectStyles() {
         const style = document.createElement('style');
         style.textContent = `
             @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
-            
+
             :root {
                 --ds-gold: #c5a882;
                 --ds-gold-dark: #b39670;
@@ -105,10 +101,10 @@
             .ds-close-btn:hover { color: var(--ds-black); }
 
             .ds-chat-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: #fafafa; }
-            
+
             .ds-msg { max-width: 85%; padding: 12px 18px; border-radius: 18px; font-size: 14px; line-height: 1.5; position: relative; animation: msgFade 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); }
             @keyframes msgFade { to { opacity: 1; transform: translateY(0); } }
-            
+
             .ds-msg.bot { background: var(--ds-white); color: var(--ds-black); align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
             .ds-msg.user { background: var(--ds-gold); color: var(--ds-white); align-self: flex-end; border-bottom-right-radius: 4px; }
 
@@ -116,10 +112,9 @@
             .ds-input-wrapper { flex: 1; background: #f5f5f5; border-radius: 25px; padding: 4px 18px; display: flex; align-items: center; border: 1px solid transparent; transition: border-color 0.2s; }
             .ds-input-wrapper:focus-within { border-color: var(--ds-gold); background: #fff; }
             .ds-input-area input { flex: 1; background: none; border: none; outline: none; padding: 10px 0; font-family: inherit; font-size: 14px; }
-            .ds-send-btn { background: var(--ds-gold); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; }
+            .ds-send-btn { background: var(--ds-gold); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
             .ds-send-btn:hover { background: var(--ds-gold-dark); }
 
-            /* Selection Screen */
             .ds-selection-screen { padding: 30px; text-align: center; }
             .ds-selection-screen h3 { font-size: 18px; margin-bottom: 25px; color: var(--ds-black); }
             .ds-platform-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -127,16 +122,20 @@
             .ds-platform-btn:hover { border-color: var(--ds-gold); background: rgba(197, 168, 130, 0.05); transform: translateY(-2px); }
             .ds-platform-btn span { font-size: 24px; }
 
-            /* Contact Form */
             .ds-form-screen { padding: 30px; display: none; }
-            .ds-form-screen h3 { margin-bottom: 20px; font-size: 18px; }
+            .ds-form-screen h3 { margin-bottom: 8px; font-size: 18px; }
+            .ds-form-hint { font-size: 12px; color: #999; margin-bottom: 20px; }
             .ds-input-group { margin-bottom: 15px; }
             .ds-input-group label { display: block; font-size: 12px; color: #888; margin-bottom: 6px; font-weight: 500; }
-            .ds-form-screen input { width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid #ddd; outline: none; transition: border-color 0.2s; font-family: inherit; }
+            .ds-form-screen input { width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid #ddd; outline: none; transition: border-color 0.2s; font-family: inherit; box-sizing: border-box; }
             .ds-form-screen input:focus { border-color: var(--ds-gold); }
-            .ds-submit-btn { width: 100%; padding: 14px; background: var(--ds-gold); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; margin-top: 10px; }
+            .ds-form-screen input.ds-input-error { border-color: #e74c3c; }
+            .ds-submit-btn { width: 100%; padding: 14px; background: var(--ds-gold); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; margin-top: 10px; font-family: inherit; transition: background 0.2s; }
+            .ds-submit-btn:hover { background: var(--ds-gold-dark); }
+            .ds-submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+            .ds-form-error { color: #e74c3c; font-size: 12px; margin-bottom: 10px; display: none; }
+            .ds-form-success { color: #2ecc71; font-size: 12px; margin-bottom: 10px; display: none; }
 
-            /* Thinking Animation */
             .ds-thinking { display: flex; gap: 4px; padding: 4px 0; }
             .ds-thinking span { width: 6px; height: 6px; background: #ccc; border-radius: 50%; animation: think 1s infinite alternate; }
             .ds-thinking span:nth-child(2) { animation-delay: 0.2s; }
@@ -152,7 +151,7 @@
         document.head.appendChild(style);
     }
 
-    // --- 3. UI Construction ---
+    // --- 4. UI Construction ---
     function buildUI() {
         const launcher = document.createElement('div');
         launcher.className = 'ds-chat-launcher';
@@ -174,7 +173,7 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
-            
+
             <div id="dsSelectionScreen" class="ds-selection-screen">
                 <h3>Оберіть зручний канал зв'язку</h3>
                 <div class="ds-platform-grid">
@@ -187,16 +186,17 @@
 
             <div id="dsFormScreen" class="ds-form-screen">
                 <h3>Давайте познайомимось</h3>
+                <p class="ds-form-hint">Вкажіть Email або номер телефону. Наступного разу вас одразу впізнаємо.</p>
                 <div class="ds-input-group">
-                    <label>Ваш номер телефону або Email</label>
-                    <input type="text" id="dsContactInput" placeholder="+380... або example@mail.com">
+                    <label>Email або номер телефону</label>
+                    <input type="text" id="dsContactInput" placeholder="+380... або example@mail.com" autocomplete="email">
                 </div>
-                <div id="dsFormError" style="color:#e74c3c; font-size:12px; margin-bottom:10px; display:none;">Будь ласка, вкажіть контактні дані</div>
-                <button class="ds-submit-btn" onclick="window.dsSubmitContact()">Почати спілкування</button>
+                <div id="dsFormError" class="ds-form-error">Вкажіть коректний Email або номер телефону</div>
+                <button class="ds-submit-btn" id="dsSubmitBtn" onclick="window.dsSubmitContact()">Почати спілкування</button>
             </div>
 
             <div id="dsChatBody" class="ds-chat-body" style="display:none;"></div>
-            
+
             <div id="dsInputArea" class="ds-input-area" style="display:none;">
                 <div class="ds-input-wrapper">
                     <input type="text" id="dsChatInput" placeholder="Ваше запитання..." onkeypress="if(event.key==='Enter') window.dsSendMessage()">
@@ -207,53 +207,159 @@
             </div>
         `;
         document.body.appendChild(win);
-
         launcher.onclick = window.dsToggleChat;
     }
 
-    // --- 4. Logic Functions ---
+    // --- 5. Session Persistence Helpers ---
+    function getSavedSession() {
+        return {
+            id: localStorage.getItem('ds_chat_session'),
+            contact: localStorage.getItem('ds_chat_contact')
+        };
+    }
+
+    function saveSession(id, contact) {
+        localStorage.setItem('ds_chat_session', id);
+        localStorage.setItem('ds_chat_contact', contact);
+    }
+
+    function clearSession() {
+        localStorage.removeItem('ds_chat_session');
+        localStorage.removeItem('ds_chat_contact');
+    }
+
+    // --- 6. Logic Functions ---
     window.dsToggleChat = function() {
         const win = document.getElementById('dsChatWindow');
         const isOpen = win.classList.toggle('open');
-        if (isOpen) {
-            const input = document.getElementById('dsChatInput') || document.getElementById('dsContactInput');
-            if (input) setTimeout(() => input.focus(), 400);
+        if (!isOpen) return;
+
+        // Check saved session FIRST — skip all intro screens
+        const saved = getSavedSession();
+        if (saved.id) {
+            chatSessionId = saved.id;
+            showChatInterface();
+            loadChatHistory(saved.id);
+            return;
         }
+
+        // No session — show channel selector
+        document.getElementById('dsSelectionScreen').style.display = 'block';
+        document.getElementById('dsFormScreen').style.display = 'none';
+        document.getElementById('dsChatBody').style.display = 'none';
+        document.getElementById('dsInputArea').style.display = 'none';
     };
 
     window.dsStartWebChat = function() {
         document.getElementById('dsSelectionScreen').style.display = 'none';
         document.getElementById('dsFormScreen').style.display = 'block';
+        setTimeout(() => {
+            const inp = document.getElementById('dsContactInput');
+            if (inp) inp.focus();
+        }, 100);
     };
 
     window.dsSubmitContact = async function() {
-        const contact = document.getElementById('dsContactInput').value.trim();
-        if (!contact) {
-            document.getElementById('dsFormError').style.display = 'block';
+        const input = document.getElementById('dsContactInput');
+        const errEl = document.getElementById('dsFormError');
+        const btn = document.getElementById('dsSubmitBtn');
+        const contact = input.value.trim();
+
+        errEl.style.display = 'none';
+        input.classList.remove('ds-input-error');
+
+        if (!validateContact(contact)) {
+            errEl.style.display = 'block';
+            input.classList.add('ds-input-error');
+            input.focus();
             return;
         }
 
-        if (widgetSb) {
-            const { data, error } = await widgetSb.from('chat_sessions').insert({ 
-                client_contact: contact, 
-                contact_type: contact.includes('@') ? 'email' : 'phone' 
-            }).select('id').single();
-            
-            if (data) {
-                chatSessionId = data.id;
-                localStorage.setItem('ds_chat_session', chatSessionId);
-                localStorage.setItem('ds_chat_contact', contact);
+        btn.disabled = true;
+        btn.textContent = 'Зберігаємо...';
+
+        const sb = getSb();
+        if (!sb) {
+            // Supabase unavailable — start chat without DB session
+            chatSessionId = 'local_' + Date.now();
+            saveSession(chatSessionId, contact);
+            startNewChat();
+            return;
+        }
+
+        try {
+            const contactType = contact.includes('@') ? 'email' : 'phone';
+
+            // Check if this contact already has a session
+            const { data: existing } = await sb.from('chat_sessions')
+                .select('id')
+                .eq('client_contact', contact)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (existing) {
+                // Returning user — reuse existing session
+                chatSessionId = existing.id;
+                saveSession(chatSessionId, contact);
                 showChatInterface();
-                appendMessage("Вітаю! Я — AI-асистент Dental Studio. 🦷 Чим можу допомогти?", 'bot');
+                loadChatHistory(chatSessionId);
+                return;
             }
+
+            // New user — create session
+            const { data: created, error } = await sb.from('chat_sessions')
+                .insert({ client_contact: contact, contact_type: contactType })
+                .select('id')
+                .single();
+
+            if (error || !created) throw new Error(error?.message || 'Insert failed');
+
+            chatSessionId = created.id;
+            saveSession(chatSessionId, contact);
+            startNewChat();
+
+        } catch (e) {
+            console.error('Widget: session create error', e);
+            // Fallback — start chat anyway so user is not stuck
+            chatSessionId = 'local_' + Date.now();
+            saveSession(chatSessionId, contact);
+            startNewChat();
         }
     };
+
+    function startNewChat() {
+        showChatInterface();
+        appendMessage("Вітаю! Я — AI-асистент Dental Studio. 🦷 Чим можу допомогти?", 'bot');
+    }
+
+    async function loadChatHistory(sessionId) {
+        if (!sessionId.startsWith('local_')) {
+            const sb = getSb();
+            if (!sb) return;
+            const { data } = await sb.from('chat_messages')
+                .select('role, content')
+                .eq('session_id', sessionId)
+                .order('created_at', { ascending: true });
+            if (data && data.length > 0) {
+                data.forEach(m => appendMessage(m.content, m.role));
+            } else {
+                appendMessage("З поверненням! Чим можу допомогти? 🦷", 'bot');
+            }
+        } else {
+            appendMessage("Вітаю! Я — AI-асистент Dental Studio. 🦷 Чим можу допомогти?", 'bot');
+        }
+    }
 
     function showChatInterface() {
         document.getElementById('dsFormScreen').style.display = 'none';
         document.getElementById('dsSelectionScreen').style.display = 'none';
         document.getElementById('dsChatBody').style.display = 'flex';
         document.getElementById('dsInputArea').style.display = 'flex';
+        setTimeout(() => {
+            const inp = document.getElementById('dsChatInput');
+            if (inp) inp.focus();
+        }, 300);
     }
 
     window.dsSendMessage = async function() {
@@ -264,7 +370,7 @@
 
         input.value = '';
         appendMessage(text, 'user');
-        saveMessage('user', text);
+        saveMessageToDb('user', text);
 
         isThinking = true;
         const thinkingEl = showThinking();
@@ -276,13 +382,13 @@
                 body: JSON.stringify({ message: text, sessionId: chatSessionId })
             });
 
-            if (!response.ok) throw new Error('API Error');
+            if (!response.ok) throw new Error('API ' + response.status);
             const data = await response.json();
-            
+
             thinkingEl.remove();
             isThinking = false;
             appendMessage(data.reply || "Вибачте, сталася помилка.", 'bot');
-            saveMessage('bot', data.reply);
+            saveMessageToDb('bot', data.reply);
         } catch(e) {
             console.error('Chat Error:', e);
             thinkingEl.remove();
@@ -310,9 +416,11 @@
         return msg;
     }
 
-    async function saveMessage(role, content) {
-        if (widgetSb && chatSessionId) {
-            await widgetSb.from('chat_messages').insert({ session_id: chatSessionId, role, content });
+    async function saveMessageToDb(role, content) {
+        if (!chatSessionId || chatSessionId.startsWith('local_')) return;
+        const sb = getSb();
+        if (sb) {
+            await sb.from('chat_messages').insert({ session_id: chatSessionId, role, content });
         }
     }
 
@@ -325,19 +433,8 @@
         if (links[platform]) window.open(links[platform], '_blank');
     };
 
-    async function resumeSession() {
-        const sess = localStorage.getItem('ds_chat_session');
-        if (sess && widgetSb) {
-            chatSessionId = sess;
-            showChatInterface();
-            const { data } = await widgetSb.from('chat_messages').select('*').eq('session_id', sess).order('created_at', { ascending: true });
-            if (data) data.forEach(m => appendMessage(m.content, m.role));
-        }
-    }
-
     // --- Start ---
     injectStyles();
     buildUI();
-    setTimeout(resumeSession, 500);
 
 })();
