@@ -231,17 +231,43 @@ async function handleAITools(toolCalls, previousMessages) {
         ]
     };
     
-    const response2 = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // Use same provider URL as the main call
+    let apiUrl2 = 'https://openrouter.ai/api/v1/chat/completions';
+    const provider = aiSettings.provider || 'openrouter';
+    const headers2 = {
+        'Authorization': `Bearer ${aiSettings.api_key}`,
+        'Content-Type': 'application/json'
+    };
+    if (provider === 'openai') {
+        apiUrl2 = 'https://api.openai.com/v1/chat/completions';
+    } else if (provider === 'deepseek') {
+        apiUrl2 = 'https://api.deepseek.com/v1/chat/completions';
+    } else if (provider === 'google') {
+        apiUrl2 = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
+    } else if (provider === 'custom' && aiSettings.custom_url) {
+        apiUrl2 = aiSettings.custom_url;
+    } else {
+        headers2['HTTP-Referer'] = 'https://rozetka.space';
+        headers2['X-Title'] = 'Dental Studio AI';
+    }
+
+    const response2 = await fetch(apiUrl2, {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${aiSettings.api_key}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://rozetka.space'
-        },
+        headers: headers2,
         body: JSON.stringify(finalPayload)
     });
-    
+
+    if (!response2.ok) {
+        const errText = await response2.text();
+        console.error(`AI Tool Follow-up Error (${response2.status}):`, errText);
+        return "Вибачте, сталася помилка при обробці запиту. Спробуйте ще раз або зателефонуйте: (077) 600 7 800.";
+    }
+
     const data2 = await response2.json();
+    if (!data2.choices || !data2.choices[0]) {
+        console.error('AI Tool Follow-up: unexpected response:', JSON.stringify(data2));
+        return "Вибачте, отримано неочікувану відповідь від ШІ. Зателефонуйте нам: (077) 600 7 800.";
+    }
     return data2.choices[0].message.content;
 }
 
