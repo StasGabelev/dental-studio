@@ -7,10 +7,18 @@
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="description" content="Про клініку Dental Studio — наша команда лікарів, місія та цінності. Сучасна стоматологія в Чернігові.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rozetka.space/about.html">
+    <meta property="og:title" content="Про клініку — Dental Studio">
+    <meta property="og:description" content="Про клініку Dental Studio — наша команда лікарів, місія та цінності. Сучасна стоматологія в Чернігові.">
+    <meta property="og:image" content="https://rozetka.space/assets/dental-2.png">
+    <meta property="og:locale" content="uk_UA">
 
     <title data-i18n="about-page-title">Про клініку — Dental Studio</title>
 
-    <link rel="stylesheet" href="styles.css?v=v1.31.43">
+    <link rel="stylesheet" href="styles.css?v=v1.31.46">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -144,9 +152,9 @@
 
 
 
-    <script src="translations.js?v=v1.31.43"></script>
-    <script src="components.js?v=v1.31.43"></script>
-    <script src="main.js?v=v1.31.43"></script>
+    <script src="translations.js?v=v1.31.46"></script>
+    <script src="components.js?v=v1.31.46"></script>
+    <script src="main.js?v=v1.31.46"></script>
 
     <script>
 
@@ -156,7 +164,8 @@
 
             member.addEventListener('mouseenter', () => {
 
-                document.querySelector('.team-member.active').classList.remove('active');
+                const active = document.querySelector('.team-member.active');
+                if (active) active.classList.remove('active');
 
                 member.classList.add('active');
 
@@ -172,7 +181,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script src="dynamic-content.js?v=v1.31.43"></script>
+    <script src="dynamic-content.js?v=v1.31.46"></script>
     <script src="chat-widget.js?v=v1.31.46"></script>
 
 </body>

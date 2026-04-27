@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="home-page-title">Dental Studio — Стоматологічна клініка в Чернігові</title>
-    <meta name="description" content="Dental Studio — преміальна стоматологічна клініка. Від ідеальної гігієни до імплантів під ключ. Запис онлайн.">
-    <link rel="stylesheet" href="styles.css?v=v1.31.43">
-    <script src="translations.js?v=v1.31.43"></script>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="description" content="Dental Studio — преміальна стоматологічна клініка в Чернігові. Імпланти, вінири, відбілювання, ортодонтія. Запис онлайн.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rozetka.space/">
+    <meta property="og:title" content="Dental Studio — Стоматологічна клініка в Чернігові">
+    <meta property="og:description" content="Dental Studio — преміальна стоматологічна клініка в Чернігові. Імпланти, вінири, відбілювання, ортодонтія. Запис онлайн.">
+    <meta property="og:image" content="https://rozetka.space/assets/dental-2.png">
+    <meta property="og:locale" content="uk_UA">
+    <title data-i18n="home-page-title">Dental Studio — Стоматологічна клініка в Чернігові</title>    <link rel="stylesheet" href="styles.css?v=v1.31.46">
+    <script src="translations.js?v=v1.31.46"></script>
 </head>
 <body>
 
@@ -98,6 +104,32 @@
         </section>
 
         <!-- =======================================
+             TRUST COUNTERS
+        ======================================= -->
+        <section class="trust-counters reveal">
+            <div class="container-full">
+                <div class="trust-counters__grid">
+                    <div class="trust-counter">
+                        <span class="trust-counter__num" data-target="500">0</span><span class="trust-counter__plus">+</span>
+                        <p class="trust-counter__label" data-i18n="trust-patients">задоволених пацієнтів</p>
+                    </div>
+                    <div class="trust-counter">
+                        <span class="trust-counter__num" data-target="7">0</span>
+                        <p class="trust-counter__label" data-i18n="trust-years">років досвіду</p>
+                    </div>
+                    <div class="trust-counter">
+                        <span class="trust-counter__num" data-target="98">0</span><span class="trust-counter__plus">%</span>
+                        <p class="trust-counter__label" data-i18n="trust-satisfaction">рекомендують нас друзям</p>
+                    </div>
+                    <div class="trust-counter">
+                        <span class="trust-counter__num" data-target="12">0</span>
+                        <p class="trust-counter__label" data-i18n="trust-doctors">лікарів у команді</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =======================================
              OUR WORKS (Debug version: reveal removed)
         ======================================= -->
         <section id="works" class="works-section">
@@ -122,6 +154,50 @@
                 <!-- Restored Button -->
                 <div class="works-footer" style="text-align: center; margin-top: 50px;">
                     <a href="cases.html" class="btn btn--nude btn--more-works" style="letter-spacing: 2px; font-size: 11px;" data-i18n="works-btn">ПЕРЕГЛЯНУТИ ВСІ РОБОТИ</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- =======================================
+             REVIEWS
+        ======================================= -->
+        <section class="reviews-section reveal">
+            <div class="container">
+                <h2 class="works-title" style="margin-bottom: 48px;" data-i18n="reviews-title">ВІДГУКИ ПАЦІЄНТІВ</h2>
+                <div class="reviews-grid">
+                    <div class="review-card">
+                        <div class="review-stars">★★★★★</div>
+                        <p class="review-text">"Нарешті знайшла клініку, де не боюся зубного! Зробила вінири — результат перевершив усі очікування. Дякую всій команді!"</p>
+                        <div class="review-author">
+                            <div class="review-avatar">О</div>
+                            <div>
+                                <p class="review-name">Олена Д.</p>
+                                <p class="review-date">Березень 2024</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-stars">★★★★★</div>
+                        <p class="review-text">"Поставили імплант під ключ. Весь процес пройшов безболісно, а лікар пояснював кожен крок. Рекомендую всім!"</p>
+                        <div class="review-author">
+                            <div class="review-avatar">М</div>
+                            <div>
+                                <p class="review-name">Максим К.</p>
+                                <p class="review-date">Лютий 2024</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-stars">★★★★★</div>
+                        <p class="review-text">"Відбілювання зробили за одне відвідування. Зуби стали на 8 тонів світліші. Персонал дуже уважний і професійний."</p>
+                        <div class="review-author">
+                            <div class="review-avatar">А</div>
+                            <div>
+                                <p class="review-name">Аліна С.</p>
+                                <p class="review-date">Січень 2024</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -179,13 +255,103 @@
     <!-- FOOTER (injected by components.js) -->
     <div id="footer-placeholder"></div>
 
-    <script src="translations.js?v=v1.31.45"></script>
-    <script src="components.js?v=v1.31.45"></script>
-    <script src="main.js?v=v1.31.45"></script>
+    <!-- FLOATING CTA -->
+    <a href="#contact-choice" id="floatingCta" class="floating-cta" data-i18n="btn-book">ЗАПИСАТИСЯ</a>
+
+    <style>
+        /* ---- Trust Counters ---- */
+        .trust-counters { background: #faf8f5; padding: 60px 0; border-top: 1px solid rgba(197,168,130,0.15); }
+        .trust-counters__grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 0; }
+        .trust-counter { flex: 1 1 140px; max-width: 220px; text-align: center; padding: 30px 20px; position: relative; }
+        .trust-counter + .trust-counter::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); height: 50px; width: 1px; background: rgba(197,168,130,0.3); }
+        .trust-counter__num { font-family: var(--font-serif, 'Bodoni Moda', serif); font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 400; color: #c5a882; line-height: 1; }
+        .trust-counter__plus { font-family: var(--font-serif, 'Bodoni Moda', serif); font-size: clamp(1.5rem, 4vw, 2.5rem); color: #c5a882; }
+        .trust-counter__label { margin-top: 10px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #888; line-height: 1.5; }
+        @media (max-width: 480px) {
+            .trust-counters__grid { gap: 0; }
+            .trust-counter { flex: 1 1 45%; max-width: 50%; padding: 24px 10px; }
+            .trust-counter:nth-child(odd) + .trust-counter::before { display: none; }
+            .trust-counter:nth-child(2)::before { display: block; }
+        }
+
+        /* ---- Reviews ---- */
+        .reviews-section { padding: 80px 0; background: #fff; border-top: 1px solid rgba(0,0,0,0.04); }
+        .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .review-card { background: #faf8f5; border-radius: 16px; padding: 28px 24px; display: flex; flex-direction: column; gap: 16px; border: 1px solid rgba(197,168,130,0.15); transition: box-shadow 0.3s; }
+        .review-card:hover { box-shadow: 0 8px 30px rgba(197,168,130,0.15); }
+        .review-stars { color: #c5a882; font-size: 18px; letter-spacing: 2px; }
+        .review-text { font-size: 14px; line-height: 1.7; color: #444; flex: 1; font-style: italic; }
+        .review-author { display: flex; align-items: center; gap: 12px; margin-top: auto; }
+        .review-avatar { width: 40px; height: 40px; border-radius: 50%; background: #c5a882; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; flex-shrink: 0; }
+        .review-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin: 0; }
+        .review-date { font-size: 11px; color: #aaa; margin: 2px 0 0; letter-spacing: 0.5px; }
+        @media (max-width: 768px) {
+            .reviews-grid { grid-template-columns: 1fr; gap: 16px; }
+            .reviews-section { padding: 60px 0; }
+        }
+
+        /* ---- Floating CTA ---- */
+        .floating-cta {
+            position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+            background: #c5a882; color: #fff; text-decoration: none;
+            padding: 14px 32px; border-radius: 50px;
+            font-size: 11px; font-family: var(--font-sans, 'Montserrat', sans-serif);
+            letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
+            box-shadow: 0 6px 20px rgba(197,168,130,0.45);
+            z-index: 9990; opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            white-space: nowrap;
+        }
+        .floating-cta.visible { opacity: 1; pointer-events: auto; }
+        .floating-cta.hidden-by-chat { opacity: 0 !important; pointer-events: none !important; }
+        @media (max-width: 480px) {
+            .floating-cta { bottom: 90px; padding: 13px 24px; font-size: 10px; }
+        }
+    </style>
+
+    <script>
+        // Trust counter animation
+        function animateCounters() {
+            document.querySelectorAll('.trust-counter__num').forEach(el => {
+                const target = +el.dataset.target;
+                const duration = 1800;
+                const step = target / (duration / 16);
+                let current = 0;
+                const timer = setInterval(() => {
+                    current = Math.min(current + step, target);
+                    el.textContent = Math.floor(current);
+                    if (current >= target) clearInterval(timer);
+                }, 16);
+            });
+        }
+        const countersSection = document.querySelector('.trust-counters');
+        if (countersSection) {
+            const io = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting) { animateCounters(); io.disconnect(); }
+            }, { threshold: 0.3 });
+            io.observe(countersSection);
+        }
+
+        // Floating CTA: show after scrolling past hero, hide when near bottom CTA
+        const floatingBtn = document.getElementById('floatingCta');
+        const heroBanner = document.getElementById('hero');
+        const bottomCta = document.getElementById('contact-choice');
+        if (floatingBtn && heroBanner) {
+            window.addEventListener('scroll', () => {
+                const heroBottom = heroBanner.getBoundingClientRect().bottom;
+                const ctaTop = bottomCta ? bottomCta.getBoundingClientRect().top : 9999;
+                const inView = heroBottom < 0 && ctaTop > window.innerHeight;
+                floatingBtn.classList.toggle('visible', inView);
+            }, { passive: true });
+        }
+    </script>
+
+    <script src="components.js?v=v1.31.46"></script>
+    <script src="main.js?v=v1.31.46"></script>
 
     <!-- Supabase & Dynamic Content Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="dynamic-content.js?v=v1.31.45"></script>
+    <script src="dynamic-content.js?v=v1.31.46"></script>
     <script src="chat-widget.js?v=v1.31.46"></script>
 </body>
 </html>
