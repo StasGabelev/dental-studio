@@ -292,20 +292,29 @@
 
         /* ---- Floating CTA ---- */
         .floating-cta {
-            position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
-            background: #c5a882; color: #fff; text-decoration: none;
-            padding: 14px 32px; border-radius: 50px;
+            position: fixed; bottom: 32px; right: 24px;
+            background: linear-gradient(135deg, #d4b896, #c5a882);
+            color: #fff; text-decoration: none;
+            padding: 14px 28px; border-radius: 50px;
             font-size: 11px; font-family: var(--font-sans, 'Montserrat', sans-serif);
             letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
-            box-shadow: 0 6px 20px rgba(197,168,130,0.45);
+            box-shadow: 0 6px 24px rgba(197,168,130,0.5);
             z-index: 9990; opacity: 0; pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.4s ease;
+            transition: opacity 0.35s ease, box-shadow 0.3s ease;
             white-space: nowrap;
         }
         .floating-cta.visible { opacity: 1; pointer-events: auto; }
+        .floating-cta:hover { box-shadow: 0 8px 30px rgba(197,168,130,0.7); }
         .floating-cta.hidden-by-chat { opacity: 0 !important; pointer-events: none !important; }
-        @media (max-width: 480px) {
-            .floating-cta { bottom: 90px; padding: 13px 24px; font-size: 10px; }
+        @media (max-width: 767px) {
+            .floating-cta {
+                right: auto; left: 50%; transform: translateX(-50%);
+                bottom: 90px;
+                padding: 15px 30px;
+                font-size: 11px;
+                border-radius: 50px;
+                box-shadow: 0 4px 20px rgba(197,168,130,0.6);
+            }
         }
     </style>
 
