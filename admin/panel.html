@@ -66,6 +66,14 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                     <span>Портфоліо (Кейси)</span>
                 </a>
+                <a href="#" class="nav-item" data-section="reviews" onclick="switchSection('reviews', this)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+                    <span>Відгуки</span>
+                </a>
+                <a href="#" class="nav-item" data-section="counters" onclick="switchSection('counters', this)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                    <span>Лічильники</span>
+                </a>
                 <a href="#" class="nav-item" data-section="ai-settings" onclick="switchSection('ai-settings', this)">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     <span>Налаштування ІІ</span>
@@ -144,6 +152,79 @@
                     <div id="portfolioArea" class="cases-grid-admin">
                         <p class="editor-placeholder">Завантаження...</p>
                     </div>
+                </section>
+
+                <!-- Reviews -->
+                <section id="sec-reviews" class="section">
+                    <div class="section-toolbar" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                        <button class="btn-primary" onclick="openReviewModal()">+ Додати відгук</button>
+                        <span style="font-size:12px;color:#888;">Відгуки відображаються на головній сторінці сайту</span>
+                    </div>
+                    <div id="reviewsArea"><p class="editor-placeholder">Завантаження...</p></div>
+
+                    <!-- Review Modal -->
+                    <div id="reviewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
+                        <div style="background:#1a1a1a;border-radius:16px;padding:32px;width:min(500px,95vw);max-height:90vh;overflow-y:auto;border:1px solid #333;">
+                            <h3 id="reviewModalTitle" style="margin-bottom:24px;font-size:18px;">✍️ Відгук</h3>
+                            <div class="form-group">
+                                <label>Ім'я автора</label>
+                                <input type="text" id="reviewAuthorName" placeholder="Олена Д.">
+                            </div>
+                            <div class="form-group" style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
+                                <div>
+                                    <label>Текст відгуку</label>
+                                    <textarea id="reviewText" rows="4" placeholder="Текст відгуку..."></textarea>
+                                </div>
+                                <div>
+                                    <label>Ініціал</label>
+                                    <input type="text" id="reviewAuthorInit" placeholder="О" maxlength="2" style="margin-bottom:8px;">
+                                    <label>Порядок</label>
+                                    <input type="number" id="reviewSortOrder" placeholder="0" min="0">
+                                </div>
+                            </div>
+                            <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                <div>
+                                    <label>Оцінка (зірки)</label>
+                                    <select id="reviewStars">
+                                        <option value="5">★★★★★ (5)</option>
+                                        <option value="4">★★★★☆ (4)</option>
+                                        <option value="3">★★★☆☆ (3)</option>
+                                        <option value="2">★★☆☆☆ (2)</option>
+                                        <option value="1">★☆☆☆☆ (1)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>Дата (текст)</label>
+                                    <input type="text" id="reviewDate" placeholder="Березень 2024">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Фото автора (необов'язково)</label>
+                                <div style="display:flex;gap:12px;align-items:center;">
+                                    <div id="reviewAvatarPreview" onclick="reviewAvatarClick()" style="width:60px;height:60px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;font-weight:700;color:#b8924a;overflow:hidden;flex-shrink:0;background-size:cover;background-position:center;">+</div>
+                                    <div style="font-size:12px;color:#888;">Натисніть на коло щоб завантажити фото</div>
+                                </div>
+                                <input type="file" id="reviewAvatarInput" accept="image/*" style="display:none;" onchange="reviewAvatarChange(this)">
+                            </div>
+                            <div class="form-group">
+                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                    <input type="checkbox" id="reviewIsActive" checked>
+                                    <span>Активний (відображається на сайті)</span>
+                                </label>
+                            </div>
+                            <div style="display:flex;gap:12px;margin-top:24px;">
+                                <button id="reviewSaveBtn" class="btn-primary" style="flex:1;" onclick="saveReview()">💾 Зберегти</button>
+                                <button onclick="closeReviewModal()" style="padding:10px 20px;background:#333;border:none;color:#fff;border-radius:8px;cursor:pointer;">Скасувати</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Counters -->
+                <section id="sec-counters" class="section">
+                    <div style="margin-bottom:16px;color:#888;font-size:13px;">Цифри відображаються на головній сторінці у блоці "довіра"</div>
+                    <div id="countersArea"><p class="editor-placeholder">Завантаження...</p></div>
+                    <button id="saveCountersBtn" class="btn-primary" style="margin-top:20px;" onclick="saveAllCounters()">💾 Зберегти всі лічильники</button>
                 </section>
 
                 <!-- AI Settings -->

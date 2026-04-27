@@ -203,6 +203,57 @@
         console.warn('Doctors load error:', e);
     }
 
+    // --- Load trust counters (index.html) ---
+    try {
+        const countersGrid = document.getElementById('trust-counters-grid');
+        if (countersGrid) {
+            const { data: counters } = await sbClient.from('trust_counters')
+                .select('*').eq('is_active', true).order('sort_order');
+            if (counters && counters.length > 0) {
+                countersGrid.innerHTML = counters.map(c => `
+                    <div class="trust-counter">
+                        <span class="trust-counter__num" data-target="${c.value}">0</span>${c.suffix ? '<span class="trust-counter__plus">' + c.suffix + '</span>' : ''}
+                        <p class="trust-counter__label">${c.label_uk}</p>
+                    </div>
+                `).join('');
+                // Re-trigger counter animation if observer already fired
+                if (window._trustCountersAnimated) animateTrustCounters();
+            }
+        }
+    } catch(e) {
+        console.warn('Trust counters load error:', e);
+    }
+
+    // --- Load reviews (index.html) ---
+    try {
+        const reviewsGrid = document.getElementById('reviews-grid');
+        if (reviewsGrid) {
+            const { data: reviews } = await sbClient.from('reviews')
+                .select('*').eq('is_active', true).order('sort_order');
+            if (reviews && reviews.length > 0) {
+                reviewsGrid.innerHTML = reviews.map(r => {
+                    const stars = '★'.repeat(Math.min(5, Math.max(1, r.stars || 5)));
+                    const avatarContent = r.avatar_url
+                        ? '<img src="' + r.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">'
+                        : (r.author_initial || r.author_name.charAt(0));
+                    return '<div class="review-card">' +
+                        '<div class="review-stars">' + stars + '</div>' +
+                        '<p class="review-text">"' + r.review_text + '"</p>' +
+                        '<div class="review-author">' +
+                            '<div class="review-avatar">' + avatarContent + '</div>' +
+                            '<div>' +
+                                '<p class="review-name">' + r.author_name + '</p>' +
+                                '<p class="review-date">' + (r.review_date || '') + '</p>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+            }
+        }
+    } catch(e) {
+        console.warn('Reviews load error:', e);
+    }
+
     // --- Load dynamic cases ---
     try {
         // Homepage preview (works__grid on index.html)

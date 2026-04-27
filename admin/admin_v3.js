@@ -2407,3 +2407,262 @@ async function syncNow() {
         showToast('❌ Помилка синхронізації: ' + e.message);
     }
 }
+
+
+// ============================================================
+// REVIEWS & TRUST COUNTERS — Admin CRUD
+// ============================================================
+
+// --- Section titles ---
+if (typeof SECTION_TITLES !== 'undefined') {
+    SECTION_TITLES['reviews']  = 'Відгуки пацієнтів';
+    SECTION_TITLES['counters'] = 'Лічильники довіри';
+}
+
+// Patch switchSection to load data on demand
+(function() {
+    const _orig = typeof switchSection === 'function' ? switchSection : null;
+    window.switchSection = function(name, el) {
+        if (_orig) _orig(name, el);
+        if (name === 'reviews')  loadReviews();
+        if (name === 'counters') loadCounters();
+    };
+})();
+
+// ============================================================
+// REVIEWS
+// ============================================================
+
+let reviewsList = [];
+let editingReviewId = null;
+let reviewAvatarDataUrl = null;
+
+async function loadReviews() {
+    const area = document.getElementById('reviewsArea');
+    if (!area) return;
+    if (!sb) { area.innerHTML = '<p style="color:#c00">Supabase не підключено</p>'; return; }
+    area.innerHTML = '<p class="editor-placeholder">Завантаження...</p>';
+    const { data, error } = await sb.from('reviews').select('*').order('sort_order');
+    if (error) { area.innerHTML = '<p style="color:#c00">Помилка: ' + error.message + '</p>'; return; }
+    reviewsList = data || [];
+    renderReviews();
+}
+
+function renderReviews() {
+    const area = document.getElementById('reviewsArea');
+    if (!area) return;
+    if (!reviewsList.length) {
+        area.innerHTML = '<p class="editor-placeholder">Відгуків ще немає. Додайте перший!</p>';
+        return;
+    }
+    area.innerHTML = reviewsList.map(r => `
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #f0ebe2;">
+            <div style="width:48px;height:48px;border-radius:50%;background:#e8ddd0;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#b8924a;">
+                ${r.avatar_url ? '<img src="' + r.avatar_url + '" style="width:100%;height:100%;object-fit:cover;">' : (r.author_initial || r.author_name.charAt(0))}
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:14px;">${r.author_name}</div>
+                <div style="font-size:12px;color:#888;margin:2px 0;">${'★'.repeat(r.stars || 5)} &nbsp;${r.review_date || ''}</div>
+                <div style="font-size:13px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.review_text}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+                <button onclick="openReviewModal(${r.id})" style="padding:6px 14px;background:#b8924a;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;">Редагувати</button>
+                <button onclick="deleteReview(${r.id})" style="padding:6px 14px;background:#f5f5f5;color:#c00;border:1px solid #e0d5c5;border-radius:6px;cursor:pointer;font-size:12px;">Видалити</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openReviewModal(id) {
+    editingReviewId = id || null;
+    reviewAvatarDataUrl = null;
+    const r = id ? reviewsList.find(x => x.id === id) : null;
+
+    document.getElementById('reviewModalTitle').textContent = id ? 'Редагувати відгук' : 'Новий відгук';
+    document.getElementById('reviewAuthorName').value  = r ? r.author_name  : '';
+    document.getElementById('reviewAuthorInit').value  = r ? (r.author_initial || '') : '';
+    document.getElementById('reviewText').value        = r ? r.review_text   : '';
+    document.getElementById('reviewStars').value       = r ? (r.stars || 5)  : 5;
+    document.getElementById('reviewDate').value        = r ? (r.review_date || '') : '';
+    document.getElementById('reviewSortOrder').value   = r ? (r.sort_order || 0) : 0;
+    document.getElementById('reviewIsActive').checked  = r ? (r.is_active !== false) : true;
+
+    const avatarPreview = document.getElementById('reviewAvatarPreview');
+    if (r && r.avatar_url) {
+        avatarPreview.style.backgroundImage = 'url(' + r.avatar_url + ')';
+        avatarPreview.textContent = '';
+    } else {
+        avatarPreview.style.backgroundImage = '';
+        avatarPreview.textContent = r ? (r.author_initial || r.author_name.charAt(0)) : '+';
+    }
+
+    document.getElementById('reviewModal').style.display = 'flex';
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModal').style.display = 'none';
+    editingReviewId = null;
+    reviewAvatarDataUrl = null;
+}
+
+function reviewAvatarClick() {
+    document.getElementById('reviewAvatarInput').click();
+}
+
+function reviewAvatarChange(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        reviewAvatarDataUrl = e.target.result;
+        const preview = document.getElementById('reviewAvatarPreview');
+        preview.style.backgroundImage = 'url(' + reviewAvatarDataUrl + ')';
+        preview.textContent = '';
+    };
+    reader.readAsDataURL(file);
+}
+
+async function uploadReviewAvatar(dataUrl, authorName) {
+    if (!dataUrl) return null;
+    try {
+        const base64 = dataUrl.split(',')[1];
+        const byteChars = atob(base64);
+        const byteArr = new Uint8Array(byteChars.length);
+        for (let i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+        const mimeMatch = dataUrl.match(/data:([^;]+);/);
+        const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+        const ext = mime.split('/')[1] || 'jpg';
+        const fileName = 'reviews/' + Date.now() + '_' + (authorName || 'avatar').replace(/\s+/g, '_') + '.' + ext;
+        const { data, error } = await sb.storage.from('avatars').upload(fileName, byteArr.buffer, { contentType: mime, upsert: true });
+        if (error) { console.error('Avatar upload error:', error); return null; }
+        const { data: urlData } = sb.storage.from('avatars').getPublicUrl(fileName);
+        return urlData ? urlData.publicUrl : null;
+    } catch(e) { console.error('Avatar upload exception:', e); return null; }
+}
+
+async function saveReview() {
+    const authorName = document.getElementById('reviewAuthorName').value.trim();
+    const reviewText = document.getElementById('reviewText').value.trim();
+    if (!authorName || !reviewText) { showToast('Введіть ім\'я та текст відгуку'); return; }
+
+    const saveBtn = document.getElementById('reviewSaveBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Збереження...';
+
+    try {
+        let avatarUrl = editingReviewId ? (reviewsList.find(x => x.id === editingReviewId) || {}).avatar_url || null : null;
+        if (reviewAvatarDataUrl) {
+            const uploaded = await uploadReviewAvatar(reviewAvatarDataUrl, authorName);
+            if (uploaded) avatarUrl = uploaded;
+        }
+
+        const row = {
+            author_name:    authorName,
+            author_initial: document.getElementById('reviewAuthorInit').value.trim() || authorName.charAt(0),
+            avatar_url:     avatarUrl || '',
+            review_text:    reviewText,
+            stars:          parseInt(document.getElementById('reviewStars').value) || 5,
+            review_date:    document.getElementById('reviewDate').value.trim(),
+            sort_order:     parseInt(document.getElementById('reviewSortOrder').value) || 0,
+            is_active:      document.getElementById('reviewIsActive').checked
+        };
+
+        let error;
+        if (editingReviewId) {
+            ({ error } = await sb.from('reviews').update(row).eq('id', editingReviewId));
+        } else {
+            ({ error } = await sb.from('reviews').insert(row));
+        }
+
+        if (error) throw error;
+        showToast('✅ Відгук збережено');
+        closeReviewModal();
+        await loadReviews();
+    } catch(e) {
+        showToast('❌ Помилка: ' + e.message);
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Зберегти';
+    }
+}
+
+async function deleteReview(id) {
+    if (!confirm('Видалити цей відгук?')) return;
+    const { error } = await sb.from('reviews').delete().eq('id', id);
+    if (error) { showToast('❌ Помилка: ' + error.message); return; }
+    showToast('✅ Відгук видалено');
+    await loadReviews();
+}
+
+// ============================================================
+// TRUST COUNTERS
+// ============================================================
+
+let countersList = [];
+
+async function loadCounters() {
+    const area = document.getElementById('countersArea');
+    if (!area) return;
+    if (!sb) { area.innerHTML = '<p style="color:#c00">Supabase не підключено</p>'; return; }
+    area.innerHTML = '<p class="editor-placeholder">Завантаження...</p>';
+    const { data, error } = await sb.from('trust_counters').select('*').order('sort_order');
+    if (error) { area.innerHTML = '<p style="color:#c00">Помилка: ' + error.message + '</p>'; return; }
+    countersList = data || [];
+    renderCounters();
+}
+
+function renderCounters() {
+    const area = document.getElementById('countersArea');
+    if (!area) return;
+    if (!countersList.length) {
+        area.innerHTML = '<p class="editor-placeholder">Лічильників немає</p>';
+        return;
+    }
+    area.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">' +
+        countersList.map(c => `
+            <div style="background:#faf7f2;border:1px solid #e8ddd0;border-radius:10px;padding:16px;">
+                <div style="font-size:12px;color:#888;margin-bottom:8px;font-weight:600;">Лічильник #${c.sort_order}</div>
+                <label style="font-size:12px;color:#555;">Значення</label>
+                <input type="number" id="cval_${c.id}" value="${c.value}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;margin:4px 0 10px;font-size:16px;font-weight:700;">
+                <label style="font-size:12px;color:#555;">Суфікс (напр. + або %)</label>
+                <input type="text" id="csuf_${c.id}" value="${c.suffix || ''}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;margin:4px 0 10px;">
+                <label style="font-size:12px;color:#555;">Підпис</label>
+                <input type="text" id="clab_${c.id}" value="${c.label_uk || ''}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;margin:4px 0 10px;">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;">
+                    <input type="checkbox" id="cact_${c.id}" ${c.is_active ? 'checked' : ''}>
+                    <span>Активний</span>
+                </label>
+            </div>
+        `).join('') +
+    '</div>';
+}
+
+async function saveAllCounters() {
+    if (!countersList.length) return;
+    const btn = document.getElementById('saveCountersBtn');
+    btn.disabled = true;
+    btn.textContent = 'Збереження...';
+    try {
+        for (const c of countersList) {
+            const valEl   = document.getElementById('cval_' + c.id);
+            const sufEl   = document.getElementById('csuf_' + c.id);
+            const labEl   = document.getElementById('clab_' + c.id);
+            const actEl   = document.getElementById('cact_' + c.id);
+            if (!valEl) continue;
+            const { error } = await sb.from('trust_counters').update({
+                value:     parseInt(valEl.value) || 0,
+                suffix:    sufEl ? sufEl.value : c.suffix,
+                label_uk:  labEl ? labEl.value : c.label_uk,
+                is_active: actEl ? actEl.checked : c.is_active
+            }).eq('id', c.id);
+            if (error) throw error;
+        }
+        showToast('✅ Лічильники збережено');
+        await loadCounters();
+    } catch(e) {
+        showToast('❌ Помилка: ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Зберегти всі лічильники';
+    }
+}

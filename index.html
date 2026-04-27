@@ -11,8 +11,8 @@
     <meta property="og:description" content="Dental Studio — преміальна стоматологічна клініка в Чернігові. Імпланти, вінири, відбілювання, ортодонтія. Запис онлайн.">
     <meta property="og:image" content="https://rozetka.space/assets/dental-2.png">
     <meta property="og:locale" content="uk_UA">
-    <title data-i18n="home-page-title">Dental Studio — Стоматологічна клініка в Чернігові</title>    <link rel="stylesheet" href="styles.css?v=v1.31.46">
-    <script src="translations.js?v=v1.31.46"></script>
+    <title data-i18n="home-page-title">Dental Studio — Стоматологічна клініка в Чернігові</title>    <link rel="stylesheet" href="styles.css?v=v1.31.47">
+    <script src="translations.js?v=v1.31.47"></script>
 </head>
 <body>
 
@@ -108,7 +108,7 @@
         ======================================= -->
         <section class="trust-counters reveal">
             <div class="container-full">
-                <div class="trust-counters__grid">
+                <div id="trust-counters-grid" class="trust-counters__grid">
                     <div class="trust-counter">
                         <span class="trust-counter__num" data-target="500">0</span><span class="trust-counter__plus">+</span>
                         <p class="trust-counter__label" data-i18n="trust-patients">задоволених пацієнтів</p>
@@ -164,7 +164,7 @@
         <section class="reviews-section reveal">
             <div class="container">
                 <h2 class="works-title" style="margin-bottom: 48px;" data-i18n="reviews-title">ВІДГУКИ ПАЦІЄНТІВ</h2>
-                <div class="reviews-grid">
+                <div id="reviews-grid" class="reviews-grid">
                     <div class="review-card">
                         <div class="review-stars">★★★★★</div>
                         <p class="review-text">"Нарешті знайшла клініку, де не боюся зубного! Зробила вінири — результат перевершив усі очікування. Дякую всій команді!"</p>
@@ -310,24 +310,30 @@
     </style>
 
     <script>
-        // Trust counter animation
-        function animateCounters() {
+        // Trust counter animation (exposed globally so dynamic-content.js can re-trigger)
+        window.animateTrustCounters = function() {
             document.querySelectorAll('.trust-counter__num').forEach(el => {
                 const target = +el.dataset.target;
+                if (!target) return;
                 const duration = 1800;
                 const step = target / (duration / 16);
                 let current = 0;
+                el.textContent = '0';
                 const timer = setInterval(() => {
                     current = Math.min(current + step, target);
                     el.textContent = Math.floor(current);
                     if (current >= target) clearInterval(timer);
                 }, 16);
             });
-        }
+        };
         const countersSection = document.querySelector('.trust-counters');
         if (countersSection) {
             const io = new IntersectionObserver(entries => {
-                if (entries[0].isIntersecting) { animateCounters(); io.disconnect(); }
+                if (entries[0].isIntersecting) {
+                    window._trustCountersAnimated = true;
+                    window.animateTrustCounters();
+                    io.disconnect();
+                }
             }, { threshold: 0.3 });
             io.observe(countersSection);
         }
@@ -346,12 +352,12 @@
         }
     </script>
 
-    <script src="components.js?v=v1.31.46"></script>
-    <script src="main.js?v=v1.31.46"></script>
+    <script src="components.js?v=v1.31.47"></script>
+    <script src="main.js?v=v1.31.47"></script>
 
     <!-- Supabase & Dynamic Content Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="dynamic-content.js?v=v1.31.46"></script>
-    <script src="chat-widget.js?v=v1.31.46"></script>
+    <script src="dynamic-content.js?v=v1.31.47"></script>
+    <script src="chat-widget.js?v=v1.31.47"></script>
 </body>
 </html>
