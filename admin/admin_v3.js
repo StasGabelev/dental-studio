@@ -1050,7 +1050,8 @@ async function savePageContent(pageSlug) {
     }
 }
 
-async function triggerMediaUpload(key, type) {
+async function triggerMediaUpload(key, type, event) {
+    if (event) event.stopPropagation();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = type === 'image' ? 'image/*' : 'video/*';
@@ -1062,7 +1063,8 @@ async function triggerMediaUpload(key, type) {
 
         if (sb) {
             // Upload to Supabase Storage
-            const filePath = `pages/${currentPage}/${key}_${Date.now()}_${file.name}`;
+            const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+            const filePath = `pages/${currentPage}/${key}_${Date.now()}_${safeName}`;
             const { data, error } = await sb.storage
                 .from('clinic-media')
                 .upload(filePath, file, { upsert: true });
@@ -1090,11 +1092,19 @@ async function triggerMediaUpload(key, type) {
             // Update preview
             const box = document.getElementById(`media-${key}`);
             if (box) {
+                let innerHtml = '';
                 if (type === 'image') {
-                    box.innerHTML = `<img src="${publicUrl}" style="max-width:100%;max-height:200px;border-radius:4px;"><div class="media-upload-hint">📷 Натисніть щоб замінити</div>`;
+                    innerHtml += `<img src="${publicUrl}" style="max-width:100%;max-height:200px;border-radius:4px;">`;
                 } else {
-                    box.innerHTML = `<video src="${publicUrl}" style="max-width:100%;max-height:200px;" controls></video><div class="media-upload-hint">🎥 Натисніть щоб замінити</div>`;
+                    innerHtml += `<video src="${publicUrl}" style="max-width:100%;max-height:200px;" controls></video>`;
                 }
+                innerHtml += `
+                    <div class="media-actions" style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+                        <button class="btn btn-primary" onclick="triggerMediaUpload('${key}', '${type}', event)">Змінити</button>
+                        <button class="btn btn-danger" onclick="deleteMedia('${key}', '${type}', event)">Видалити</button>
+                    </div>
+                `;
+                box.innerHTML = innerHtml;
             }
 
             showToast('✅ Файл завантажено');
@@ -1105,6 +1115,40 @@ async function triggerMediaUpload(key, type) {
     input.click();
 }
 
+window.deleteMedia = async function(key, type, event) {
+    if (event) event.stopPropagation();
+    if (!confirm('Видалити цей медіафайл?')) return;
+    
+    showToast(`🗑 Видалення...`);
+    
+    if (sb) {
+        const { error } = await sb.from('site_content').upsert({
+            page_slug: currentPage,
+            section_key: key,
+            content_type: type,
+            media_url: '',
+            updated_at: new Date().toISOString(),
+        }, { onConflict: 'page_slug,section_key' });
+        
+        if (error) {
+            showToast(`❌ Помилка: ${error.message}`);
+            return;
+        }
+
+        const box = document.getElementById(`media-${key}`);
+        if (box) {
+            box.innerHTML = `
+                <div class="media-upload-hint">${type === 'image' ? '📷' : '🎥'} Немає файлу</div>
+                <div class="media-actions" style="margin-top:10px; display:flex; justify-content:center;">
+                    <button class="btn btn-primary" onclick="triggerMediaUpload('${key}', '${type}', event)">Завантажити</button>
+                </div>
+            `;
+        }
+        showToast('✅ Видалено');
+    } else {
+        showToast(`⚠️ Підключіть Supabase`);
+    }
+};
 
 // ============================================================
 // PRICE LIST
@@ -2000,15 +2044,35 @@ function renderEditorField(field, existing, defaults, pageSlug) {
         out += `<textarea data-key="${field.key}" rows="3" placeholder="${field.label}">${escapeHtml(val)}</textarea>`;
     } else if (field.type === 'image') {
         const imgSrc = (val && !val.startsWith('http') && !val.startsWith('blob:') && !val.startsWith('/')) ? '/' + val : val;
-        out += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'image')" id="media-${field.key}">`;
-        out += `${val ? `<img src="${imgSrc}" style="max-width:100%;max-height:200px;border-radius:4px;">` : ''}`;
-        out += `<div class="media-upload-hint">📷 Натисніть щоб завантажити зображення</div>`;
+        out += `<div class="media-upload-box" id="media-${field.key}" style="cursor:default;">`;
+        if (val) {
+            out += `<img src="${imgSrc}" style="max-width:100%;max-height:200px;border-radius:4px;">`;
+            out += `<div class="media-actions" style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+                        <button class="btn btn-primary" onclick="triggerMediaUpload('${field.key}', 'image', event)">Змінити</button>
+                        <button class="btn btn-danger" onclick="deleteMedia('${field.key}', 'image', event)">Видалити</button>
+                    </div>`;
+        } else {
+            out += `<div class="media-upload-hint">📷 Немає файлу</div>`;
+            out += `<div class="media-actions" style="margin-top:10px; display:flex; justify-content:center;">
+                        <button class="btn btn-primary" onclick="triggerMediaUpload('${field.key}', 'image', event)">Завантажити</button>
+                    </div>`;
+        }
         out += `</div>`;
     } else if (field.type === 'video') {
         const videoSrc = (val && !val.startsWith('http') && !val.startsWith('blob:') && !val.startsWith('/')) ? '/' + val : val;
-        out += `<div class="media-upload-box" onclick="triggerMediaUpload('${field.key}', 'video')" id="media-${field.key}">`;
-        out += `${val ? `<video src="${videoSrc}" style="max-width:100%;max-height:200px;" controls></video>` : ''}`;
-        out += `<div class="media-upload-hint">🎥 Натисніть щоб завантажити відео</div>`;
+        out += `<div class="media-upload-box" id="media-${field.key}" style="cursor:default;">`;
+        if (val) {
+            out += `<video src="${videoSrc}" style="max-width:100%;max-height:200px;" controls></video>`;
+            out += `<div class="media-actions" style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+                        <button class="btn btn-primary" onclick="triggerMediaUpload('${field.key}', 'video', event)">Змінити</button>
+                        <button class="btn btn-danger" onclick="deleteMedia('${field.key}', 'video', event)">Видалити</button>
+                    </div>`;
+        } else {
+            out += `<div class="media-upload-hint">🎥 Немає файлу</div>`;
+            out += `<div class="media-actions" style="margin-top:10px; display:flex; justify-content:center;">
+                        <button class="btn btn-primary" onclick="triggerMediaUpload('${field.key}', 'video', event)">Завантажити</button>
+                    </div>`;
+        }
         out += `</div>`;
     }
 
