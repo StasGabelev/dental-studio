@@ -55,7 +55,7 @@ async function refreshSettings() {
             viberBot = new ViberBot({
                 authToken: data.viber_bot_token,
                 name: "Dental Studio AI",
-                avatar: "https://rozetka.space/assets/logo.png" // Replace with real logo
+                avatar: "https://dentstudio.in.ua/assets/logo.png" // Replace with real logo
             });
             setupViberHandlers();
         }
@@ -154,7 +154,7 @@ ${knowledgeBase}`;
         } else if (provider === 'google') {
             apiUrl = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'; // OpenAI compatibility layer
         } else if (provider === 'openrouter') {
-            headers['HTTP-Referer'] = 'https://rozetka.space';
+            headers['HTTP-Referer'] = 'https://dentstudio.in.ua';
             headers['X-Title'] = 'Dental Studio AI';
         } else if (provider === 'custom' && aiSettings.custom_url) {
             apiUrl = aiSettings.custom_url;
@@ -247,7 +247,7 @@ async function handleAITools(toolCalls, previousMessages) {
     } else if (provider === 'custom' && aiSettings.custom_url) {
         apiUrl2 = aiSettings.custom_url;
     } else {
-        headers2['HTTP-Referer'] = 'https://rozetka.space';
+        headers2['HTTP-Referer'] = 'https://dentstudio.in.ua';
         headers2['X-Title'] = 'Dental Studio AI';
     }
 
