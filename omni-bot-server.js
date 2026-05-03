@@ -395,7 +395,14 @@ app.post('/api/chat', async (req, res) => {
 
     try {
         const history = await getChatHistory(sessionId);
-        const reply = await getAIResponse(message, history);
+        let reply = await getAIResponse(message, history);
+
+        // Check for callback trigger before stripping tag
+        if (reply.includes('[[CALLBACK:TRUE]]')) {
+            triggerAdminAlert('WebChat', sessionId, message, sessionId);
+        }
+        // Strip internal tags from client-facing reply
+        reply = reply.replace(/\[\[CALLBACK:TRUE\]\]/g, '').trim();
 
         await saveMessage(sessionId, 'user', message);
         await saveMessage(sessionId, 'bot', reply);
