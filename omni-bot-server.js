@@ -399,7 +399,9 @@ app.post('/api/chat', async (req, res) => {
 
         // Check for callback trigger before stripping tag
         if (reply.includes('[[CALLBACK:TRUE]]')) {
-            triggerAdminAlert('WebChat', sessionId, message, sessionId);
+            const { data: sess } = await supabase.from('chat_sessions').select('client_name').eq('id', sessionId).single();
+            const clientName = (sess && sess.client_name) ? sess.client_name : sessionId;
+            triggerAdminAlert('WebChat', clientName, message, sessionId);
         }
         // Strip internal tags from client-facing reply
         reply = reply.replace(/\[\[CALLBACK:TRUE\]\]/g, '').trim();
