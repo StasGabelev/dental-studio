@@ -376,7 +376,7 @@
         const thinkingEl = showThinking();
 
         try {
-            const response = await fetch('https://api.dentstudio.in.ua/api/chat', {
+            const response = await fetch('https://api.rozetka.space/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text, sessionId: chatSessionId })
