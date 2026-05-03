@@ -1059,7 +1059,15 @@ async function triggerMediaUpload(key, type, event) {
         const file = e.target.files[0];
         if (!file) return;
 
-        showToast(`📤 Завантажується "${file.name}"...`);
+        // Check file size (max 200 MB after bucket update, default 50 MB)
+        const MAX_MB = 200;
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        if (file.size > MAX_MB * 1024 * 1024) {
+            showToast(`❌ Файл завеликий: ${fileSizeMB} МБ (макс. ${MAX_MB} МБ). Стисніть відео або збільшіть ліміт у Supabase Storage.`);
+            return;
+        }
+
+        showToast(`📤 Завантажується "${file.name}" (${fileSizeMB} МБ)...`);
 
         if (sb) {
             // Upload to Supabase Storage
