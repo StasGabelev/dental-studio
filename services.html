@@ -20,7 +20,7 @@
 
     <title>Послуги — Dental Studio</title>
 
-    <link rel="stylesheet" href="styles.css?v=v1.31.48">
+    <link rel="stylesheet" href="styles.css?v=v1.31.49">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -28,7 +28,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 
-    <script src="translations.js?v=v1.31.48"></script>
+    <script src="translations.js?v=v1.31.49"></script>
 
     <style>
 
@@ -2167,8 +2167,8 @@
 
 
 
-    <script src="translations.js?v=v1.31.48"></script>
-    <script src="components.js?v=v1.31.48"></script>
+    <script src="translations.js?v=v1.31.49"></script>
+    <script src="components.js?v=v1.31.49"></script>
 
     <script>
 
@@ -2177,6 +2177,28 @@
             const tabs = document.querySelectorAll('.tab-btn-outline');
 
             const panels = document.querySelectorAll('.accordion-panel');
+
+            function activateTab(targetId) {
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                const tab = document.querySelector(`.tab-btn-outline[data-target="${targetId}"]`);
+                const panel = document.getElementById(targetId);
+                if (tab) tab.classList.add('active');
+                if (panel) panel.classList.add('active');
+            }
+
+            // Activate tab from URL hash (e.g. services.html#children)
+            const hashMap = {
+                '#aesthetic': 'content-aesthetic',
+                '#therapy':   'content-therapy',
+                '#surgery':   'content-surgery',
+                '#ortho':     'content-ortho',
+                '#children':  'content-children'
+            };
+            const hash = window.location.hash;
+            if (hash && hashMap[hash]) {
+                activateTab(hashMap[hash]);
+            }
 
             tabs.forEach(tab => {
 
@@ -2240,7 +2262,7 @@
 
     </script>
 
-    <script src="main.js?v=v1.31.48"></script>
+    <script src="main.js?v=v1.31.49"></script>
 
 
 
@@ -2248,8 +2270,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script src="dynamic-content.js?v=v1.31.48"></script>
-    <script src="chat-widget.js?v=v1.31.48"></script>
+    <script src="dynamic-content.js?v=v1.31.49"></script>
+    <script src="chat-widget.js?v=v1.31.49"></script>
 
 </body>
 
