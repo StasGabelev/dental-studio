@@ -18,11 +18,10 @@ jobs:
           username: holiday8
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
-          server-dir: /home2/holiday8/public_html/
+          server-dir: /dentstudio.in.ua/
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
             .github/**
-          include: |
-            .htaccess
+         
