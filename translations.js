@@ -32,6 +32,7 @@ const translations = {
         "feat-therapy": "Лікування зубів",
         "feat-surgery": "Хірургія",
         "feat-ortho": "Ортодонтія",
+        "feat-children": "Дитяча стоматологія",
         
         // Service Categories (Services Page Tabs)
         "cat-aesthetic-title": "Естетична <br> стоматологія",
@@ -68,6 +69,28 @@ const translations = {
         "svc-extraction-desc": "Майстерне видалення зубів під місцевою анастезією або в медикаментозному сні (седація). Седація – це занурення пацієнта в глибокий або поверхневий природний сон під контролем лікаря-анастезіолога.",
         "svc-gum-surgery-title": "Закриття рецесій, хірургічне подовження клінічної коронки зуба, усунення ясеневої посмішки",
         "svc-gum-surgery-desc": "Високоестетичні хірургічні операції із яснами (корекція ясен) для створення нової естетики посмішки пацієнта в комбінації із керамічними вінірами.",
+
+        // -- 5. Children's Dentistry --
+        "svc-children-caries-title": "Лікування карієсу у дітей",
+        "svc-children-caries-desc": "Лікування карієсу молочних та постійних зубів у дітей з використанням сучасних матеріалів та безболісних технік. Комфортний підхід до маленьких пацієнтів.",
+        "svc-children-hygiene-title": "Дитяча гігієна та профілактика",
+        "svc-children-hygiene-desc": "Професійне чищення зубів, навчання правильній гігієні, контроль стану ротової порожнини дитини. Регулярна профілактика — основа здорових зубів на все життя.",
+        "svc-children-sealants-title": "Герметизація фісур",
+        "svc-children-sealants-desc": "Запечатування природніх заглибин на жувальній поверхні зубів спеціальним герметиком для захисту від карієсу. Проста та ефективна процедура для дітей.",
+        "svc-children-extraction-title": "Видалення молочного зуба",
+        "svc-children-extraction-desc": "Безболісне видалення молочних зубів під місцевою анестезією. М'який підхід до дітей, комфортна атмосфера без стресу.",
+        "price-children-consult": "Консультація дитячого стоматолога",
+        "price-children-consult-val": "500 ₴",
+        "price-children-caries-milk": "Лікування карієсу молочного зуба",
+        "price-children-caries-milk-val": "80 €",
+        "price-children-caries-perm": "Лікування карієсу постійного зуба у дитини",
+        "price-children-caries-perm-val": "100 €",
+        "price-children-hygiene": "Дитяча гігієна (до 12 років)",
+        "price-children-hygiene-val": "60 €",
+        "price-children-sealants": "Герметизація фісур (1 зуб)",
+        "price-children-sealants-val": "40 €",
+        "price-children-extraction": "Видалення молочного зуба",
+        "price-children-extraction-val": "60 €",
 
         // -- 4. Orthodontics --
         "svc-braces-title": "Лікування брекет-системою",
@@ -206,6 +229,7 @@ const translations = {
         "feat-therapy": "Tooth Treatment",
         "feat-surgery": "Surgery",
         "feat-ortho": "Orthodontics",
+        "feat-children": "Children's Dentistry",
 
         // Service Categories (Services Page Tabs)
         "cat-aesthetic-title": "Aesthetic <br> Dentistry",
@@ -242,6 +266,28 @@ const translations = {
         "svc-extraction-desc": "Masterful extraction of teeth under local anesthesia or in drug-induced sleep (sedation). Sedation is the immersion of a patient into a deep or surface natural sleep under the control of an anesthesiologist.",
         "svc-gum-surgery-title": "Recession closure, surgical lengthening of the clinical crown, gummy smile elimination",
         "svc-gum-surgery-desc": "Highly aesthetic surgical operations with the gums (gum correction) to create new smile aesthetics in combination with ceramic veneers.",
+
+        // -- 5. Children's Dentistry --
+        "svc-children-caries-title": "Children's Caries Treatment",
+        "svc-children-caries-desc": "Treatment of caries in baby and permanent teeth using modern materials and painless techniques. A comfortable approach for young patients.",
+        "svc-children-hygiene-title": "Children's Hygiene & Prevention",
+        "svc-children-hygiene-desc": "Professional teeth cleaning, proper hygiene training, and monitoring the oral health of children. Regular prevention is the foundation of healthy teeth for life.",
+        "svc-children-sealants-title": "Fissure Sealants",
+        "svc-children-sealants-desc": "Sealing natural grooves on the chewing surface of teeth with a special sealant to protect against caries. A simple and effective procedure for children.",
+        "svc-children-extraction-title": "Baby Tooth Extraction",
+        "svc-children-extraction-desc": "Painless extraction of baby teeth under local anesthesia. A gentle approach for children in a comfortable, stress-free environment.",
+        "price-children-consult": "Children's Dentist Consultation",
+        "price-children-consult-val": "500 ₴",
+        "price-children-caries-milk": "Baby Tooth Caries Treatment",
+        "price-children-caries-milk-val": "80 €",
+        "price-children-caries-perm": "Permanent Tooth Caries Treatment (child)",
+        "price-children-caries-perm-val": "100 €",
+        "price-children-hygiene": "Children's Hygiene (under 12)",
+        "price-children-hygiene-val": "60 €",
+        "price-children-sealants": "Fissure Sealant (1 tooth)",
+        "price-children-sealants-val": "40 €",
+        "price-children-extraction": "Baby Tooth Extraction",
+        "price-children-extraction-val": "60 €",
 
         // -- 4. Orthodontics --
         "svc-braces-title": "Braces System Treatment",

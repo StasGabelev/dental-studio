@@ -20,7 +20,7 @@
 
     <title>Послуги — Dental Studio</title>
 
-    <link rel="stylesheet" href="styles.css?v=v1.31.47">
+    <link rel="stylesheet" href="styles.css?v=v1.31.48">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -28,7 +28,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 
-    <script src="translations.js?v=v1.31.47"></script>
+    <script src="translations.js?v=v1.31.48"></script>
 
     <style>
 
@@ -273,6 +273,8 @@
                     <button class="tab-btn-outline" data-target="content-surgery" data-i18n="feat-surgery">Хірургія</button>
 
                     <button class="tab-btn-outline" data-target="content-ortho" data-i18n="feat-ortho">Ортодонтія</button>
+
+                    <button class="tab-btn-outline" data-target="content-children" data-i18n="feat-children">Дитяча стоматологія</button>
 
                 </div>
 
@@ -1974,6 +1976,147 @@
 
                     </div>
 
+                    <div class="accordion-panel" id="content-children">
+
+                        <!-- 1. Консультація -->
+                        <div class="accordion-item-box">
+                            <div class="accordion-item-box-header">
+                                <div class="accordion-header-box">
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C8.5 2 6 5 6 9c0 2-1 3.5-3 4.5v1.5h18v-1.5c-2-1-3-2.5-3-4.5 0-4-2.5-7-6-7z"/><path d="M16 4.5c1 0 1.5.5 1.5 1.5m-7 0c0-1 .5-1.5 1.5-1.5M19 18v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2"/></svg></div>
+                                    <span class="accordion-title" data-i18n="svc-consult-title">Консультація</span>
+                                </div>
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+                            </div>
+                            <div class="accordion-item-content">
+                                <div class="accordion-content-grid">
+                                    <div class="accordion-content-text" data-i18n="svc-consult-desc">Лікар проводить повну діагностику стану ротової порожнини, сканує зуби, оглядає зуби під мікроскопом та складає план лікування із кошторисом по кожному етапу роботи.</div>
+                                    <div class="accordion-content-media"><video autoplay muted loop playsinline><source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4"></video></div>
+                                </div>
+                                <div class="accordion-price-list">
+                                    <div class="accordion-price-item">
+                                        <div class="price-item-name" data-i18n="price-children-consult">Консультація дитячого стоматолога</div>
+                                        <div class="price-item-right">
+                                            <span class="price-item-value" data-i18n="price-children-consult-val">500 ₴</span>
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Лікування карієсу у дітей -->
+                        <div class="accordion-item-box">
+                            <div class="accordion-item-box-header">
+                                <div class="accordion-header-box">
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z"/></svg></div>
+                                    <span class="accordion-title" data-i18n="svc-children-caries-title">Лікування карієсу у дітей</span>
+                                </div>
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+                            </div>
+                            <div class="accordion-item-content">
+                                <div class="accordion-content-grid">
+                                    <div class="accordion-content-text" data-i18n="svc-children-caries-desc">Лікування карієсу молочних та постійних зубів у дітей з використанням сучасних матеріалів та безболісних технік. Комфортний підхід до маленьких пацієнтів.</div>
+                                    <div class="accordion-content-media"><video autoplay muted loop playsinline><source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4"></video></div>
+                                </div>
+                                <div class="accordion-price-list">
+                                    <div class="accordion-price-item">
+                                        <div class="price-item-name" data-i18n="price-children-caries-milk">Лікування карієсу молочного зуба</div>
+                                        <div class="price-item-right">
+                                            <span class="price-item-value" data-i18n="price-children-caries-milk-val">80 €</span>
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-price-item">
+                                        <div class="price-item-name" data-i18n="price-children-caries-perm">Лікування карієсу постійного зуба у дитини</div>
+                                        <div class="price-item-right">
+                                            <span class="price-item-value" data-i18n="price-children-caries-perm-val">100 €</span>
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Дитяча гігієна та профілактика -->
+                        <div class="accordion-item-box">
+                            <div class="accordion-item-box-header">
+                                <div class="accordion-header-box">
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 3C8 3 5 6 5 10c0 3-1 5-3 6v2h20v-2c-2-1-3-3-3-6 0-4-3-7-7-7z"/><path d="M10 21h4"/></svg></div>
+                                    <span class="accordion-title" data-i18n="svc-children-hygiene-title">Дитяча гігієна та профілактика</span>
+                                </div>
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+                            </div>
+                            <div class="accordion-item-content">
+                                <div class="accordion-content-grid">
+                                    <div class="accordion-content-text" data-i18n="svc-children-hygiene-desc">Професійне чищення зубів, навчання правильній гігієні, контроль стану ротової порожнини дитини. Регулярна профілактика — основа здорових зубів на все життя.</div>
+                                    <div class="accordion-content-media"><video autoplay muted loop playsinline><source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4"></video></div>
+                                </div>
+                                <div class="accordion-price-list">
+                                    <div class="accordion-price-item">
+                                        <div class="price-item-name" data-i18n="price-children-hygiene">Дитяча гігієна (до 12 років)</div>
+                                        <div class="price-item-right">
+                                            <span class="price-item-value" data-i18n="price-children-hygiene-val">60 €</span>
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Герметизація фісур -->
+                        <div class="accordion-item-box">
+                            <div class="accordion-item-box-header">
+                                <div class="accordion-header-box">
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2v20M5 7l14 0M5 12l14 0M5 17l14 0"/></svg></div>
+                                    <span class="accordion-title" data-i18n="svc-children-sealants-title">Герметизація фісур</span>
+                                </div>
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+                            </div>
+                            <div class="accordion-item-content">
+                                <div class="accordion-content-grid">
+                                    <div class="accordion-content-text" data-i18n="svc-children-sealants-desc">Запечатування природніх заглибин на жувальній поверхні зубів спеціальним герметиком для захисту від карієсу. Проста та ефективна процедура для дітей.</div>
+                                    <div class="accordion-content-media"><video autoplay muted loop playsinline><source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4"></video></div>
+                                </div>
+                                <div class="accordion-price-list">
+                                    <div class="accordion-price-item">
+                                        <div class="price-item-name" data-i18n="price-children-sealants">Герметизація фісур (1 зуб)</div>
+                                        <div class="price-item-right">
+                                            <span class="price-item-value" data-i18n="price-children-sealants-val">40 €</span>
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Видалення молочного зуба -->
+                        <div class="accordion-item-box">
+                            <div class="accordion-item-box-header">
+                                <div class="accordion-header-box">
+                                    <div class="accordion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 9c0-3 2-5 5-5s5 2 5 5v3c0 2 1 3 3 4v1H4v-1c2-1 3-2 3-4V9z"/></svg></div>
+                                    <span class="accordion-title" data-i18n="svc-children-extraction-title">Видалення молочного зуба</span>
+                                </div>
+                                <div class="accordion-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 10l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+                            </div>
+                            <div class="accordion-item-content">
+                                <div class="accordion-content-grid">
+                                    <div class="accordion-content-text" data-i18n="svc-children-extraction-desc">Безболісне видалення молочних зубів під місцевою анестезією. М'який підхід до дітей, комфортна атмосфера без стресу.</div>
+                                    <div class="accordion-content-media"><video autoplay muted loop playsinline><source src="https://storage.googleapis.com/tokar_clinic_site/video/home-cover/web.mp4" type="video/mp4"></video></div>
+                                </div>
+                                <div class="accordion-price-list">
+                                    <div class="accordion-price-item">
+                                        <div class="price-item-name" data-i18n="price-children-extraction">Видалення молочного зуба</div>
+                                        <div class="price-item-right">
+                                            <span class="price-item-value" data-i18n="price-children-extraction-val">60 €</span>
+                                            <a href="#form" class="price-item-btn" data-i18n="btn-book-short">Записатися</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -2024,8 +2167,8 @@
 
 
 
-    <script src="translations.js?v=v1.31.47"></script>
-    <script src="components.js?v=v1.31.47"></script>
+    <script src="translations.js?v=v1.31.48"></script>
+    <script src="components.js?v=v1.31.48"></script>
 
     <script>
 
@@ -2097,7 +2240,7 @@
 
     </script>
 
-    <script src="main.js?v=v1.31.47"></script>
+    <script src="main.js?v=v1.31.48"></script>
 
 
 
@@ -2105,8 +2248,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script src="dynamic-content.js?v=v1.31.47"></script>
-    <script src="chat-widget.js?v=v1.31.47"></script>
+    <script src="dynamic-content.js?v=v1.31.48"></script>
+    <script src="chat-widget.js?v=v1.31.48"></script>
 
 </body>
 
