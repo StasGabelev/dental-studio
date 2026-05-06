@@ -19,17 +19,17 @@ const contactHubHTML = `
             <h2 class="contact-hub-title" style="margin-top: 10px;">СВ’ЯЗАТИСЯ З НАМИ</h2>
             <p class="contact-hub-subtitle">Оберіть зручний для Вас месенджер</p>
             <div class="messenger-grid">
-                <a href="https://t.me/dentalstudioche" target="_blank" class="messenger-link">
+                <a href="https://t.me/+380736007800" target="_blank" class="messenger-link">
                     <div class="messenger-icon-box">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 10l-4 4 6 6 4-16-18 7 4 2 2 6 3-4"/></svg>
                     </div>
-                    <span>Telegram</span>
+                    <span>Telegram<br><small style="font-size:10px; color:#999; letter-spacing:1px; margin-top:4px; display:block;">+380 73 600 7800</small></span>
                 </a>
-                <a href="viber://chat?number=%2B380776007800" class="messenger-link">
+                <a href="viber://chat?number=%2B380736007800" class="messenger-link">
                     <div class="messenger-icon-box">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                     </div>
-                    <span>Viber</span>
+                    <span>Viber<br><small style="font-size:10px; color:#999; letter-spacing:1px; margin-top:4px; display:block;">+380 73 600 7800</small></span>
                 </a>
                 <a href="https://www.instagram.com/dental_studio_che/" target="_blank" class="messenger-link">
                     <div class="messenger-icon-box">
@@ -37,11 +37,11 @@ const contactHubHTML = `
                     </div>
                     <span>Instagram</span>
                 </a>
-                <a href="https://wa.me/380776007800" target="_blank" class="messenger-link">
+                <a href="https://wa.me/380736007800" target="_blank" class="messenger-link">
                     <div class="messenger-icon-box">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.3 8.38 8.38 0 0 1 3.8.9L21 3.5Z"></path></svg>
                     </div>
-                    <span>WhatsApp</span>
+                    <span>WhatsApp<br><small style="font-size:10px; color:#999; letter-spacing:1px; margin-top:4px; display:block;">+380 73 600 7800</small></span>
                 </a>
             </div>
         </div>
