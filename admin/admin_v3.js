@@ -2791,9 +2791,6 @@ async function loadServicePricesUI() {
                     <div style="width:150px;">
                         <input type="text" value="${escapeAttr(p.price_display)}" onchange="updatePriceItem('${p.id}', 'price_display', this.value)" style="font-weight:bold;" placeholder="Ціна (напр. 500 ₴)">
                     </div>
-                    <div style="width:70px;">
-                        <input type="number" value="${p.sort_order || 0}" onchange="updatePriceItem('${p.id}', 'sort_order', this.value)" title="Сортування (менше число = вище)">
-                    </div>
                     <button class="btn btn-danger" style="padding:10px 15px;" onclick="deletePriceItem('${p.id}')">❌</button>
                 </div>`;
             });

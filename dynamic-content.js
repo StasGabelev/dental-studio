@@ -133,21 +133,13 @@
                 if (listEl) {
                     let html = '';
                     items.forEach(item => {
-                        html += `<div class="price-item">
-                                    <div class="price-name">${item.name_uk}</div>
-                                    <div class="price-dots"></div>
-                                    <div class="price-value">${item.price_display}</div>
+                        html += `<div class="price-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 15px;">
+                                    <div class="price-name" style="flex: 1; min-width: 150px;">${item.name_uk}</div>
+                                    <div class="price-dots" style="flex-grow: 1; border-bottom: 1px dashed #e8ddd0; margin: 0 10px;"></div>
+                                    <div class="price-value" style="font-weight: 500; white-space: nowrap;">${item.price_display}</div>
+                                    <a href="#contacts" class="btn-primary" style="padding: 8px 16px; font-size: 13px; text-decoration: none; border-radius: 4px; white-space: nowrap; flex-shrink: 0;" onclick="if(window.openContactModal) { openContactModal(); return false; }">Записатися</a>
                                  </div>`;
                     });
-                    
-                    // Keep the "book consultation" button if it exists in the original HTML
-                    const bookBtn = listEl.querySelector('.btn-primary, .btn-primary-dark');
-                    if (bookBtn) {
-                        html += bookBtn.outerHTML;
-                    } else {
-                        // Fallback button if we wiped it out
-                        html += `<a href="#" class="btn-primary" data-cms="btn-book-short" onclick="openContactModal(); return false;">Записатися</a>`;
-                    }
                     
                     listEl.innerHTML = html;
                 }
