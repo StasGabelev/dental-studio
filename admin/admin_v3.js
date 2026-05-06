@@ -1474,6 +1474,10 @@ function renderCases() {
             <div class="case-card-actions">
                 <button class="btn-primary" onclick="editCase(${i})">✏️ Редагувати</button>
                 <button class="btn-danger" onclick="deleteCase(${i})">🗑️</button>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px; color:${c.show_on_homepage ? '#B8924A' : '#888'};" title="Показувати на головній">
+                    <input type="checkbox" ${c.show_on_homepage ? 'checked' : ''} onchange="toggleHomepage(${i}, this.checked)" style="accent-color:#B8924A; width:16px; height:16px;">
+                    ⭐
+                </label>
             </div>
         </div>`;
     });
@@ -1545,10 +1549,6 @@ function renderFullCaseEditor() {
                     <div class="card-field-group">
                         <label class="card-field-label">Опис кейсу (під заголовком)</label>
                         <textarea rows="3" onchange="cases[${editingCaseIndex}].description_uk=this.value">${escapeHtml(c.description_uk || '')}</textarea>
-                    </div>
-                    <div class="card-field-group" style="display:flex; align-items:center; gap:12px; padding:12px 0;">
-                        <input type="checkbox" id="chk-homepage-${editingCaseIndex}" ${c.show_on_homepage ? 'checked' : ''} onchange="cases[${editingCaseIndex}].show_on_homepage=this.checked" style="width:20px; height:20px; accent-color: #B8924A;">
-                        <label for="chk-homepage-${editingCaseIndex}" class="card-field-label" style="margin:0; cursor:pointer;">⭐ Показувати на головній сторінці</label>
                     </div>
                 </div>
 
@@ -1706,6 +1706,21 @@ async function deleteCase(index) {
     cases.splice(index, 1);
     renderCases();
     showToast('🗑️ Кейс видалено');
+}
+
+async function toggleHomepage(index, checked) {
+    cases[index].show_on_homepage = checked;
+    const c = cases[index];
+    if (sb && c.id && !String(c.id).startsWith('new_')) {
+        try {
+            const { error } = await sb.from('treatment_cases').update({ show_on_homepage: checked }).eq('id', c.id);
+            if (error) throw error;
+            showToast(checked ? '⭐ Додано на головну' : '❌ Прибрано з головної');
+        } catch (e) {
+            showToast('❌ Помилка: ' + e.message);
+        }
+    }
+    renderCases();
 }
 
 async function uploadCaseMedia(index, field) {
