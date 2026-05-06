@@ -224,6 +224,7 @@ const PAGE_SCHEMA = {
         { "label": "ХЕДДЕР ПОСЛУГИ", "type": "heading" },
         { "key": "img-services-hero", "label": "🖼️ Головне фото (Hero)", "type": "image" },
         { "key": "services-hero-title", "label": "Головний заголовок сторінки", "type": "textarea" },
+        { "key": "services-hero-subtitle", "label": "Підзаголовок сторінки", "type": "textarea" },
 
         { "label": "ЕСТЕТИЧНА СТОМАТОЛОГІЯ", "type": "heading" },
         { "key": "feat-aesthetic", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
