@@ -78,20 +78,23 @@
                             }
                         }
                     });
-                } else if ((item.content_type === 'image' || item.content_type === 'video') && item.media_url) {
+                } else if (item.content_type === 'image' || item.content_type === 'video') {
                     // Update media sources
                     const mediaEl = document.getElementById(item.section_key);
                     if (mediaEl) {
                         if (mediaEl.tagName === 'IMG') {
-                            mediaEl.src = item.media_url;
+                            if (item.media_url) mediaEl.src = item.media_url;
                         } else if (mediaEl.tagName === 'VIDEO') {
                             const source = mediaEl.querySelector('source');
-                            if (source) {
+                            if (source && item.media_url) {
+                                // Show the container (hidden by default for service videos)
+                                const wrapper = mediaEl.closest('.accordion-content-media');
+                                if (wrapper) wrapper.style.display = '';
                                 source.src = item.media_url;
                                 mediaEl.load();
                                 mediaEl.play().catch(e => console.warn('Autoplay prevented:', e));
                             }
-                        } else if (mediaEl.tagName === 'DIV' || mediaEl.tagName === 'SECTION') {
+                        } else if ((mediaEl.tagName === 'DIV' || mediaEl.tagName === 'SECTION') && item.media_url) {
                             mediaEl.style.backgroundImage = `url('${item.media_url}')`;
                         }
                     }

@@ -225,6 +225,7 @@ const PAGE_SCHEMA = {
         { "key": "feat-aesthetic", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
         { "key": "svc-consult-title", "label": "Консультація", "type": "text" },
         { "key": "svc-consult-desc", "label": "Консультація — Опис", "type": "textarea" },
+        { "key": "vid-svc-consult-aesthetic", "label": "🎬 Відео: Консультація", "type": "video" },
         { "key": "price-consult-general", "label": "Назва: Загальна консультація", "type": "text" },
         { "key": "price-consult-general-val", "label": "💰 Ціна: Загальна консультація", "type": "text" },
         { "key": "price-consult-modjaw", "label": "Назва: Діагностика MODJAW", "type": "text" },
@@ -235,6 +236,7 @@ const PAGE_SCHEMA = {
 
         { "key": "svc-composite-veneer-title", "label": "Композитні вініри — Заголовок", "type": "text" },
         { "key": "svc-composite-veneer-desc", "label": "Композитні вініри — Опис", "type": "textarea" },
+        { "key": "vid-svc-composite-veneer", "label": "🎬 Відео: Композитні вініри", "type": "video" },
         { "key": "price-frontal-restoration", "label": "Назва: Реставрація фронтального зуба", "type": "text" },
         { "key": "price-frontal-restoration-val", "label": "💰 Ціна: Реставрація фронт. зуба", "type": "text" },
         { "key": "price-art-restoration", "label": "Назва: Художня реставрація", "type": "text" },
@@ -242,6 +244,7 @@ const PAGE_SCHEMA = {
 
         { "key": "svc-ceramic-restoration-title", "label": "Керамічні реставрації — Заголовок", "type": "textarea" },
         { "key": "svc-ceramic-restoration-desc", "label": "Керамічні реставрації — Опис", "type": "textarea" },
+        { "key": "vid-svc-ceramic-restoration", "label": "🎬 Відео: Керамічні реставрації", "type": "video" },
         { "key": "price-veneer-digital", "label": "Назва: Вінір (digital)", "type": "text" },
         { "key": "price-veneer-digital-val", "label": "💰 Ціна: Вінір (digital)", "type": "text" },
         { "key": "price-veneer-layering", "label": "Назва: Вінір (digital + нашарування)", "type": "text" },
@@ -261,8 +264,10 @@ const PAGE_SCHEMA = {
 
         { "label": "ЛІКУВАННЯ ЗУБІВ", "type": "heading" },
         { "key": "feat-therapy", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
+        { "key": "vid-svc-consult-therapy", "label": "🎬 Відео: Консультація", "type": "video" },
         { "key": "svc-endo-title", "label": "Ендодонтія", "type": "text" },
         { "key": "svc-endo-desc", "label": "Ендодонтія — Опис", "type": "textarea" },
+        { "key": "vid-svc-endo", "label": "🎬 Відео: Ендодонтія", "type": "video" },
         { "key": "price-endo-incisor", "label": "Назва: Лікування кореневих каналів (різці, ікла)", "type": "text" },
         { "key": "price-endo-incisor-val", "label": "💰 Ціна: Канали (різці, ікла)", "type": "text" },
         { "key": "price-endo-premolar", "label": "Назва: Лікування кореневих каналів (премоляри)", "type": "text" },
@@ -272,6 +277,7 @@ const PAGE_SCHEMA = {
 
         { "key": "svc-caries-title", "label": "Лікування карієсу", "type": "text" },
         { "key": "svc-caries-desc", "label": "Лікування карієсу — Опис", "type": "textarea" },
+        { "key": "vid-svc-caries", "label": "🎬 Відео: Лікування карієсу", "type": "video" },
         { "key": "price-caries-1", "label": "Назва: Лікування карієсу - І рівень складності", "type": "text" },
         { "key": "price-caries-1-val", "label": "💰 Ціна: Карієс І рівень", "type": "text" },
         { "key": "price-caries-2", "label": "Назва: Лікування карієсу - ІI рівень складності", "type": "text" },
@@ -281,6 +287,7 @@ const PAGE_SCHEMA = {
 
         { "key": "svc-periodontal-title", "label": "Пародонтологічне лікування", "type": "text" },
         { "key": "svc-periodontal-desc", "label": "Пародонтологічне лікування — Опис", "type": "textarea" },
+        { "key": "vid-svc-periodontal", "label": "🎬 Відео: Пародонтологічне лікування", "type": "video" },
         { "key": "price-periodont-1", "label": "Назва: Лікування пародонтиту - І ступінь", "type": "text" },
         { "key": "price-periodont-1-val", "label": "💰 Ціна: Пародонтит І ступінь", "type": "text" },
         { "key": "price-periodont-2", "label": "Назва: Лікування пародонтиту - ІІ ступінь", "type": "text" },
@@ -290,6 +297,7 @@ const PAGE_SCHEMA = {
 
         { "key": "svc-hygiene-title", "label": "Професійна гігієна зубів", "type": "text" },
         { "key": "svc-hygiene-desc", "label": "Професійна гігієна зубів — Опис", "type": "textarea" },
+        { "key": "vid-svc-hygiene", "label": "🎬 Відео: Гігієна зубів", "type": "video" },
         { "key": "price-hygiene", "label": "Назва: Професійна гігієна", "type": "text" },
         { "key": "price-hygiene-val", "label": "💰 Ціна: Професійна гігієна", "type": "text" },
         { "key": "price-hygiene-smoker", "label": "Назва: Професійна гігієна (наліт курця)", "type": "text" },
@@ -297,14 +305,17 @@ const PAGE_SCHEMA = {
 
         { "key": "svc-whitening-title", "label": "Відбілювання зубів", "type": "text" },
         { "key": "svc-whitening-desc", "label": "Відбілювання зубів — Опис", "type": "textarea" },
+        { "key": "vid-svc-whitening", "label": "🎬 Відео: Відбілювання зубів", "type": "video" },
         { "key": "price-whitening", "label": "Назва: Відбілювання", "type": "text" },
         { "key": "price-whitening-val", "label": "💰 Ціна: Відбілювання", "type": "text" },
 
 
         { "label": "ХІРУРГІЯ", "type": "heading" },
         { "key": "feat-surgery", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
+        { "key": "vid-svc-consult-surgery", "label": "🎬 Відео: Консультація", "type": "video" },
         { "key": "svc-implant-title", "label": "Імплантація — Заголовок", "type": "text" },
         { "key": "svc-implant-desc", "label": "Імплантація — Опис", "type": "textarea" },
+        { "key": "vid-svc-implant", "label": "🎬 Відео: Імплантація", "type": "video" },
         { "key": "price-implant-neodent", "label": "Назва: Імплант NEODENT", "type": "text" },
         { "key": "price-implant-neodent-val", "label": "💰 Ціна: Імплант NEODENT", "type": "text" },
         { "key": "price-implant-sla", "label": "Назва: Імплант STRAUMANN SLA", "type": "text" },
@@ -318,6 +329,7 @@ const PAGE_SCHEMA = {
 
         { "key": "svc-extraction-title", "label": "Видалення зубів — Заголовок", "type": "text" },
         { "key": "svc-extraction-desc", "label": "Видалення зубів — Опис", "type": "textarea" },
+        { "key": "vid-svc-extraction", "label": "🎬 Відео: Видалення зубів", "type": "video" },
         { "key": "price-extraction", "label": "Назва: Видалення зуба", "type": "text" },
         { "key": "price-extraction-val", "label": "💰 Ціна: Видалення зуба", "type": "text" },
         { "key": "price-extraction-atypical-1", "label": "Назва: Атипове видалення (просте)", "type": "text" },
@@ -329,6 +341,7 @@ const PAGE_SCHEMA = {
 
         { "key": "svc-gum-surgery-title", "label": "Хірургія ясен — Заголовок", "type": "textarea" },
         { "key": "svc-gum-surgery-desc", "label": "Хірургія ясен — Опис", "type": "textarea" },
+        { "key": "vid-svc-gum-surgery", "label": "🎬 Відео: Хірургія ясен", "type": "video" },
         { "key": "price-gum-smile", "label": "Назва: Усунення ясеневої посмішки", "type": "text" },
         { "key": "price-gum-smile-val", "label": "💰 Ціна: Усунення ясенної посмішки", "type": "text" },
         { "key": "price-recession", "label": "Назва: Закриття рецесій", "type": "text" },
@@ -338,8 +351,10 @@ const PAGE_SCHEMA = {
 
         { "label": "ОРТОДОНТІЯ", "type": "heading" },
         { "key": "feat-ortho", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
+        { "key": "vid-svc-consult-ortho", "label": "🎬 Відео: Консультація", "type": "video" },
         { "key": "svc-braces-title", "label": "Брекети — Заголовок", "type": "text" },
         { "key": "svc-braces-desc", "label": "Брекети — Опис", "type": "textarea" },
+        { "key": "vid-svc-braces", "label": "🎬 Відео: Лікування брекетами", "type": "video" },
         { "key": "price-braces-metal", "label": "Назва: Брекети (метал)", "type": "text" },
         { "key": "price-braces-metal-val", "label": "💰 Ціна: Брекети (метал)", "type": "text" },
         { "key": "price-braces-ceramic", "label": "Назва: Брекети (кераміка)", "type": "text" },
@@ -353,13 +368,16 @@ const PAGE_SCHEMA = {
 
         { "key": "svc-aligners-title", "label": "Елайнери — Заголовок", "type": "text" },
         { "key": "svc-aligners-desc", "label": "Елайнери — Опис", "type": "textarea" },
+        { "key": "vid-svc-aligners", "label": "🎬 Відео: Лікування елайнерами", "type": "video" },
         { "key": "price-aligners", "label": "Назва: Лікування елайнерами", "type": "text" },
         { "key": "price-aligners-val", "label": "💰 Ціна: Лікування елайнерами", "type": "text" },
 
         { "label": "ДИТЯЧА СТОМАТОЛОГІЯ", "type": "heading" },
         { "key": "feat-children", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
+        { "key": "vid-svc-consult-children", "label": "🎬 Відео: Консультація", "type": "video" },
         { "key": "svc-children-caries-title", "label": "Карієс у дітей — Заголовок", "type": "text" },
         { "key": "svc-children-caries-desc", "label": "Карієс у дітей — Опис", "type": "textarea" },
+        { "key": "vid-svc-children-caries", "label": "🎬 Відео: Карієс у дітей", "type": "video" },
         { "key": "price-children-consult", "label": "Назва: Консультація дитячого стоматолога", "type": "text" },
         { "key": "price-children-consult-val", "label": "💰 Ціна: Консультація дитячого стоматолога", "type": "text" },
         { "key": "price-children-caries-milk", "label": "Назва: Карієс молочного зуба", "type": "text" },
@@ -368,14 +386,17 @@ const PAGE_SCHEMA = {
         { "key": "price-children-caries-perm-val", "label": "💰 Ціна: Карієс постійного зуба (дитина)", "type": "text" },
         { "key": "svc-children-hygiene-title", "label": "Дитяча гігієна — Заголовок", "type": "text" },
         { "key": "svc-children-hygiene-desc", "label": "Дитяча гігієна — Опис", "type": "textarea" },
+        { "key": "vid-svc-children-hygiene", "label": "🎬 Відео: Дитяча гігієна", "type": "video" },
         { "key": "price-children-hygiene", "label": "Назва: Дитяча гігієна", "type": "text" },
         { "key": "price-children-hygiene-val", "label": "💰 Ціна: Дитяча гігієна", "type": "text" },
         { "key": "svc-children-sealants-title", "label": "Герметизація фісур — Заголовок", "type": "text" },
         { "key": "svc-children-sealants-desc", "label": "Герметизація фісур — Опис", "type": "textarea" },
+        { "key": "vid-svc-children-sealants", "label": "🎬 Відео: Герметизація фісур", "type": "video" },
         { "key": "price-children-sealants", "label": "Назва: Герметизація фісур", "type": "text" },
         { "key": "price-children-sealants-val", "label": "💰 Ціна: Герметизація фісур", "type": "text" },
         { "key": "svc-children-extraction-title", "label": "Видалення молочного зуба — Заголовок", "type": "text" },
         { "key": "svc-children-extraction-desc", "label": "Видалення молочного зуба — Опис", "type": "textarea" },
+        { "key": "vid-svc-children-extraction", "label": "🎬 Відео: Видалення молочного зуба", "type": "video" },
         { "key": "price-children-extraction", "label": "Назва: Видалення молочного зуба", "type": "text" },
         { "key": "price-children-extraction-val", "label": "💰 Ціна: Видалення молочного зуба", "type": "text" },
 
