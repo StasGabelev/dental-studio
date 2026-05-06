@@ -418,6 +418,21 @@ button { font-family: var(--font-sans); }
     padding-right: 60px;
 }
 
+.hero-layout-bottom {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 60px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .hero-layout-bottom {
+        padding-bottom: 10px; /* Force the button much closer to the bottom on mobile */
+    }
+}
+
 .hero__content h1 {
     font-family: var(--font-serif);
     font-size: 76px;
