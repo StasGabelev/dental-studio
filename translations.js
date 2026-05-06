@@ -24,7 +24,7 @@ const translations = {
         // Hero
         "hero-title": "Стоматологія, якій довіряють",
         "hero-subtitle": "Естетика і точність - у кожному рішенні.<br>Ваша усмішка - наша відповідальність.",
-        "services-hero-title": "Послуги",
+        "services-hero-title": "Естетичне та функціональне відновлення зубів",
         "services-hero-subtitle": "Ми пропонуємо повний спектр стоматологіческих послуг для вашого здоров'я та краси.",
         
         // Features
@@ -221,7 +221,7 @@ const translations = {
         // Hero
         "hero-title": "DENTISTRY YOU CAN TRUST",
         "hero-subtitle": "Aesthetics and precision in every decision.<br>Your smile is our responsibility.",
-        "services-hero-title": "Services",
+        "services-hero-title": "Aesthetic and Functional Tooth Restoration",
         "services-hero-subtitle": "We offer a full range of dental services for your health and beauty.",
         
         // Features

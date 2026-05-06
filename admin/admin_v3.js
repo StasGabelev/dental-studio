@@ -221,8 +221,11 @@ const PAGE_SCHEMA = {
         { "key": "about-team-title", "label": "Заголовок команди (Лікарі налаштовуються у розділі 'Лікарі')", "type": "text" }
     ],
         "services": [
-        { "label": "ЕСТЕТИЧНА СТОМАТОЛОГІЯ", "type": "heading" },
+        { "label": "ХЕДДЕР ПОСЛУГИ", "type": "heading" },
         { "key": "img-services-hero", "label": "🖼️ Головне фото (Hero)", "type": "image" },
+        { "key": "services-hero-title", "label": "Головний заголовок сторінки", "type": "textarea" },
+
+        { "label": "ЕСТЕТИЧНА СТОМАТОЛОГІЯ", "type": "heading" },
         { "key": "feat-aesthetic", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
         { "key": "svc-consult-title", "label": "Консультація", "type": "text" },
         { "key": "svc-consult-desc", "label": "Консультація — Опис", "type": "textarea" },
