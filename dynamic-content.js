@@ -133,10 +133,10 @@
                 if (listEl) {
                     let html = '';
                     items.forEach(item => {
-                        html += `<div class="price-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 15px;">
-                                    <div class="price-name" style="flex: 1; min-width: 150px;">${item.name_uk}</div>
-                                    <div class="price-dots" style="flex-grow: 1; border-bottom: 1px dashed #e8ddd0; margin: 0 10px;"></div>
-                                    <div class="price-value" style="font-weight: 500; white-space: nowrap;">${item.price_display}</div>
+                        html += `<div class="price-item">
+                                    <div class="price-name">${item.name_uk}</div>
+                                    <div class="price-dots"></div>
+                                    <div class="price-value">${item.price_display}</div>
                                     <a href="#contacts" class="price-item-btn" onclick="if(window.openContactHub) { openContactHub(); return false; }">Записатися</a>
                                  </div>`;
                     });

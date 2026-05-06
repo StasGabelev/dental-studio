@@ -143,9 +143,10 @@
             @keyframes think { from { opacity: 0.3; transform: scale(0.8); } to { opacity: 1; transform: scale(1.1); } }
 
             @media (max-width: 480px) {
-                .ds-chat-window { bottom: 0; right: 0; width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
-                .ds-chat-launcher { bottom: 20px; right: 20px; width: 55px; height: 55px; }
-                .ds-chat-header { padding: 20px; }
+                .ds-chat-window { bottom: 0; right: 0; width: 100%; height: 100%; max-height: 100%; border-radius: 0; z-index: 999999; }
+                .ds-chat-launcher { bottom: 15px; right: 15px; width: 50px; height: 50px; z-index: 99999; }
+                .ds-chat-launcher svg { width: 24px; height: 24px; }
+                .ds-chat-header { padding: 15px; }
             }
         `;
         document.head.appendChild(style);

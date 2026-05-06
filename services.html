@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="uk">
 
@@ -107,21 +107,24 @@
 
 
         .service-huge-title {
-
             font-family: 'Bodoni Moda', serif;
-
             font-size: 64px;
-
             font-weight: 400;
-
             color: #1A1A1A;
-
             line-height: 1.0;
-
-            margin-bottom: 36px;
-
+            margin-bottom: 24px;
             letter-spacing: -0.5px;
+        }
 
+        .service-hero-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 300;
+            line-height: 1.8;
+            color: #555;
+            max-width: 480px;
+            margin-bottom: 48px;
+            letter-spacing: 0.5px;
         }
 
 
@@ -171,55 +174,64 @@
 
 
         @media (max-width: 900px) {
-
             .service-fullscreen-hero {
-
-                flex-direction: column;
-
-                padding-top: 80px;
-
+                flex-direction: column !important;
+                height: auto !important;
+                min-height: auto !important;
+                padding-top: 80px !important;
+                display: flex !important;
+                background: #fff !important;
             }
-
-
-
-            .service-hero-left {
-
-                flex: none;
-
-                height: 50vh;
-
-                padding: 0 20px;
-
-                text-align: center;
-
-                align-items: center;
-
-                justify-content: flex-end;
-
-                padding-bottom: 40px;
-
-            }
-
-
 
             .service-hero-right {
-
-                flex: none;
-
-                height: 50vh;
-
-                order: -1;
-
+                flex: none !important;
+                width: 100% !important;
+                height: auto !important;
+                order: -1 !important;
+                background: #fff !important;
+                padding: 0 !important;
             }
 
+            .service-hero-right img {
+                width: 100% !important;
+                height: auto !important;
+                max-height: 60vh !important;
+                object-fit: contain !important;
+                object-position: center top !important;
+                -webkit-mask-image: none !important;
+                mask-image: none !important;
+                display: block !important;
+            }
 
+            .service-hero-left {
+                flex: none !important;
+                width: 100% !important;
+                height: auto !important;
+                padding: 40px 20px 60px !important;
+                text-align: center !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                background: #fff !important;
+                z-index: 2 !important;
+            }
 
             .service-huge-title {
-
-                font-size: 34px;
-
+                font-family: 'Bodoni Moda', serif !important;
+                font-size: 32px !important;
+                margin-bottom: 20px !important;
+                line-height: 1.2 !important;
+                color: #1a1a1a !important;
             }
 
+            .service-hero-subtitle {
+                font-size: 15px !important;
+                margin-bottom: 30px !important;
+                max-width: 100% !important;
+                color: #555 !important;
+                line-height: 1.6 !important;
+            }
         }
 
     </style>

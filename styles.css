@@ -2112,6 +2112,30 @@ button { font-family: var(--font-sans); }
     margin-left: 8px;
 }
 
+/* Shared Price Item Styles */
+.price-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 15px;
+}
+.price-name {
+    flex: 1;
+    min-width: 120px;
+    font-size: 14px;
+}
+.price-dots {
+    flex-grow: 1;
+    border-bottom: 1px dashed #e8ddd0;
+    margin: 0 10px;
+}
+.price-value {
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 15px;
+}
+
 .price-item-right {
     display: flex;
     align-items: center;
@@ -2411,9 +2435,11 @@ button { font-family: var(--font-sans); }
         transform: none;
         text-align: left;
     }
+    .logo-top { font-size: 16px; letter-spacing: 3px; }
+    .logo-bottom { font-size: 8px; letter-spacing: 2px; }
 
     /* Right side: flex end for icons and burger */
-    .header__right { gap: 12px; }
+    .header__right { gap: 10px; }
 
     .mobile-menu-btn {
         display: flex !important;
@@ -2421,18 +2447,19 @@ button { font-family: var(--font-sans); }
         justify-content: center;
         align-items: center;
         gap: 5px;
-        width: 30px;
-        height: 30px;
+        width: 35px;
+        height: 35px;
         background: none;
         border: none;
         cursor: pointer;
         z-index: 10001;
         flex-shrink: 0;
+        margin-right: -5px; /* Adjust for padding to align with right edge */
     }
 
     .mobile-menu-btn span {
         display: block;
-        width: 24px;
+        width: 20px;
         height: 1.5px;
         background: var(--text-dark);
         transition: all 0.3s ease;
@@ -2597,6 +2624,32 @@ button { font-family: var(--font-sans); }
         letter-spacing: 2px;
         text-transform: uppercase;
     }
+
+    /* ── Price List Mobile Fix ───────────────── */
+    .accordion-price-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        padding: 20px 0 !important;
+    }
+    .price-item-right {
+        width: 100% !important;
+        justify-content: space-between !important;
+        gap: 10px !important;
+    }
+    .price-item-name {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+    }
+    /* Fix for dynamic items from JS */
+    .price-item {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        padding: 15px 0 !important;
+        border-bottom: 1px solid rgba(184, 146, 74, 0.1) !important;
+    }
+    .price-dots { display: none !important; }
 }
 
 @media (max-width: 480px) {
