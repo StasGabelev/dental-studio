@@ -267,26 +267,37 @@
     // --- Load dynamic cases ---
     try {
         // Homepage preview (works__grid on index.html)
-        /* 
-        const worksGrid = document.querySelector('.works__grid');
+        const worksGrid = document.getElementById('works-grid-dynamic');
         if (worksGrid) {
-            const { data: homeCases } = await sbClient.from('treatment_cases')
-                .select('*').eq('is_published', true).order('sort_order').limit(4);
+            // Try fetching featured cases first, fallback to first 4 published
+            let homeCases = null;
+            try {
+                const { data } = await sbClient.from('treatment_cases')
+                    .select('*').eq('is_published', true).eq('show_on_homepage', true).order('sort_order').limit(4);
+                if (data && data.length > 0) homeCases = data;
+            } catch(e) { /* show_on_homepage column might not exist yet */ }
+
+            if (!homeCases) {
+                const { data } = await sbClient.from('treatment_cases')
+                    .select('*').eq('is_published', true).order('sort_order').limit(4);
+                homeCases = data;
+            }
 
             if (homeCases && homeCases.length > 0) {
                 let html = '';
                 homeCases.forEach(c => {
-                    const img = c.hero_image_url || c.before_image_url || '';
+                    const img = c.main_image_url || c.before_image_url || '';
                     if (img) {
-                        html += `<div class="works__item" onclick="location.href='case-db.html?id=${c.id}'" style="cursor:pointer;">
+                        html += `<div class="works__item" onclick="location.href='case.html?id=${c.slug || c.id}'" style="cursor:pointer;">
                             <img src="${img}" alt="${c.title_uk || 'Кейс'}">
                         </div>`;
                     }
                 });
                 if (html) worksGrid.innerHTML = html;
+            } else {
+                worksGrid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:40px; color:#999;">Роботи скоро з\'являться...</p>';
             }
         }
-        */
 
         // Full cases page — render from Supabase
         const casesGridFull = document.querySelector('.cases-grid');

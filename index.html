@@ -11,8 +11,8 @@
     <meta property="og:description" content="Dental Studio — преміальна стоматологічна клініка в Чернігові. Імпланти, вінири, відбілювання, ортодонтія. Запис онлайн.">
     <meta property="og:image" content="https://dentstudio.in.ua/assets/dental-2.png">
     <meta property="og:locale" content="uk_UA">
-    <title data-i18n="home-page-title">Dental Studio — Стоматологічна клініка в Чернігові</title>    <link rel="stylesheet" href="styles.css?v=v1.31.54">
-    <script src="translations.js?v=v1.31.54"></script>
+    <title data-i18n="home-page-title">Dental Studio — Стоматологічна клініка в Чернігові</title>    <link rel="stylesheet" href="styles.css?v=v1.31.55">
+    <script src="translations.js?v=v1.31.55"></script>
 </head>
 <body>
 
@@ -140,18 +140,10 @@
                 <div class="works-header">
                     <h2 class="works-title" data-i18n="works-title">НАШІ РОБОТИ</h2>
                 </div>
-                <div class="works__grid">
-                    <div class="works__item" onclick="location.href='case-1.html'">
-                        <img src="https://storage.googleapis.com/tokar_clinic_site/patients/MelnykAnna/preview.jpg" alt="Case 1">
-                    </div>
-                    <div class="works__item" onclick="location.href='case-1.html'">
-                        <img src="https://storage.googleapis.com/tokar_clinic_site/patients/ShmakovaTania/preview.jpg" alt="Case 2">
-                    </div>
-                    <div class="works__item" onclick="location.href='case-3.html'">
-                        <img src="https://storage.googleapis.com/tokar_clinic_site/patients/PavlykIra/preview.jpg" alt="Case 3">
-                    </div>
-                    <div class="works__item" onclick="location.href='case-4.html'">
-                        <img src="https://storage.googleapis.com/tokar_clinic_site/patients/DenysovaOlena/preview.jpg" alt="Case 4">
+                <div class="works__grid" id="works-grid-dynamic">
+                    <!-- Dynamically loaded from Supabase -->
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px 0;">
+                        <div class="spinner" style="margin: 0 auto;"></div>
                     </div>
                 </div>
                 <!-- Restored Button -->
@@ -364,12 +356,12 @@
         }
     </script>
 
-    <script src="components.js?v=v1.31.54"></script>
-    <script src="main.js?v=v1.31.54"></script>
+    <script src="components.js?v=v1.31.55"></script>
+    <script src="main.js?v=v1.31.55"></script>
 
     <!-- Supabase & Dynamic Content Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="dynamic-content.js?v=v1.31.54"></script>
-    <script src="chat-widget.js?v=v1.31.54"></script>
+    <script src="dynamic-content.js?v=v1.31.55"></script>
+    <script src="chat-widget.js?v=v1.31.55"></script>
 </body>
 </html>

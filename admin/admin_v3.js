@@ -1546,6 +1546,10 @@ function renderFullCaseEditor() {
                         <label class="card-field-label">Опис кейсу (під заголовком)</label>
                         <textarea rows="3" onchange="cases[${editingCaseIndex}].description_uk=this.value">${escapeHtml(c.description_uk || '')}</textarea>
                     </div>
+                    <div class="card-field-group" style="display:flex; align-items:center; gap:12px; padding:12px 0;">
+                        <input type="checkbox" id="chk-homepage-${editingCaseIndex}" ${c.show_on_homepage ? 'checked' : ''} onchange="cases[${editingCaseIndex}].show_on_homepage=this.checked" style="width:20px; height:20px; accent-color: #B8924A;">
+                        <label for="chk-homepage-${editingCaseIndex}" class="card-field-label" style="margin:0; cursor:pointer;">⭐ Показувати на головній сторінці</label>
+                    </div>
                 </div>
 
                 <div class="editor-column">
@@ -1673,6 +1677,7 @@ async function saveCase(index) {
             after_text: c.after_text || '',
             stages: c.stages,
             is_published: true,
+            show_on_homepage: c.show_on_homepage || false,
             sort_order: index
         };
 
