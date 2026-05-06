@@ -22,8 +22,8 @@ const translations = {
         "btn-book-short": "Записатися",
         
         // Hero
-        "hero-title": "ІННОВАЦІЇ, ЕСТЕТИКА, КОМФОРТ🤍",
-        "hero-subtitle": "Від ідеальної гігієни до імплантів 'під ключ'.",
+        "hero-title": "Стоматологія, якій довіряють",
+        "hero-subtitle": "Естетика і точність - у кожному рішенні.<br>Ваша усмішка - наша відповідальність.",
         "services-hero-title": "Послуги",
         "services-hero-subtitle": "Ми пропонуємо повний спектр стоматологіческих послуг для вашого здоров'я та краси.",
         
@@ -219,8 +219,8 @@ const translations = {
         "btn-book-short": "Book Now",
         
         // Hero
-        "hero-title": "INNOVATION, AESTHETICS, COMFORT🤍",
-        "hero-subtitle": "From ideal hygiene to 'turnkey' implants.",
+        "hero-title": "DENTISTRY YOU CAN TRUST",
+        "hero-subtitle": "Aesthetics and precision in every decision.<br>Your smile is our responsibility.",
         "services-hero-title": "Services",
         "services-hero-subtitle": "We offer a full range of dental services for your health and beauty.",
         
