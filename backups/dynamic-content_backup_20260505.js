@@ -78,30 +78,20 @@
                             }
                         }
                     });
-                } else if (item.content_type === 'image' || item.content_type === 'video') {
+                } else if ((item.content_type === 'image' || item.content_type === 'video') && item.media_url) {
                     // Update media sources
-                    let mediaEl = document.getElementById(item.section_key);
+                    const mediaEl = document.getElementById(item.section_key);
                     if (mediaEl) {
-                        // Check if this is a video container (ID on DIV wrapping a VIDEO)
-                        const internalVideo = mediaEl.tagName === 'DIV' ? mediaEl.querySelector('video') : (mediaEl.tagName === 'VIDEO' ? mediaEl : null);
-                        
                         if (mediaEl.tagName === 'IMG') {
-                            if (item.media_url) mediaEl.src = item.media_url;
-                        } else if (internalVideo) {
-                            const source = internalVideo.querySelector('source');
-                            if (source && item.media_url) {
-                                // Show the container (in case it was display:none)
-                                if (mediaEl.tagName === 'DIV') {
-                                    mediaEl.style.display = '';
-                                } else {
-                                    const wrapper = mediaEl.closest('.accordion-content-media');
-                                    if (wrapper) wrapper.style.display = '';
-                                }
+                            mediaEl.src = item.media_url;
+                        } else if (mediaEl.tagName === 'VIDEO') {
+                            const source = mediaEl.querySelector('source');
+                            if (source) {
                                 source.src = item.media_url;
-                                internalVideo.load();
-                                internalVideo.play().catch(e => console.warn('Autoplay prevented:', e));
+                                mediaEl.load();
+                                mediaEl.play().catch(e => console.warn('Autoplay prevented:', e));
                             }
-                        } else if ((mediaEl.tagName === 'DIV' || mediaEl.tagName === 'SECTION') && item.media_url) {
+                        } else if (mediaEl.tagName === 'DIV' || mediaEl.tagName === 'SECTION') {
                             mediaEl.style.backgroundImage = `url('${item.media_url}')`;
                         }
                     }
@@ -112,49 +102,41 @@
         console.warn('Dynamic content load error:', e);
     }
 
-    // --- Load dynamic service prices (accordion specific) ---
+    // --- Load and display dynamic price list (if on services page) ---
     try {
-        // Fetch all prices ordered by sort_order
-        const { data: prices } = await sbClient.from('service_prices')
-            .select('*')
-            .order('sort_order', { ascending: true });
+        const priceContainer = document.getElementById('dynamic-prices');
+        if (priceContainer) {
+            const { data: prices } = await sbClient.from('price_list')
+                .select('*').eq('is_active', true).order('sort_order');
 
-        if (prices && prices.length > 0) {
-            // Group by service_group
-            const groupedPrices = {};
-            prices.forEach(p => {
-                if (!groupedPrices[p.service_group]) groupedPrices[p.service_group] = [];
-                groupedPrices[p.service_group].push(p);
-            });
+            if (prices && prices.length > 0) {
+                // Group by category
+                const categories = {};
+                prices.forEach(p => {
+                    if (!categories[p.category]) categories[p.category] = [];
+                    categories[p.category].push(p);
+                });
 
-            // Find all matching price lists on the page
-            Object.entries(groupedPrices).forEach(([group, items]) => {
-                const listEl = document.getElementById(`prices-${group}`);
-                if (listEl) {
-                    let html = '';
+                let html = '';
+                Object.entries(categories).forEach(([cat, items]) => {
+                    html += `<div class="price-category">
+                        <h3 class="price-category-title">${cat}</h3>
+                        <div class="price-items">`;
                     items.forEach(item => {
                         html += `<div class="price-item">
-                                    <div class="price-name">${escapeHtml(item.name_uk)}</div>
-                                    <div class="price-dots"></div>
-                                    <div class="price-value">${escapeHtml(item.price_display)}</div>
-                                 </div>`;
+                            <span class="price-item-name">${item.service_name_uk}</span>
+                            <span class="price-item-dots"></span>
+                            <span class="price-item-value">${item.price_display}</span>
+                        </div>`;
                     });
-                    
-                    // Keep the "book consultation" button if it exists in the original HTML
-                    const bookBtn = listEl.querySelector('.btn-primary, .btn-primary-dark');
-                    if (bookBtn) {
-                        html += bookBtn.outerHTML;
-                    } else {
-                        // Fallback button if we wiped it out
-                        html += `<a href="#" class="btn-primary" data-cms="btn-book-short" onclick="openContactModal(); return false;">Записатися</a>`;
-                    }
-                    
-                    listEl.innerHTML = html;
-                }
-            });
+                    html += `</div></div>`;
+                });
+
+                priceContainer.innerHTML = html;
+            }
         }
     } catch(e) {
-        console.warn('Service prices load error:', e);
+        console.warn('Price list load error:', e);
     }
 
     // --- Load dynamic doctors ---
