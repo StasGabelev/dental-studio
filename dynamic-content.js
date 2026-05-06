@@ -80,19 +80,26 @@
                     });
                 } else if (item.content_type === 'image' || item.content_type === 'video') {
                     // Update media sources
-                    const mediaEl = document.getElementById(item.section_key);
+                    let mediaEl = document.getElementById(item.section_key);
                     if (mediaEl) {
+                        // Check if this is a video container (ID on DIV wrapping a VIDEO)
+                        const internalVideo = mediaEl.tagName === 'DIV' ? mediaEl.querySelector('video') : (mediaEl.tagName === 'VIDEO' ? mediaEl : null);
+                        
                         if (mediaEl.tagName === 'IMG') {
                             if (item.media_url) mediaEl.src = item.media_url;
-                        } else if (mediaEl.tagName === 'VIDEO') {
-                            const source = mediaEl.querySelector('source');
+                        } else if (internalVideo) {
+                            const source = internalVideo.querySelector('source');
                             if (source && item.media_url) {
-                                // Show the container (hidden by default for service videos)
-                                const wrapper = mediaEl.closest('.accordion-content-media');
-                                if (wrapper) wrapper.style.display = '';
+                                // Show the container (in case it was display:none)
+                                if (mediaEl.tagName === 'DIV') {
+                                    mediaEl.style.display = '';
+                                } else {
+                                    const wrapper = mediaEl.closest('.accordion-content-media');
+                                    if (wrapper) wrapper.style.display = '';
+                                }
                                 source.src = item.media_url;
-                                mediaEl.load();
-                                mediaEl.play().catch(e => console.warn('Autoplay prevented:', e));
+                                internalVideo.load();
+                                internalVideo.play().catch(e => console.warn('Autoplay prevented:', e));
                             }
                         } else if ((mediaEl.tagName === 'DIV' || mediaEl.tagName === 'SECTION') && item.media_url) {
                             mediaEl.style.backgroundImage = `url('${item.media_url}')`;
