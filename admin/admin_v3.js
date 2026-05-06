@@ -222,6 +222,7 @@ const PAGE_SCHEMA = {
     ],
         "services": [
         { "label": "ЕСТЕТИЧНА СТОМАТОЛОГІЯ", "type": "heading" },
+        { "key": "img-services-hero", "label": "🖼️ Головне фото (Hero)", "type": "image" },
         { "key": "feat-aesthetic", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
         { "key": "svc-consult-title", "label": "Консультація", "type": "text" },
         { "key": "svc-consult-desc", "label": "Консультація — Опис", "type": "textarea" },

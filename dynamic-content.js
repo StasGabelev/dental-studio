@@ -137,7 +137,7 @@
                                     <div class="price-name" style="flex: 1; min-width: 150px;">${item.name_uk}</div>
                                     <div class="price-dots" style="flex-grow: 1; border-bottom: 1px dashed #e8ddd0; margin: 0 10px;"></div>
                                     <div class="price-value" style="font-weight: 500; white-space: nowrap;">${item.price_display}</div>
-                                    <a href="#contacts" class="btn-primary" style="padding: 8px 16px; font-size: 13px; text-decoration: none; border-radius: 4px; white-space: nowrap; flex-shrink: 0;" onclick="if(window.openContactModal) { openContactModal(); return false; }">Записатися</a>
+                                    <a href="#contacts" class="btn-primary" style="padding: 8px 16px; font-size: 13px; text-decoration: none; border-radius: 4px; white-space: nowrap; flex-shrink: 0;" onclick="if(window.openContactHub) { openContactHub(); return false; }">Записатися</a>
                                  </div>`;
                     });
                     
