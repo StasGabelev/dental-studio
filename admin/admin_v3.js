@@ -2784,17 +2784,17 @@ async function loadServicePricesUI() {
             let html = '';
             groupPrices.forEach(p => {
                 html += `
-                <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center; background:#fff; padding:10px; border-radius:6px; border:1px solid #eee;">
+                <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
                     <div style="flex:1;">
-                        <input type="text" value="${escapeAttr(p.name_uk)}" onchange="updatePriceItem('${p.id}', 'name_uk', this.value)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" placeholder="Назва послуги">
+                        <input type="text" value="${escapeAttr(p.name_uk)}" onchange="updatePriceItem('${p.id}', 'name_uk', this.value)" placeholder="Назва послуги">
                     </div>
                     <div style="width:150px;">
-                        <input type="text" value="${escapeAttr(p.price_display)}" onchange="updatePriceItem('${p.id}', 'price_display', this.value)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; font-weight:bold;" placeholder="Ціна (напр. 500 ₴)">
+                        <input type="text" value="${escapeAttr(p.price_display)}" onchange="updatePriceItem('${p.id}', 'price_display', this.value)" style="font-weight:bold;" placeholder="Ціна (напр. 500 ₴)">
                     </div>
                     <div style="width:70px;">
-                        <input type="number" value="${p.sort_order || 0}" onchange="updatePriceItem('${p.id}', 'sort_order', this.value)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" title="Сортування (менше число = вище)">
+                        <input type="number" value="${p.sort_order || 0}" onchange="updatePriceItem('${p.id}', 'sort_order', this.value)" title="Сортування (менше число = вище)">
                     </div>
-                    <button class="btn btn-danger" style="padding:8px 12px;" onclick="deletePriceItem('${p.id}')">❌</button>
+                    <button class="btn btn-danger" style="padding:10px 15px;" onclick="deletePriceItem('${p.id}')">❌</button>
                 </div>`;
             });
             listEl.innerHTML = html;
