@@ -134,9 +134,9 @@
                     let html = '';
                     items.forEach(item => {
                         html += `<div class="price-item">
-                                    <div class="price-name">${escapeHtml(item.name_uk)}</div>
+                                    <div class="price-name">${item.name_uk}</div>
                                     <div class="price-dots"></div>
-                                    <div class="price-value">${escapeHtml(item.price_display)}</div>
+                                    <div class="price-value">${item.price_display}</div>
                                  </div>`;
                     });
                     
