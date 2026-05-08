@@ -435,7 +435,21 @@
     };
 
     // --- Start ---
-    injectStyles();
-    buildUI();
+    async function init() {
+        try {
+            const sb = getSb();
+            if (sb) {
+                const { data } = await sb.from('site_content')
+                    .select('value_uk')
+                    .eq('page_slug', 'social')
+                    .eq('section_key', 'chatbot-enabled')
+                    .single();
+                if (data && data.value_uk === 'false') return;
+            }
+        } catch(e) {}
+        injectStyles();
+        buildUI();
+    }
+    init();
 
 })();

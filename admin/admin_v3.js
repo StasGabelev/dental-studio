@@ -597,9 +597,11 @@ async function handleLogin(e) {
             }
             console.log('Login successful!');
             currentUser = data.user;
+            window.isSuperAdmin = (data.user.email === 'sgabelev@gmail.com');
             document.getElementById('userEmail').textContent = email;
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'flex';
+            applyRoleRestrictions();
             loadDashboardData();
             return;
         } else {
@@ -721,7 +723,37 @@ const SECTION_TITLES = {
     'setup': 'Supabase',
 };
 
+const SUPER_ADMIN_SECTIONS = ['ai-settings', 'ai-hub', 'chat-logs'];
+
+function applyRoleRestrictions() {
+    if (window.isSuperAdmin) return;
+    document.querySelectorAll('.nav-item').forEach(el => {
+        const section = el.getAttribute('data-section');
+        if (SUPER_ADMIN_SECTIONS.includes(section)) {
+            el.style.opacity = '0.45';
+            el.title = 'Доступно тільки для супер-адміністратора';
+            const span = el.querySelector('span');
+            if (span && !span.textContent.includes('🔒')) span.textContent += ' 🔒';
+        }
+    });
+}
+
 function switchSection(sectionId, navEl) {
+    if (SUPER_ADMIN_SECTIONS.includes(sectionId) && !window.isSuperAdmin) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        if (navEl) navEl.classList.add('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById('sectionTitle').textContent = '🔒 Розділ заблоковано';
+        const locked = document.getElementById('sec-locked');
+        if (locked) { locked.classList.add('active'); return; }
+        const div = document.createElement('section');
+        div.id = 'sec-locked';
+        div.className = 'section active';
+        div.innerHTML = '<div style="text-align:center;padding:80px 20px;"><div style="font-size:48px;margin-bottom:16px;">🔒</div><h2 style="font-size:20px;margin-bottom:12px;color:#e0c99a;">Розділ заблоковано</h2><p style="color:#888;font-size:14px;">Цей розділ доступний тільки для супер-адміністратора.</p></div>';
+        document.querySelector('.content-area').appendChild(div);
+        return;
+    }
+
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     if (navEl) navEl.classList.add('active');
 
@@ -1839,7 +1871,49 @@ function toggleKeyVisibility() {
     input.type = input.type === 'password' ? 'text' : 'password';
 }
 
+async function loadChatbotToggle() {
+    const btn = document.getElementById('chatbotToggleBtn');
+    if (!btn || !sb) return;
+    try {
+        const { data } = await sb.from('site_content')
+            .select('value_uk')
+            .eq('page_slug', 'social')
+            .eq('section_key', 'chatbot-enabled')
+            .single();
+        const enabled = !data || data.value_uk !== 'false';
+        btn.textContent = enabled ? '👁 Чат-бот увімкнено' : '🚫 Чат-бот вимкнено';
+        btn.className = 'btn ' + (enabled ? 'btn-success' : 'btn-danger');
+        btn.dataset.enabled = enabled ? 'true' : 'false';
+    } catch(e) {
+        btn.textContent = '👁 Чат-бот увімкнено';
+        btn.dataset.enabled = 'true';
+    }
+}
+
+window.toggleChatbotVisibility = async function(btn) {
+    const nowEnabled = btn.dataset.enabled !== 'false';
+    const newVal = nowEnabled ? 'false' : 'true';
+    btn.disabled = true;
+    btn.textContent = '⏳ Збереження...';
+    try {
+        const { data: existing } = await sb.from('site_content')
+            .select('id').eq('page_slug', 'social').eq('section_key', 'chatbot-enabled').single();
+        if (existing) {
+            await sb.from('site_content').update({ value_uk: newVal }).eq('id', existing.id);
+        } else {
+            await sb.from('site_content').insert({ page_slug: 'social', section_key: 'chatbot-enabled', content_type: 'text', value_uk: newVal });
+        }
+        btn.dataset.enabled = newVal;
+        btn.textContent = newVal === 'true' ? '👁 Чат-бот увімкнено' : '🚫 Чат-бот вимкнено';
+        btn.className = 'btn ' + (newVal === 'true' ? 'btn-success' : 'btn-danger');
+    } catch(e) {
+        btn.textContent = '❌ Помилка';
+    }
+    btn.disabled = false;
+};
+
 async function loadAISettings() {
+    loadChatbotToggle();
     // Try Supabase first
     if (sb) {
         try {
