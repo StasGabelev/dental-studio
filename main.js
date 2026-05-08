@@ -323,4 +323,59 @@ document.addEventListener('DOMContentLoaded', () => {
     window.initCasesFilters();
 
     console.log("Dental Studio JS Initialized (v3 - Gold Edition)");
+
+    // Floating callback button
+    const fab = document.createElement('button');
+    fab.id = 'callback-fab';
+    fab.title = 'Замовити дзвінок';
+    fab.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z"/></svg><span>ДЗВІНОК</span>';
+    fab.onclick = function() {
+        var section = document.getElementById('callback-section');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    document.body.appendChild(fab);
 });
+
+// Callback form submit (loaded via innerHTML so must be global)
+window.submitCallbackForm = async function(e) {
+    e.preventDefault();
+    var name = document.getElementById('callback-name').value.trim();
+    var phone = document.getElementById('callback-phone').value.trim();
+    if (!name || !phone) return;
+
+    var btn = document.querySelector('.callback-btn');
+    btn.disabled = true;
+    btn.textContent = '...';
+
+    try {
+        var PUBLIC_SB_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
+        var PUBLIC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
+        var sbClient = supabase.createClient(PUBLIC_SB_URL, PUBLIC_SB_KEY);
+        var result = await sbClient.from('site_content')
+            .select('section_key, value_uk')
+            .in('section_key', ['telegram-bot-token', 'telegram-chat-id'])
+            .eq('page_slug', 'social');
+
+        var botToken = '', chatId = '';
+        if (result.data) result.data.forEach(function(row) {
+            if (row.section_key === 'telegram-bot-token') botToken = row.value_uk;
+            if (row.section_key === 'telegram-chat-id') chatId = row.value_uk;
+        });
+
+        if (botToken && chatId) {
+            var text = 'Замовлення дзвінка\nIм\'я: ' + name + '\nТелефон: ' + phone + '\nСайт: ' + window.location.hostname;
+            await fetch('https://api.telegram.org/bot' + botToken + '/sendMessage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: text })
+            });
+        }
+
+        document.getElementById('callbackForm').style.display = 'none';
+        document.getElementById('callbackSuccess').style.display = 'block';
+    } catch (err) {
+        console.warn('Callback form error:', err);
+        btn.disabled = false;
+        btn.textContent = 'ПЕРЕДЗВОНІТЬ МЕНІ';
+    }
+};

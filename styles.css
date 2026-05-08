@@ -3807,3 +3807,35 @@ main {
     letter-spacing: 1.5px;
     padding: 20px 0;
 }
+
+/* ============================================================
+   FLOATING CALLBACK BUTTON (FAB)
+============================================================ */
+#callback-fab {
+    position: fixed;
+    bottom: 32px;
+    left: 32px;
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    background: #1a1a1a;
+    color: #C5A882;
+    border: 1px solid #C5A882;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.25s, color 0.25s;
+}
+#callback-fab:hover {
+    background: #C5A882;
+    color: #fff;
+}
+#callback-fab svg { flex-shrink: 0; }
+@media (max-width: 600px) {
+    #callback-fab span { display: none; }
+    #callback-fab { padding: 14px; border-radius: 50%; bottom: 24px; left: 20px; }
+}

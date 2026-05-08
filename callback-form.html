@@ -1,6 +1,6 @@
-<section class="callback-section">
+<section class="callback-section" id="callback-section">
     <div class="container--narrow">
-        <div class="callback-inner reveal">
+        <div class="callback-inner">
             <p class="section-tag" data-i18n="callback-tag">ЗВОРОТНІЙ ЗВ'ЯЗОК</p>
             <h2 class="callback-title" data-i18n="callback-title">ЗАМОВИТИ ДЗВІНОК</h2>
             <p class="callback-subtitle" data-i18n="callback-subtitle">Залиште свій номер — ми передзвонимо вам протягом 30 хвилин</p>
@@ -13,52 +13,3 @@
         </div>
     </div>
 </section>
-
-<script>
-async function submitCallbackForm(e) {
-    e.preventDefault();
-    const name = document.getElementById('callback-name').value.trim();
-    const phone = document.getElementById('callback-phone').value.trim();
-    if (!name || !phone) return;
-
-    const btn = document.querySelector('.callback-btn');
-    btn.disabled = true;
-    btn.textContent = '...';
-
-    try {
-        const PUBLIC_SB_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
-        const PUBLIC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
-
-        const sb = supabase.createClient(PUBLIC_SB_URL, PUBLIC_SB_KEY);
-        const { data } = await sb.from('site_content')
-            .select('section_key, value_uk')
-            .in('section_key', ['telegram-bot-token', 'telegram-chat-id'])
-            .eq('page_slug', 'global');
-
-        let botToken = '', chatId = '';
-        if (data) {
-            data.forEach(row => {
-                if (row.section_key === 'telegram-bot-token') botToken = row.value_uk;
-                if (row.section_key === 'telegram-chat-id') chatId = row.value_uk;
-            });
-        }
-
-        if (botToken && chatId) {
-            const text = `📞 Замовлення дзвінка\n👤 Ім'я: ${name}\n📱 Телефон: ${phone}\n🌐 Сайт: ${window.location.hostname}`;
-            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: chatId, text })
-            });
-        }
-
-        document.getElementById('callbackForm').style.display = 'none';
-        document.getElementById('callbackSuccess').style.display = 'block';
-    } catch (err) {
-        console.warn('Callback form error:', err);
-        btn.disabled = false;
-        btn.setAttribute('data-i18n', 'callback-btn');
-        btn.textContent = document.querySelector('[data-i18n="callback-btn"]')?.textContent || 'ПЕРЕДЗВОНІТЬ МЕНІ';
-    }
-}
-</script>
