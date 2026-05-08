@@ -3839,3 +3839,20 @@ main {
     #callback-fab span { display: none; }
     #callback-fab { padding: 14px; border-radius: 50%; bottom: 24px; left: 20px; }
 }
+
+/* ─────────── GOOGLE REVIEWS ─────────── */
+.gr-header { display: flex; align-items: center; gap: 24px; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid rgba(0,0,0,0.07); flex-wrap: wrap; }
+.gr-brand { display: flex; align-items: center; gap: 8px; }
+.gr-brand-text { font-size: 14px; font-weight: 600; color: #444; letter-spacing: 0.5px; }
+.gr-summary { display: flex; align-items: center; gap: 10px; }
+.gr-score { font-size: 28px; font-weight: 700; color: #1a1a1a; line-height: 1; }
+.gr-stars { color: #fbbc05; font-size: 20px; letter-spacing: 2px; }
+.gr-count { font-size: 13px; color: #888; }
+.gr-leave-btn { margin-left: auto; padding: 10px 22px; border: 1px solid #c5a882; color: #c5a882; text-decoration: none; border-radius: 24px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; white-space: nowrap; }
+.gr-leave-btn:hover { background: #c5a882; color: #fff; }
+.rc-top { display: flex; align-items: center; gap: 12px; }
+.rc-google-logo { display: flex; align-items: center; gap: 5px; margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); }
+.rc-google-logo span { font-size: 11px; color: #aaa; letter-spacing: 0.3px; }
+@media (max-width: 768px) {
+    .gr-leave-btn { margin-left: 0; width: 100%; text-align: center; }
+}

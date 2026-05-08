@@ -557,7 +557,10 @@ const PAGE_SCHEMA = {
         { "key": "callback-tag", "label": "Форма: Тег над заголовком", "type": "text" },
         { "key": "callback-title", "label": "Форма: Заголовок", "type": "text" },
         { "key": "callback-subtitle", "label": "Форма: Підзаголовок", "type": "text" },
-        { "key": "callback-btn", "label": "Форма: Кнопка", "type": "text" }
+        { "key": "callback-btn", "label": "Форма: Кнопка", "type": "text" },
+        { "label": "GOOGLE ВІДГУКИ", "type": "heading" },
+        { "key": "google-rating", "label": "Google: Рейтинг (наприклад: 5.0)", "type": "text" },
+        { "key": "google-review-count", "label": "Google: Кількість відгуків (наприклад: (47 відгуків))", "type": "text" }
     ]
 };
 

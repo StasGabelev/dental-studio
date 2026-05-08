@@ -29,7 +29,10 @@ const translations = {
         "callback-phone-placeholder": "Номер телефону",
         "callback-btn": "ПЕРЕДЗВОНІТЬ МЕНІ",
         "callback-success": "✓ Дякуємо! Ми зв'яжемося з вами найближчим часом.",
-        
+        "google-rating": "5.0",
+        "google-review-count": "(47 відгуків)",
+        "google-leave-review": "Залишити відгук",
+
         // Hero
         "hero-title": "Стоматологія, якій довіряють",
         "hero-subtitle": "Естетика і точність - у кожному рішенні.<br>Ваша усмішка - наша відповідальність.",
@@ -229,6 +232,9 @@ const translations = {
         "callback-phone-placeholder": "Phone number",
         "callback-btn": "CALL ME BACK",
         "callback-success": "✓ Thank you! We will contact you shortly.",
+        "google-rating": "5.0",
+        "google-review-count": "(47 reviews)",
+        "google-leave-review": "Leave a review",
 
         // Footer (Contact Info)
         "footer-find-us": "WHERE TO FIND US",
