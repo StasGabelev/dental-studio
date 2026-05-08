@@ -77,7 +77,11 @@
                             
                             // 3. Auto-update tel: links if this is a phone number
                             if (el.tagName === 'A' && (el.innerHTML.includes('(') || el.innerHTML.includes('+'))) {
-                                const cleanPhone = el.innerHTML.replace(/\D/g, '');
+                                let cleanPhone = el.innerHTML.replace(/\D/g, '');
+                                // Normalize Ukrainian local format: 0XXXXXXXXX (10 digits) → 380XXXXXXXXX
+                                if (cleanPhone.length === 10 && cleanPhone.startsWith('0')) {
+                                    cleanPhone = '380' + cleanPhone.slice(1);
+                                }
                                 el.href = `tel:+${cleanPhone}`;
                             }
                         }
