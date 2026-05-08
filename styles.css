@@ -3853,6 +3853,10 @@ main {
 .rc-top { display: flex; align-items: center; gap: 12px; }
 .rc-google-logo { display: flex; align-items: center; gap: 5px; margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); }
 .rc-google-logo span { font-size: 11px; color: #aaa; letter-spacing: 0.3px; }
+.review-card .review-text { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: none; }
+.review-card .review-text.expanded { display: block; overflow: visible; }
+.review-read-more { display: none; background: none; border: none; color: #1a73e8; font-size: 12px; font-family: var(--font-sans); cursor: pointer; padding: 2px 0; letter-spacing: 0.3px; text-align: left; }
+.review-read-more:hover { text-decoration: underline; }
 @media (max-width: 768px) {
     .gr-leave-btn { margin-left: 0; width: 100%; text-align: center; }
 }

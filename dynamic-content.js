@@ -287,9 +287,17 @@
                         '<div><p class="review-name">' + r.author_name + '</p><p class="review-date">' + displayDate + '</p></div></div>' +
                         '<div class="review-stars">' + stars + '</div>' +
                         '<p class="review-text">"' + r.review_text + '"</p>' +
+                        '<button class="review-read-more" onclick="var t=this.previousElementSibling;t.classList.toggle(\'expanded\');this.textContent=t.classList.contains(\'expanded\')?\'Згорнути\':\'Читати далі\'">Читати далі</button>' +
                         '<div class="rc-google-logo">' + googleLogoSvg + '<span>Google</span></div>' +
                     '</div>';
                 }).join('');
+                // Show expand buttons only where text is actually clamped
+                reviewsGrid.querySelectorAll('.review-text').forEach(el => {
+                    if (el.scrollHeight > el.clientHeight + 2) {
+                        const btn = el.nextElementSibling;
+                        if (btn && btn.classList.contains('review-read-more')) btn.style.display = 'block';
+                    }
+                });
             }
         }
     } catch(e) {
