@@ -723,7 +723,7 @@ const SECTION_TITLES = {
     'setup': 'Supabase',
 };
 
-const SUPER_ADMIN_SECTIONS = ['ai-settings', 'ai-hub', 'chat-logs'];
+const SUPER_ADMIN_SECTIONS = ['ai-hub', 'chat-logs'];
 
 function applyRoleRestrictions() {
     if (window.isSuperAdmin) return;
