@@ -5,17 +5,6 @@
 // ============================================================
 
 (async function initDynamicContent() {
-    // Hide page during Supabase load to prevent flash of hardcoded fallback content
-    const _overlay = document.createElement('div');
-    _overlay.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:99999;transition:opacity 0.25s;pointer-events:none;';
-    document.body.appendChild(_overlay);
-    const _hideOverlay = () => {
-        _overlay.style.opacity = '0';
-        setTimeout(() => _overlay.remove(), 300);
-    };
-    // Safety: remove overlay after 1.5s max even if Supabase is slow/down
-    const _overlaySafety = setTimeout(_hideOverlay, 1500);
-
     const PUBLIC_SB_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
     const PUBLIC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
     let sbClient = null;
@@ -128,8 +117,6 @@
     }
 
     // Content loaded — reveal the page
-    clearTimeout(_overlaySafety);
-    _hideOverlay();
 
     // --- Load dynamic service prices (accordion specific) ---
     try {
