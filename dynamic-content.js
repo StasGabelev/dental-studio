@@ -53,7 +53,7 @@
         const page = detectCurrentPage();
         const { data: content } = await sbClient.from('site_content')
             .select('section_key, value_uk, value_ru, value_en, content_type, media_url')
-            .in('page_slug', [page, 'footer', 'header', 'global']);
+            .in('page_slug', [page, 'footer', 'header', 'global', 'social']);
 
         console.log(`Checking content for ${page} page... Items:`, content ? content.length : 0);
         if (Array.isArray(content) && content.length > 0) {
