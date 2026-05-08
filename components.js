@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadComponent('header-placeholder', 'header.html', highlightActiveLink);
+    loadComponent('callback-form-placeholder', 'callback-form.html');
     loadComponent('footer-placeholder', 'footer.html');
 });
 

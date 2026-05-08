@@ -550,7 +550,14 @@ const PAGE_SCHEMA = {
         { "label": "МЕСЕНДЖЕРИ (CONTACT HUB)", "type": "heading" },
         { "key": "whatsapp-phone", "label": "WhatsApp: Номер (без +)", "type": "text" },
         { "key": "viber-phone", "label": "Viber: Номер (або URI)", "type": "text" },
-        { "key": "telegram-username", "label": "Telegram: Username (без @)", "type": "text" }
+        { "key": "telegram-username", "label": "Telegram: Username (без @)", "type": "text" },
+        { "label": "ФОРМА ЗВОРОТНЬОГО ДЗВ'ІНКА", "type": "heading" },
+        { "key": "telegram-bot-token", "label": "Telegram Bot Token (від @BotFather)", "type": "text" },
+        { "key": "telegram-chat-id", "label": "Telegram Chat ID адміністратора", "type": "text" },
+        { "key": "callback-tag", "label": "Форма: Тег над заголовком", "type": "text" },
+        { "key": "callback-title", "label": "Форма: Заголовок", "type": "text" },
+        { "key": "callback-subtitle", "label": "Форма: Підзаголовок", "type": "text" },
+        { "key": "callback-btn", "label": "Форма: Кнопка", "type": "text" }
     ]
 };
 

@@ -20,6 +20,15 @@ const translations = {
         // Buttons
         "btn-book": "ЗАПИСАТИСЯ НА КОНСУЛЬТАЦІЮ",
         "btn-book-short": "Записатися",
+
+        // Callback form
+        "callback-tag": "ЗВОРОТНІЙ ЗВ'ЯЗОК",
+        "callback-title": "ЗАМОВИТИ ДЗВІНОК",
+        "callback-subtitle": "Залиште свій номер — ми передзвонимо вам протягом 30 хвилин",
+        "callback-name-placeholder": "Ваше ім'я",
+        "callback-phone-placeholder": "Номер телефону",
+        "callback-btn": "ПЕРЕДЗВОНІТЬ МЕНІ",
+        "callback-success": "✓ Дякуємо! Ми зв'яжемося з вами найближчим часом.",
         
         // Hero
         "hero-title": "Стоматологія, якій довіряють",
@@ -212,6 +221,15 @@ const translations = {
         "nav-about": "About Us",
         "nav-contacts": "Contact",
         
+        // Callback form
+        "callback-tag": "CALLBACK",
+        "callback-title": "REQUEST A CALL",
+        "callback-subtitle": "Leave your number — we will call you back within 30 minutes",
+        "callback-name-placeholder": "Your name",
+        "callback-phone-placeholder": "Phone number",
+        "callback-btn": "CALL ME BACK",
+        "callback-success": "✓ Thank you! We will contact you shortly.",
+
         // Footer (Contact Info)
         "footer-find-us": "WHERE TO FIND US",
         "footer-location": "Chernihiv, Ukraine",
