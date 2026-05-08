@@ -228,17 +228,20 @@ const PAGE_SCHEMA = {
 
         { "label": "ЕСТЕТИЧНА СТОМАТОЛОГІЯ", "type": "heading" },
         { "key": "feat-aesthetic", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
+        { "key": "svc-consult-aesthetic-visible", "label": "👁 Консультація — показати/сховати", "type": "toggle" },
         { "key": "svc-consult-title", "label": "Консультація", "type": "text" },
         { "key": "svc-consult-desc", "label": "Консультація — Опис", "type": "textarea" },
         { "key": "vid-svc-consult-aesthetic", "label": "🎬 Відео: Консультація", "type": "video" },
         { "key": "consult-aesthetic", "label": "📋 Прайс-лист: Консультація", "type": "price_group" },
 
 
+        { "key": "svc-composite-veneer-visible", "label": "👁 Композитні вініри — показати/сховати", "type": "toggle" },
         { "key": "svc-composite-veneer-title", "label": "Композитні вініри — Заголовок", "type": "text" },
         { "key": "svc-composite-veneer-desc", "label": "Композитні вініри — Опис", "type": "textarea" },
         { "key": "vid-svc-composite-veneer", "label": "🎬 Відео: Композитні вініри", "type": "video" },
         { "key": "composite-veneer", "label": "📋 Прайс-лист: Композитні вініри", "type": "price_group" },
 
+        { "key": "svc-ceramic-restoration-visible", "label": "👁 Керамічні реставрації — показати/сховати", "type": "toggle" },
         { "key": "svc-ceramic-restoration-title", "label": "Керамічні реставрації — Заголовок", "type": "textarea" },
         { "key": "svc-ceramic-restoration-desc", "label": "Керамічні реставрації — Опис", "type": "textarea" },
         { "key": "vid-svc-ceramic-restoration", "label": "🎬 Відео: Керамічні реставрації", "type": "video" },
@@ -246,30 +249,36 @@ const PAGE_SCHEMA = {
 
         { "label": "ЛІКУВАННЯ ЗУБІВ", "type": "heading" },
         { "key": "feat-therapy", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
+        { "key": "svc-consult-therapy-visible", "label": "👁 Консультація — показати/сховати", "type": "toggle" },
         { "key": "svc-consult-therapy-title", "label": "Консультація", "type": "text" },
         { "key": "svc-consult-therapy-desc", "label": "Консультація — Опис", "type": "textarea" },
         { "key": "vid-svc-consult-therapy", "label": "🎬 Відео: Консультація", "type": "video" },
+        { "key": "svc-endo-visible", "label": "👁 Ендодонтія — показати/сховати", "type": "toggle" },
         { "key": "svc-endo-title", "label": "Ендодонтія", "type": "text" },
         { "key": "svc-endo-desc", "label": "Ендодонтія — Опис", "type": "textarea" },
         { "key": "vid-svc-endo", "label": "🎬 Відео: Ендодонтія", "type": "video" },
         { "key": "consult-therapy", "label": "📋 Прайс-лист: Консультація", "type": "price_group" },
         { "key": "endo", "label": "📋 Прайс-лист: Ендодонтія", "type": "price_group" },
 
+        { "key": "svc-caries-visible", "label": "👁 Лікування карієсу — показати/сховати", "type": "toggle" },
         { "key": "svc-caries-title", "label": "Лікування карієсу", "type": "text" },
         { "key": "svc-caries-desc", "label": "Лікування карієсу — Опис", "type": "textarea" },
         { "key": "vid-svc-caries", "label": "🎬 Відео: Лікування карієсу", "type": "video" },
         { "key": "caries", "label": "📋 Прайс-лист: Лікування карієсу", "type": "price_group" },
 
+        { "key": "svc-periodontal-visible", "label": "👁 Пародонтологічне лікування — показати/сховати", "type": "toggle" },
         { "key": "svc-periodontal-title", "label": "Пародонтологічне лікування", "type": "text" },
         { "key": "svc-periodontal-desc", "label": "Пародонтологічне лікування — Опис", "type": "textarea" },
         { "key": "vid-svc-periodontal", "label": "🎬 Відео: Пародонтологічне лікування", "type": "video" },
         { "key": "periodontal", "label": "📋 Прайс-лист: Пародонтологічне лікування", "type": "price_group" },
 
+        { "key": "svc-hygiene-visible", "label": "👁 Гігієна зубів — показати/сховати", "type": "toggle" },
         { "key": "svc-hygiene-title", "label": "Професійна гігієна зубів", "type": "text" },
         { "key": "svc-hygiene-desc", "label": "Професійна гігієна зубів — Опис", "type": "textarea" },
         { "key": "vid-svc-hygiene", "label": "🎬 Відео: Гігієна зубів", "type": "video" },
         { "key": "hygiene", "label": "📋 Прайс-лист: Професійна гігієна", "type": "price_group" },
 
+        { "key": "svc-whitening-visible", "label": "👁 Відбілювання зубів — показати/сховати", "type": "toggle" },
         { "key": "svc-whitening-title", "label": "Відбілювання зубів", "type": "text" },
         { "key": "svc-whitening-desc", "label": "Відбілювання зубів — Опис", "type": "textarea" },
         { "key": "vid-svc-whitening", "label": "🎬 Відео: Відбілювання зубів", "type": "video" },
@@ -278,9 +287,11 @@ const PAGE_SCHEMA = {
 
         { "label": "ХІРУРГІЯ", "type": "heading" },
         { "key": "feat-surgery", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
+        { "key": "svc-consult-surgery-visible", "label": "👁 Консультація — показати/сховати", "type": "toggle" },
         { "key": "svc-consult-surgery-title", "label": "Консультація", "type": "text" },
         { "key": "svc-consult-surgery-desc", "label": "Консультація — Опис", "type": "textarea" },
         { "key": "vid-svc-consult-surgery", "label": "🎬 Відео: Консультація", "type": "video" },
+        { "key": "svc-implant-visible", "label": "👁 Імплантація — показати/сховати", "type": "toggle" },
         { "key": "svc-implant-title", "label": "Імплантація — Заголовок", "type": "text" },
         { "key": "svc-implant-desc", "label": "Імплантація — Опис", "type": "textarea" },
         { "key": "vid-svc-implant", "label": "🎬 Відео: Імплантація", "type": "video" },
@@ -288,11 +299,13 @@ const PAGE_SCHEMA = {
         { "key": "implant", "label": "📋 Прайс-лист: Імплантація", "type": "price_group" },
 
 
+        { "key": "svc-extraction-visible", "label": "👁 Видалення зубів — показати/сховати", "type": "toggle" },
         { "key": "svc-extraction-title", "label": "Видалення зубів — Заголовок", "type": "text" },
         { "key": "svc-extraction-desc", "label": "Видалення зубів — Опис", "type": "textarea" },
         { "key": "vid-svc-extraction", "label": "🎬 Відео: Видалення зубів", "type": "video" },
         { "key": "extraction", "label": "📋 Прайс-лист: Видалення зубів", "type": "price_group" },
 
+        { "key": "svc-gum-surgery-visible", "label": "👁 Хірургія ясен — показати/сховати", "type": "toggle" },
         { "key": "svc-gum-surgery-title", "label": "Хірургія ясен — Заголовок", "type": "textarea" },
         { "key": "svc-gum-surgery-desc", "label": "Хірургія ясен — Опис", "type": "textarea" },
         { "key": "vid-svc-gum-surgery", "label": "🎬 Відео: Хірургія ясен", "type": "video" },
@@ -300,15 +313,18 @@ const PAGE_SCHEMA = {
 
         { "label": "ОРТОДОНТІЯ", "type": "heading" },
         { "key": "feat-ortho", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
+        { "key": "svc-consult-ortho-visible", "label": "👁 Консультація — показати/сховати", "type": "toggle" },
         { "key": "svc-consult-ortho-title", "label": "Консультація", "type": "text" },
         { "key": "svc-consult-ortho-desc", "label": "Консультація — Опис", "type": "textarea" },
         { "key": "vid-svc-consult-ortho", "label": "🎬 Відео: Консультація", "type": "video" },
+        { "key": "svc-braces-visible", "label": "👁 Брекети — показати/сховати", "type": "toggle" },
         { "key": "svc-braces-title", "label": "Брекети — Заголовок", "type": "text" },
         { "key": "svc-braces-desc", "label": "Брекети — Опис", "type": "textarea" },
         { "key": "vid-svc-braces", "label": "🎬 Відео: Лікування брекетами", "type": "video" },
         { "key": "consult-ortho", "label": "📋 Прайс-лист: Консультація", "type": "price_group" },
         { "key": "braces", "label": "📋 Прайс-лист: Лікування брекетами", "type": "price_group" },
 
+        { "key": "svc-aligners-visible", "label": "👁 Елайнери — показати/сховати", "type": "toggle" },
         { "key": "svc-aligners-title", "label": "Елайнери — Заголовок", "type": "text" },
         { "key": "svc-aligners-desc", "label": "Елайнери — Опис", "type": "textarea" },
         { "key": "vid-svc-aligners", "label": "🎬 Відео: Лікування елайнерами", "type": "video" },
@@ -316,22 +332,27 @@ const PAGE_SCHEMA = {
 
         { "label": "ДИТЯЧА СТОМАТОЛОГІЯ", "type": "heading" },
         { "key": "feat-children", "label": "Фільтр: Редагувати назву вкладки", "type": "text" },
+        { "key": "svc-consult-children-visible", "label": "👁 Консультація — показати/сховати", "type": "toggle" },
         { "key": "svc-consult-children-title", "label": "Консультація", "type": "text" },
         { "key": "svc-consult-children-desc", "label": "Консультація — Опис", "type": "textarea" },
         { "key": "vid-svc-consult-children", "label": "🎬 Відео: Консультація", "type": "video" },
+        { "key": "svc-children-caries-visible", "label": "👁 Карієс у дітей — показати/сховати", "type": "toggle" },
         { "key": "svc-children-caries-title", "label": "Карієс у дітей — Заголовок", "type": "text" },
         { "key": "svc-children-caries-desc", "label": "Карієс у дітей — Опис", "type": "textarea" },
         { "key": "vid-svc-children-caries", "label": "🎬 Відео: Карієс у дітей", "type": "video" },
         { "key": "consult-children", "label": "📋 Прайс-лист: Консультація", "type": "price_group" },
         { "key": "children-caries", "label": "📋 Прайс-лист: Карієс у дітей", "type": "price_group" },
+        { "key": "svc-children-hygiene-visible", "label": "👁 Дитяча гігієна — показати/сховати", "type": "toggle" },
         { "key": "svc-children-hygiene-title", "label": "Дитяча гігієна — Заголовок", "type": "text" },
         { "key": "svc-children-hygiene-desc", "label": "Дитяча гігієна — Опис", "type": "textarea" },
         { "key": "vid-svc-children-hygiene", "label": "🎬 Відео: Дитяча гігієна", "type": "video" },
         { "key": "children-hygiene", "label": "📋 Прайс-лист: Дитяча гігієна", "type": "price_group" },
+        { "key": "svc-children-sealants-visible", "label": "👁 Герметизація фісур — показати/сховати", "type": "toggle" },
         { "key": "svc-children-sealants-title", "label": "Герметизація фісур — Заголовок", "type": "text" },
         { "key": "svc-children-sealants-desc", "label": "Герметизація фісур — Опис", "type": "textarea" },
         { "key": "vid-svc-children-sealants", "label": "🎬 Відео: Герметизація фісур", "type": "video" },
         { "key": "children-sealants", "label": "📋 Прайс-лист: Герметизація фісур", "type": "price_group" },
+        { "key": "svc-children-extraction-visible", "label": "👁 Видалення молочного зуба — показати/сховати", "type": "toggle" },
         { "key": "svc-children-extraction-title", "label": "Видалення молочного зуба — Заголовок", "type": "text" },
         { "key": "svc-children-extraction-desc", "label": "Видалення молочного зуба — Опис", "type": "textarea" },
         { "key": "vid-svc-children-extraction", "label": "🎬 Відео: Видалення молочного зуба", "type": "video" },
@@ -2123,6 +2144,10 @@ function renderEditorField(field, existing, defaults, pageSlug) {
                     </div>`;
         }
         out += `</div>`;
+    } else if (field.type === 'toggle') {
+        const isVisible = val !== 'false';
+        out += `<input type="hidden" data-key="${field.key}" value="${isVisible ? 'true' : 'false'}">`;
+        out += `<button type="button" class="btn ${isVisible ? 'btn-success' : 'btn-danger'}" style="width:100%;" onclick="toggleSectionVisibility(this)">${isVisible ? '👁 Розділ показано' : '🚫 Розділ прихований'}</button>`;
     } else if (field.type === 'price_group') {
         out += `<div class="price-group-container" id="pg-container-${field.key}" style="border:1px solid #333; padding:15px; border-radius:8px; margin-bottom:15px;">
                     <div id="pg-list-${field.key}">⏳ Завантаження прайс-листа...</div>
@@ -2133,6 +2158,20 @@ function renderEditorField(field, existing, defaults, pageSlug) {
     out += `</div>`;
     return out;
 }
+
+window.toggleSectionVisibility = function(btn) {
+    const hidden = btn.previousElementSibling;
+    const isCurrentlyVisible = hidden.value === 'true';
+    if (isCurrentlyVisible) {
+        hidden.value = 'false';
+        btn.textContent = '🚫 Розділ прихований';
+        btn.className = 'btn btn-danger';
+    } else {
+        hidden.value = 'true';
+        btn.textContent = '👁 Розділ показано';
+        btn.className = 'btn btn-success';
+    }
+};
 
 window.switchInnerTab = function(btnEl, targetId) {
     // de-activate all tabs

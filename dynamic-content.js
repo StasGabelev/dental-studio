@@ -58,7 +58,11 @@
         console.log(`Checking content for ${page} page... Items:`, content ? content.length : 0);
         if (Array.isArray(content) && content.length > 0) {
             content.forEach(item => {
-                if (item.content_type === 'text' && item.value_uk) {
+                if (item.content_type === 'text' && item.section_key.endsWith('-visible') && item.value_uk === 'false') {
+                    const sectionId = 'section-' + item.section_key.slice(0, -8);
+                    const el = document.getElementById(sectionId);
+                    if (el) el.style.display = 'none';
+                } else if (item.content_type === 'text' && item.value_uk) {
                     // Find elements with matching data-i18n or data-cms attribute
                     const elements = document.querySelectorAll(
                         `[data-i18n="${item.section_key}"], [data-cms="${item.section_key}"], [data-cms-href="${item.section_key}"]`
