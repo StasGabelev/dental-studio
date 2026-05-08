@@ -552,6 +552,7 @@ const PAGE_SCHEMA = {
         { "key": "viber-phone", "label": "Viber: Номер (або URI)", "type": "text" },
         { "key": "telegram-username", "label": "Telegram: Username (без @)", "type": "text" },
         { "label": "ФОРМА ЗВОРОТНЬОГО ДЗВ'ІНКА", "type": "heading" },
+        { "type": "info", "label": "<b>Як налаштувати сповіщення в Telegram:</b><br><br><b>Крок 1.</b> Відкрий Telegram → знайди <b>@BotFather</b> → напиши <code>/newbot</code> → придумай назву → отримаєш токен вигляду <code>7123456789:AAHxxxxx</code>. Скопіюй його.<br><br><b>Крок 2.</b> Знайди <b>@userinfobot</b> → напиши <code>/start</code> → він надішле твій Chat ID (просто число, наприклад <code>123456789</code>). Скопіюй його.<br><br><b>Крок 3.</b> Вставте обидва значення у поля нижче → натисни «Зберегти зміни».<br><br>Після цього кожна заявка з сайту буде приходити тобі в Telegram." },
         { "key": "telegram-bot-token", "label": "Telegram Bot Token (від @BotFather)", "type": "text" },
         { "key": "telegram-chat-id", "label": "Telegram Chat ID адміністратора", "type": "text" },
         { "label": "GOOGLE ВІДГУКИ", "type": "heading" },
@@ -2111,6 +2112,10 @@ function renderEditorField(field, existing, defaults, pageSlug) {
         val = defaults[pageSlug][field.key];
     }
     
+    if (field.type === 'info') {
+        return `<div class="editor-info-box">${field.label}</div>`;
+    }
+
     let out = `<div class="editor-field">`;
     out += `<div class="editor-field-label">${field.label}</div>`;
 

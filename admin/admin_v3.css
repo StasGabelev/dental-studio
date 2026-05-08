@@ -1202,3 +1202,17 @@ body {
     font-style: italic;
     font-size: 13px;
 }
+
+.editor-info-box {
+    background: rgba(197, 168, 130, 0.07);
+    border: 1px solid rgba(197, 168, 130, 0.25);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #bbb;
+    margin-bottom: 20px;
+}
+.editor-info-box b { color: #e0c99a; }
+.editor-info-box code { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #ddd; }
+
