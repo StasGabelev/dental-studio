@@ -230,7 +230,9 @@
                                 member.classList.add('active');
                                 setTimeout(() => {
                                     const img = member.querySelector('.team-member__img');
-                                    (img || member).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    const target = img || member;
+                                    const rect = target.getBoundingClientRect();
+                                    window.scrollBy({ top: rect.top - 100, behavior: 'smooth' });
                                 }, 320);
                             }
                         });
