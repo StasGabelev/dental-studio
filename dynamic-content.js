@@ -229,8 +229,9 @@
                             if (!alreadyActive) {
                                 member.classList.add('active');
                                 setTimeout(() => {
-                                    member.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                }, 50);
+                                    const img = member.querySelector('.team-member__img');
+                                    (img || member).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }, 320);
                             }
                         });
                     }
