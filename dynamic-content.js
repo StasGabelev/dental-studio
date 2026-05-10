@@ -211,23 +211,29 @@
 
                 // Rebind accordion events
                 document.querySelectorAll('.team-member').forEach(member => {
+                    // Desktop only: hover
                     member.addEventListener('mouseenter', () => {
-                        const active = document.querySelector('.team-member.active');
-                        if (active) active.classList.remove('active');
+                        if (window.innerWidth <= 1024) return;
+                        document.querySelectorAll('.team-member.active').forEach(a => a.classList.remove('active'));
                         member.classList.add('active');
                     });
-                    member.addEventListener('click', () => {
-                        const isMobile = window.innerWidth <= 1024;
-                        if (!isMobile) return;
-                        const alreadyActive = member.classList.contains('active');
-                        document.querySelectorAll('.team-member.active').forEach(a => a.classList.remove('active'));
-                        if (!alreadyActive) {
-                            member.classList.add('active');
-                            setTimeout(() => {
-                                member.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }, 50);
-                        }
-                    });
+
+                    // Mobile only: tap on label area only (not on photo)
+                    const label = member.querySelector('.team-member__label');
+                    if (label) {
+                        label.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (window.innerWidth > 1024) return;
+                            const alreadyActive = member.classList.contains('active');
+                            document.querySelectorAll('.team-member.active').forEach(a => a.classList.remove('active'));
+                            if (!alreadyActive) {
+                                member.classList.add('active');
+                                setTimeout(() => {
+                                    member.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }, 50);
+                            }
+                        });
+                    }
                 });
             }
         }
