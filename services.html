@@ -2122,6 +2122,13 @@
 
                         box.classList.add('active');
 
+                        if (window.innerWidth <= 1024) {
+                            setTimeout(() => {
+                                const rect = box.getBoundingClientRect();
+                                window.scrollBy({ top: rect.top - 100, behavior: 'smooth' });
+                            }, 320);
+                        }
+
                     }
 
                 });
