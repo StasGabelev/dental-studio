@@ -1131,6 +1131,30 @@ async function savePageContent(pageSlug) {
     }
 }
 
+// Compress image to max 1400px, JPEG quality 0.82 (~200-400KB)
+async function compressImage(file, maxPx = 1400, quality = 0.82) {
+    if (!file.type.startsWith('image/')) return file;
+    return new Promise((resolve) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            let { width, height } = img;
+            if (width > maxPx || height > maxPx) {
+                if (width > height) { height = Math.round(height * maxPx / width); width = maxPx; }
+                else { width = Math.round(width * maxPx / height); height = maxPx; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width; canvas.height = height;
+            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+            canvas.toBlob((blob) => {
+                resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+            }, 'image/jpeg', quality);
+        };
+        img.src = url;
+    });
+}
+
 async function triggerMediaUpload(key, type, event) {
     if (event) event.stopPropagation();
     const input = document.createElement('input');
@@ -1151,12 +1175,13 @@ async function triggerMediaUpload(key, type, event) {
         showToast(`📤 Завантажується "${file.name}" (${fileSizeMB} МБ)...`);
 
         if (sb) {
-            // Upload to Supabase Storage
-            const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+            // Compress image before upload (videos skip)
+            const uploadFile = type === 'image' ? await compressImage(file) : file;
+            const safeName = uploadFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
             const filePath = `pages/${currentPage}/${key}_${Date.now()}_${safeName}`;
             const { data, error } = await sb.storage
                 .from('clinic-media')
-                .upload(filePath, file, { upsert: true });
+                .upload(filePath, uploadFile, { upsert: true });
 
             if (error) {
                 showToast(`❌ Помилка: ${error.message}`);
@@ -1477,8 +1502,9 @@ async function uploadDoctorPhoto(index) {
 
         showToast('⏳ Завантаження фото...');
         if (sb) {
-            const filePath = `doctors/doc_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-            const { error } = await sb.storage.from('clinic-media').upload(filePath, file);
+            const compressed = await compressImage(file);
+            const filePath = `doctors/doc_${Date.now()}_${compressed.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            const { error } = await sb.storage.from('clinic-media').upload(filePath, compressed);
             if (error) {
                 showToast(`❌ ${error.message}`);
                 return;
@@ -1724,8 +1750,9 @@ async function uploadStageMedia(caseIdx, stageIdx) {
         if (!file) return;
         showToast('⏳ Завантаження...');
         if (sb) {
-            const filePath = `cases/stages/s_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-            const { error } = await sb.storage.from('clinic-media').upload(filePath, file);
+            const compressed = await compressImage(file);
+            const filePath = `cases/stages/s_${Date.now()}_${compressed.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            const { error } = await sb.storage.from('clinic-media').upload(filePath, compressed);
             if (error) { showToast(`❌ ${error.message}`); return; }
             const { data: urlData } = sb.storage.from('clinic-media').getPublicUrl(filePath);
             cases[caseIdx].stages[stageIdx].image_url = urlData.publicUrl;
@@ -1812,8 +1839,9 @@ async function uploadCaseMedia(index, field) {
         if (!file) return;
         showToast('⏳ Завантаження основного медіа...');
         if (sb) {
-            const filePath = `cases/c_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-            const { error } = await sb.storage.from('clinic-media').upload(filePath, file);
+            const compressed = await compressImage(file);
+            const filePath = `cases/c_${Date.now()}_${compressed.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            const { error } = await sb.storage.from('clinic-media').upload(filePath, compressed);
             if (error) { showToast(`❌ ${error.message}`); return; }
             const { data: urlData } = sb.storage.from('clinic-media').getPublicUrl(filePath);
             cases[index][field] = urlData.publicUrl;
