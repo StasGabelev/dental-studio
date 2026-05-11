@@ -2,39 +2,60 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>Стиснення фото у Storage</title>
+<title>Storage: Бекап і стиснення</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <style>
-  body { font-family: monospace; background: #111; color: #eee; padding: 20px; max-width: 800px; margin: 0 auto; }
+  body { font-family: monospace; background: #111; color: #eee; padding: 20px; max-width: 860px; margin: 0 auto; }
   h2 { color: #f0c040; }
-  button { background: #f0c040; color: #111; border: none; padding: 10px 24px; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 6px; margin: 8px 4px; }
+  .btn-gold { background: #f0c040; color: #111; border: none; padding: 10px 24px; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 6px; margin: 8px 4px; }
+  .btn-green { background: #4caf50; color: #fff; border: none; padding: 10px 24px; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 6px; margin: 8px 4px; }
+  .btn-gray { background: #444; color: #eee; border: none; padding: 10px 24px; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 6px; margin: 8px 4px; }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
-  #log { background: #1a1a1a; border: 1px solid #333; padding: 16px; margin-top: 16px; height: 400px; overflow-y: auto; font-size: 12px; line-height: 1.6; }
+  #log { background: #1a1a1a; border: 1px solid #333; padding: 16px; margin-top: 16px; height: 380px; overflow-y: auto; font-size: 12px; line-height: 1.6; }
   .ok { color: #4caf50; }
   .skip { color: #888; }
   .err { color: #f44336; }
   .info { color: #2196f3; }
   .warn { color: #ff9800; }
-  progress { width: 100%; height: 20px; margin-top: 12px; }
-  #stats { margin-top: 12px; font-size: 14px; color: #aaa; }
+  progress { width: 100%; height: 22px; margin-top: 12px; }
+  #stats { margin-top: 12px; font-size: 14px; color: #aaa; min-height: 20px; }
+  .section { border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .section h3 { margin: 0 0 10px; color: #f0c040; font-size: 14px; }
 </style>
 </head>
 <body>
-<h2>🗜️ Стиснення фото в Supabase Storage</h2>
-<p style="color:#aaa; font-size:13px;">Завантажує всі зображення з <b>clinic-media</b>, стискає до макс. 1400px / JPEG 82%, перезаливає на те саме місце. URL у базі не змінюються.</p>
+<h2>🗄️ Storage: Бекап і стиснення фото</h2>
 
-<div>
-  <label style="font-size:13px;">Supabase URL: <input id="sbUrl" type="text" style="width:320px;background:#222;color:#eee;border:1px solid #444;padding:4px 8px;" value="https://ckldvntrsiacbjpiydmn.supabase.co"></label>
-</div>
-<div style="margin-top:8px;">
-  <label style="font-size:13px;">Anon key: <input id="sbKey" type="text" style="width:480px;background:#222;color:#eee;border:1px solid #444;padding:4px 8px;" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg"></label>
+<div class="section">
+  <div>
+    <label style="font-size:13px;">Supabase URL:&nbsp;
+      <input id="sbUrl" type="text" style="width:310px;background:#222;color:#eee;border:1px solid #444;padding:4px 8px;"
+        value="https://ckldvntrsiacbjpiydmn.supabase.co">
+    </label>
+  </div>
+  <div style="margin-top:8px;">
+    <label style="font-size:13px;">Anon key:&nbsp;
+      <input id="sbKey" type="text" style="width:460px;background:#222;color:#eee;border:1px solid #444;padding:4px 8px;"
+        value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg">
+    </label>
+  </div>
 </div>
 
-<div style="margin-top:16px;">
-  <button onclick="startScan()">1. Сканувати файли</button>
-  <button id="compressBtn" onclick="startCompress()" disabled>2. Стиснути і перезалити</button>
-  <button onclick="clearLog()" style="background:#444;color:#eee;">Очистити лог</button>
+<div class="section">
+  <h3>📦 ШАГ 1 — Скачати бекап (ZIP)</h3>
+  <p style="color:#aaa;font-size:12px;margin:0 0 10px;">Скачує всі фото з Storage на комп'ютер у вигляді ZIP-архіву. Нічого не змінює.</p>
+  <button class="btn-gold" onclick="startScan()">Сканувати файли</button>
+  <button class="btn-green" id="backupBtn" onclick="startBackup()" disabled>⬇️ Скачати ZIP (бекап)</button>
 </div>
+
+<div class="section">
+  <h3>🗜️ ШАГ 2 — Стиснути і перезалити</h3>
+  <p style="color:#aaa;font-size:12px;margin:0 0 10px;">Стискає фото до макс. 1400px / JPEG 82% і перезаливає на те саме місце. URL не змінюються.</p>
+  <button class="btn-gold" id="compressBtn" onclick="startCompress()" disabled>🗜️ Стиснути і перезалити</button>
+</div>
+
+<button class="btn-gray" onclick="clearLog()">Очистити лог</button>
 
 <progress id="bar" value="0" max="100" style="display:none;"></progress>
 <div id="stats"></div>
@@ -48,6 +69,7 @@ const BUCKET = 'clinic-media';
 const MAX_PX = 1400;
 const QUALITY = 0.82;
 const IMAGE_EXTS = ['jpg','jpeg','png','webp','gif'];
+const ALL_EXTS = ['jpg','jpeg','png','webp','gif','mp4','mov','webm'];
 const FOLDERS = ['', 'cases', 'cases/stages', 'doctors', 'pages'];
 
 function log(msg, cls = '') {
@@ -58,14 +80,8 @@ function log(msg, cls = '') {
   d.appendChild(line);
   d.scrollTop = d.scrollHeight;
 }
-
-function clearLog() {
-  document.getElementById('log').innerHTML = '';
-}
-
-function setStats(txt) {
-  document.getElementById('stats').textContent = txt;
-}
+function clearLog() { document.getElementById('log').innerHTML = ''; }
+function setStats(txt) { document.getElementById('stats').textContent = txt; }
 
 function getSb() {
   const url = document.getElementById('sbUrl').value.trim();
@@ -74,26 +90,25 @@ function getSb() {
   return supabase.createClient(url, key);
 }
 
-async function listAllFiles(client) {
+async function listAllFiles(client, extFilter) {
   let all = [];
   for (const folder of FOLDERS) {
     try {
       const { data, error } = await client.storage.from(BUCKET).list(folder, { limit: 1000 });
-      if (error) { log(`⚠️ Папка "${folder}": ${error.message}`, 'warn'); continue; }
+      if (error) { log(`⚠️ Папка "${folder || 'root'}": ${error.message}`, 'warn'); continue; }
       if (!data) continue;
       for (const item of data) {
         if (item.metadata) {
-          // it's a file
           const ext = item.name.split('.').pop().toLowerCase();
-          if (IMAGE_EXTS.includes(ext)) {
+          if (extFilter.includes(ext)) {
             const path = folder ? `${folder}/${item.name}` : item.name;
             const sizeMB = item.metadata.size ? (item.metadata.size / 1024 / 1024).toFixed(2) : '?';
-            all.push({ path, name: item.name, sizeMB, size: item.metadata.size || 0 });
+            all.push({ path, name: item.name, folder, sizeMB, size: item.metadata.size || 0 });
           }
         }
       }
     } catch(e) {
-      log(`⚠️ Помилка сканування "${folder}": ${e.message}`, 'warn');
+      log(`⚠️ Помилка "${folder || 'root'}": ${e.message}`, 'warn');
     }
   }
   return all;
@@ -103,32 +118,78 @@ async function startScan() {
   clearLog();
   filesToProcess = [];
   document.getElementById('compressBtn').disabled = true;
+  document.getElementById('backupBtn').disabled = true;
   sb = getSb();
   if (!sb) return;
 
   log('🔍 Сканування bucket "clinic-media"...', 'info');
-
-  const files = await listAllFiles(sb);
+  const files = await listAllFiles(sb, IMAGE_EXTS);
 
   if (files.length === 0) {
-    log('Файлів не знайдено. Можливо, потрібен сервісний ключ для перегляду storage.', 'warn');
-    log('Спробуйте замінити anon key на service_role key з Supabase → Settings → API', 'warn');
+    log('Файлів не знайдено.', 'warn');
+    log('Якщо файли є — замініть anon key на service_role key: Supabase → Settings → API → service_role', 'warn');
     return;
   }
 
   let totalMB = 0;
-  let bigCount = 0;
   for (const f of files) {
-    const isBig = f.size > 500 * 1024; // >500KB worth compressing
+    const isBig = f.size > 500 * 1024;
     log(`${isBig ? '📸' : '✓ '} ${f.path}  (${f.sizeMB} МБ)`, isBig ? '' : 'skip');
     totalMB += parseFloat(f.sizeMB) || 0;
-    if (isBig) bigCount++;
     filesToProcess.push(f);
   }
 
-  log(`\n📊 Знайдено: ${files.length} фото, загалом ~${totalMB.toFixed(1)} МБ, з них ${bigCount} > 500 КБ`, 'info');
-  setStats(`Знайдено ${files.length} зображень (${totalMB.toFixed(1)} МБ). Натисни "Стиснути і перезалити".`);
+  log(`\n📊 Знайдено: ${files.length} фото, загалом ~${totalMB.toFixed(1)} МБ`, 'info');
+  setStats(`Знайдено ${files.length} зображень (${totalMB.toFixed(1)} МБ)`);
+  document.getElementById('backupBtn').disabled = false;
   document.getElementById('compressBtn').disabled = false;
+}
+
+async function startBackup() {
+  if (filesToProcess.length === 0) { log('Спочатку натисни "Сканувати файли"', 'warn'); return; }
+
+  document.getElementById('backupBtn').disabled = true;
+  const bar = document.getElementById('bar');
+  bar.style.display = 'block';
+  bar.value = 0;
+  bar.max = filesToProcess.length;
+
+  log('\n📦 Створення ZIP-бекапу...', 'info');
+  const zip = new JSZip();
+
+  for (let i = 0; i < filesToProcess.length; i++) {
+    const f = filesToProcess[i];
+    bar.value = i + 1;
+    setStats(`Скачую ${i + 1} / ${filesToProcess.length}: ${f.path}`);
+
+    try {
+      const { data, error } = await sb.storage.from(BUCKET).download(f.path);
+      if (error) { log(`❌ ${f.path}: ${error.message}`, 'err'); continue; }
+      const arrayBuffer = await data.arrayBuffer();
+      zip.file(f.path, arrayBuffer);
+      log(`✅ ${f.path} (${f.sizeMB} МБ)`, 'ok');
+    } catch(e) {
+      log(`❌ ${f.path}: ${e.message}`, 'err');
+    }
+
+    await new Promise(r => setTimeout(r, 100));
+  }
+
+  log('\n🔧 Пакування ZIP...', 'info');
+  setStats('Пакування ZIP — зачекайте...');
+
+  const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
+  const url = URL.createObjectURL(zipBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `clinic-media-backup-${new Date().toISOString().slice(0,10)}.zip`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  log(`\n✅ ZIP скачано! Розмір: ${(zipBlob.size / 1024 / 1024).toFixed(1)} МБ`, 'ok');
+  setStats(`Бекап готовий. Розмір ZIP: ${(zipBlob.size / 1024 / 1024).toFixed(1)} МБ`);
+  bar.style.display = 'none';
+  document.getElementById('backupBtn').disabled = false;
 }
 
 async function compressImageFromBlob(blob, filename) {
@@ -146,8 +207,7 @@ async function compressImageFromBlob(blob, filename) {
       canvas.width = width; canvas.height = height;
       canvas.getContext('2d').drawImage(img, 0, 0, width, height);
       canvas.toBlob((outBlob) => {
-        const outName = filename.replace(/\.[^.]+$/, '.jpg');
-        resolve({ blob: outBlob, name: outName });
+        resolve({ blob: outBlob, name: filename.replace(/\.[^.]+$/, '.jpg') });
       }, 'image/jpeg', QUALITY);
     };
     img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
@@ -164,55 +224,42 @@ async function startCompress() {
   bar.value = 0;
   bar.max = filesToProcess.length;
 
-  let done = 0, skipped = 0, errors = 0;
-  let savedMB = 0;
-
-  log('\n🚀 Починаємо стиснення...', 'info');
+  let done = 0, skipped = 0, errors = 0, savedMB = 0;
+  log('\n🚀 Стиснення...', 'info');
 
   for (let i = 0; i < filesToProcess.length; i++) {
     const f = filesToProcess[i];
     bar.value = i + 1;
+    setStats(`Обробляю ${i + 1} / ${filesToProcess.length}: ${f.path}`);
 
     try {
-      // Download
       const { data: dlData, error: dlErr } = await sb.storage.from(BUCKET).download(f.path);
-      if (dlErr) { log(`❌ ${f.path}: download error — ${dlErr.message}`, 'err'); errors++; continue; }
+      if (dlErr) { log(`❌ ${f.path}: ${dlErr.message}`, 'err'); errors++; continue; }
 
       const origSize = dlData.size;
-
-      // Compress
       const result = await compressImageFromBlob(dlData, f.name);
       if (!result) { log(`⚠️ ${f.path}: не вдалося стиснути`, 'warn'); skipped++; continue; }
 
       const newSize = result.blob.size;
-      const ratio = ((1 - newSize / origSize) * 100).toFixed(0);
-
       if (newSize >= origSize * 0.95) {
-        log(`○ ${f.path}: вже маленьке (${(origSize/1024).toFixed(0)} КБ → ${(newSize/1024).toFixed(0)} КБ)`, 'skip');
-        skipped++;
-        continue;
+        log(`○ ${f.path}: вже стиснене (${(origSize/1024).toFixed(0)} КБ)`, 'skip');
+        skipped++; continue;
       }
 
-      // Re-upload same path
       const outPath = f.path.replace(/\.[^.]+$/, '.jpg');
       const { error: upErr } = await sb.storage.from(BUCKET).upload(outPath, result.blob, {
-        upsert: true,
-        contentType: 'image/jpeg',
-        cacheControl: '604800'
+        upsert: true, contentType: 'image/jpeg', cacheControl: '604800'
       });
-
-      if (upErr) { log(`❌ ${f.path}: upload error — ${upErr.message}`, 'err'); errors++; continue; }
+      if (upErr) { log(`❌ ${f.path}: upload — ${upErr.message}`, 'err'); errors++; continue; }
 
       savedMB += (origSize - newSize) / 1024 / 1024;
-      log(`✅ ${f.path}: ${(origSize/1024/1024).toFixed(2)} МБ → ${(newSize/1024/1024).toFixed(2)} МБ (−${ratio}%)`, 'ok');
+      const ratio = ((1 - newSize / origSize) * 100).toFixed(0);
+      log(`✅ ${f.path}: ${(origSize/1024/1024).toFixed(2)} → ${(newSize/1024/1024).toFixed(2)} МБ (−${ratio}%)`, 'ok');
       done++;
-
     } catch(e) {
-      log(`❌ ${f.path}: ${e.message}`, 'err');
-      errors++;
+      log(`❌ ${f.path}: ${e.message}`, 'err'); errors++;
     }
 
-    // Small delay to avoid rate limiting
     await new Promise(r => setTimeout(r, 300));
   }
 
