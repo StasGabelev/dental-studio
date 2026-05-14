@@ -8,8 +8,8 @@
     let widgetSb = null;
     let chatSessionId = null;
 
-    const SUPABASE_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
+    const SUPABASE_URL = 'https://ladeofbnhqcxjaomlvbx.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhZGVvZmJuaHFjeGphb21sdmJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDMzNDksImV4cCI6MjA5NDMxOTM0OX0.pr3COkOr2h1V986c4-2tluSttWhQuiMD4H4OZaXmdW4';
 
     // --- 1. Supabase Init (with retry) ---
     function getSb() {

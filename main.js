@@ -348,8 +348,8 @@ window.submitCallbackForm = async function(e) {
     btn.textContent = '...';
 
     try {
-        var PUBLIC_SB_URL = 'https://ckldvntrsiacbjpiydmn.supabase.co';
-        var PUBLIC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
+        var PUBLIC_SB_URL = 'https://ladeofbnhqcxjaomlvbx.supabase.co';
+        var PUBLIC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhZGVvZmJuaHFjeGphb21sdmJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDMzNDksImV4cCI6MjA5NDMxOTM0OX0.pr3COkOr2h1V986c4-2tluSttWhQuiMD4H4OZaXmdW4';
         var sbClient = supabase.createClient(PUBLIC_SB_URL, PUBLIC_SB_KEY);
         var result = await sbClient.from('site_content')
             .select('section_key, value_uk')

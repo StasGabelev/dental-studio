@@ -23,8 +23,8 @@ function getSupabaseConfig() {
 function initSupabase() {
 
     const config = getSupabaseConfig();
-    const defaultUrl = 'https://ckldvntrsiacbjpiydmn.supabase.co';
-    const defaultKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg';
+    const defaultUrl = 'https://ladeofbnhqcxjaomlvbx.supabase.co';
+    const defaultKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhZGVvZmJuaHFjeGphb21sdmJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDMzNDksImV4cCI6MjA5NDMxOTM0OX0.pr3COkOr2h1V986c4-2tluSttWhQuiMD4H4OZaXmdW4';
 
     const url = (config && config.url) ? config.url : defaultUrl;
     const key = (config && config.key) ? config.key : defaultKey;
