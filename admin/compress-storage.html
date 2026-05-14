@@ -31,13 +31,13 @@
   <div>
     <label style="font-size:13px;">Supabase URL:&nbsp;
       <input id="sbUrl" type="text" style="width:310px;background:#222;color:#eee;border:1px solid #444;padding:4px 8px;"
-        value="https://ckldvntrsiacbjpiydmn.supabase.co">
+        value="https://ladeofbnhqcxjaomlvbx.supabase.co">
     </label>
   </div>
   <div style="margin-top:8px;">
     <label style="font-size:13px;">Anon key:&nbsp;
       <input id="sbKey" type="text" style="width:460px;background:#222;color:#eee;border:1px solid #444;padding:4px 8px;"
-        value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrbGR2bnRyc2lhY2JqcGl5ZG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzMzMTUsImV4cCI6MjA5MTY0OTMxNX0.6zxRqTheJDt2BTb1hbAxQHCLZI8wT5xPus2Ad97AuMg">
+        value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhZGVvZmJuaHFjeGphb21sdmJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDMzNDksImV4cCI6MjA5NDMxOTM0OX0.pr3COkOr2h1V986c4-2tluSttWhQuiMD4H4OZaXmdW4">
     </label>
   </div>
 </div>
@@ -50,7 +50,14 @@
 </div>
 
 <div class="section">
-  <h3>🗜️ ШАГ 2 — Стиснути і перезалити</h3>
+  <h3>📤 ШАГ 2 — Завантажити фото з ZIP у новий Storage</h3>
+  <p style="color:#aaa;font-size:12px;margin:0 0 10px;">Вибери ZIP-файл бекапу → всі фото заллються у новий Storage зберігаючи структуру папок.</p>
+  <input type="file" id="zipFileInput" accept=".zip" style="display:none;" onchange="startUploadFromZip(this)">
+  <button class="btn-green" onclick="document.getElementById('zipFileInput').click()">📤 Вибрати ZIP і завантажити</button>
+</div>
+
+<div class="section">
+  <h3>🗜️ ШАГ 3 — Стиснути і перезалити</h3>
   <p style="color:#aaa;font-size:12px;margin:0 0 10px;">Стискає фото до макс. 1400px / JPEG 82% і перезаливає на те саме місце. URL не змінюються.</p>
   <button class="btn-gold" id="compressBtn" onclick="startCompress()" disabled>🗜️ Стиснути і перезалити</button>
 </div>
@@ -190,6 +197,73 @@ async function startBackup() {
   setStats(`Бекап готовий. Розмір ZIP: ${(zipBlob.size / 1024 / 1024).toFixed(1)} МБ`);
   bar.style.display = 'none';
   document.getElementById('backupBtn').disabled = false;
+}
+
+async function startUploadFromZip(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  sb = getSb();
+  if (!sb) return;
+
+  clearLog();
+  log(`📦 Читаємо ZIP: ${file.name}...`, 'info');
+
+  const bar = document.getElementById('bar');
+  bar.style.display = 'block';
+  bar.value = 0;
+
+  let zip;
+  try {
+    zip = await JSZip.loadAsync(file);
+  } catch(e) {
+    log(`❌ Не вдалося розпакувати ZIP: ${e.message}`, 'err');
+    bar.style.display = 'none';
+    return;
+  }
+
+  const IMAGE_EXTS_SET = new Set(['jpg','jpeg','png','webp','gif']);
+  const entries = [];
+  zip.forEach((relativePath, zipEntry) => {
+    if (zipEntry.dir) return;
+    const ext = relativePath.split('.').pop().toLowerCase();
+    if (IMAGE_EXTS_SET.has(ext)) entries.push({ path: relativePath, entry: zipEntry });
+  });
+
+  log(`📊 Знайдено у ZIP: ${entries.length} фото`, 'info');
+  bar.max = entries.length;
+
+  let done = 0, errors = 0;
+
+  for (let i = 0; i < entries.length; i++) {
+    const { path, entry } = entries[i];
+    bar.value = i + 1;
+    setStats(`Завантажую ${i + 1} / ${entries.length}: ${path}`);
+
+    try {
+      const blob = await entry.async('blob');
+      const mimeType = blob.type || 'image/jpeg';
+
+      const { error } = await sb.storage.from(BUCKET).upload(path, blob, {
+        upsert: true,
+        contentType: mimeType,
+        cacheControl: '604800'
+      });
+
+      if (error) { log(`❌ ${path}: ${error.message}`, 'err'); errors++; continue; }
+      log(`✅ ${path}`, 'ok');
+      done++;
+    } catch(e) {
+      log(`❌ ${path}: ${e.message}`, 'err'); errors++;
+    }
+
+    await new Promise(r => setTimeout(r, 100));
+  }
+
+  log(`\n🎉 Готово! Завантажено: ${done}, помилок: ${errors}`, 'info');
+  setStats(`Завантажено ${done} файлів у новий Storage.`);
+  bar.style.display = 'none';
+  input.value = '';
 }
 
 async function compressImageFromBlob(blob, filename) {
