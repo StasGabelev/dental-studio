@@ -76,8 +76,7 @@ const BUCKET = 'clinic-media';
 const MAX_PX = 1400;
 const QUALITY = 0.82;
 const IMAGE_EXTS = ['jpg','jpeg','png','webp','gif'];
-const ALL_EXTS = ['jpg','jpeg','png','webp','gif','mp4','mov','webm'];
-const FOLDERS = ['', 'cases', 'cases/stages', 'doctors', 'pages'];
+const ALL_EXTS = new Set(['jpg','jpeg','png','webp','gif','mp4','mov','webm','avi','mkv']);
 
 function log(msg, cls = '') {
   const d = document.getElementById('log');
@@ -97,17 +96,24 @@ function getSb() {
   return supabase.createClient(url, key);
 }
 
+// Recursive listing of all files in bucket
 async function listAllFiles(client, extFilter) {
+  const extSet = new Set(extFilter);
   let all = [];
-  for (const folder of FOLDERS) {
+
+  async function scanFolder(folder) {
     try {
       const { data, error } = await client.storage.from(BUCKET).list(folder, { limit: 1000 });
-      if (error) { log(`⚠️ Папка "${folder || 'root'}": ${error.message}`, 'warn'); continue; }
-      if (!data) continue;
+      if (error) { log(`⚠️ Папка "${folder || 'root'}": ${error.message}`, 'warn'); return; }
+      if (!data) return;
       for (const item of data) {
-        if (item.metadata) {
+        if (!item.metadata) {
+          // it's a subfolder — recurse
+          const subPath = folder ? `${folder}/${item.name}` : item.name;
+          await scanFolder(subPath);
+        } else {
           const ext = item.name.split('.').pop().toLowerCase();
-          if (extFilter.includes(ext)) {
+          if (extSet.has(ext)) {
             const path = folder ? `${folder}/${item.name}` : item.name;
             const sizeMB = item.metadata.size ? (item.metadata.size / 1024 / 1024).toFixed(2) : '?';
             all.push({ path, name: item.name, folder, sizeMB, size: item.metadata.size || 0 });
@@ -118,6 +124,8 @@ async function listAllFiles(client, extFilter) {
       log(`⚠️ Помилка "${folder || 'root'}": ${e.message}`, 'warn');
     }
   }
+
+  await scanFolder('');
   return all;
 }
 
@@ -129,8 +137,8 @@ async function startScan() {
   sb = getSb();
   if (!sb) return;
 
-  log('🔍 Сканування bucket "clinic-media"...', 'info');
-  const files = await listAllFiles(sb, IMAGE_EXTS);
+  log('🔍 Сканування bucket "clinic-media" (включаючи відео та підпапки)...', 'info');
+  const files = await listAllFiles(sb, [...ALL_EXTS]);
 
   if (files.length === 0) {
     log('Файлів не знайдено.', 'warn');
