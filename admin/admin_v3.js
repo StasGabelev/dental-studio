@@ -721,6 +721,7 @@ const SECTION_TITLES = {
     'ai-hub': 'AI HUB — Управління клінікою',
     'chat-logs': 'Чат-логи',
     'setup': 'Supabase',
+    'lusya-settings': '🌸 Люся — Внутрішній ІІ-Агент',
 };
 
 const SUPER_ADMIN_SECTIONS = ['ai-hub', 'chat-logs'];
@@ -1987,6 +1988,15 @@ async function loadAISettings() {
                 const autoBookEl = document.getElementById('aiAutonomousBooking');
                 if (autoBookEl) autoBookEl.checked = data.autonomous_booking || false;
 
+                // Populate Lusya fields
+                if (data.lusya_bot_token) document.getElementById('lusyaBotToken').value = data.lusya_bot_token;
+                if (data.lusya_openrouter_key) document.getElementById('lusyaOpenrouterKey').value = data.lusya_openrouter_key;
+                if (data.lusya_simple_model) document.getElementById('lusyaSimpleModel').value = data.lusya_simple_model;
+                if (data.lusya_complex_model) document.getElementById('lusyaComplexModel').value = data.lusya_complex_model;
+                if (data.lusya_simple_keywords) document.getElementById('lusyaSimpleKeywords').value = data.lusya_simple_keywords;
+                if (data.lusya_system_prompt) document.getElementById('lusyaSystemPrompt').value = data.lusya_system_prompt;
+                if (data.booking_rules) document.getElementById('bookingRules').value = JSON.stringify(data.booking_rules, null, 2);
+
                 return;
             }
         } catch(e) { console.warn('Supabase AI load error:', e); }
@@ -2088,6 +2098,58 @@ async function saveAISettings() {
         }
     } else {
         showToast('✅ Збережено локально');
+    }
+}
+
+async function saveLusyaSettings() {
+    const statusEl = document.getElementById('lusya-save-status');
+    statusEl.style.display = 'block';
+    statusEl.textContent = '⏳ Зберігаємо...';
+    statusEl.style.color = '#666';
+
+    try {
+        let bookingRules = null;
+        const bookingRulesRaw = document.getElementById('bookingRules').value.trim();
+        if (bookingRulesRaw) {
+            try { bookingRules = JSON.parse(bookingRulesRaw); }
+            catch(e) {
+                statusEl.textContent = '❌ Помилка: некоректний JSON в "Правила запису"';
+                statusEl.style.color = 'red';
+                return;
+            }
+        }
+
+        const updates = {
+            lusya_bot_token: document.getElementById('lusyaBotToken').value.trim() || null,
+            lusya_openrouter_key: document.getElementById('lusyaOpenrouterKey').value.trim() || null,
+            lusya_simple_model: document.getElementById('lusyaSimpleModel').value.trim() || 'google/gemini-flash-1.5',
+            lusya_complex_model: document.getElementById('lusyaComplexModel').value.trim() || 'anthropic/claude-sonnet-4-6',
+            lusya_simple_keywords: document.getElementById('lusyaSimpleKeywords').value.trim() || null,
+            lusya_system_prompt: document.getElementById('lusyaSystemPrompt').value.trim() || null,
+            booking_rules: bookingRules
+        };
+
+        if (sb) {
+            const { data: existing, error: selErr } = await sb.from('ai_settings').select('id').limit(1).single();
+            if (selErr && selErr.code !== 'PGRST116' && selErr.code !== '42P01') throw selErr;
+
+            if (existing) {
+                const { error } = await sb.from('ai_settings').update(updates).eq('id', existing.id);
+                if (error) throw error;
+            } else {
+                const { error } = await sb.from('ai_settings').insert(updates);
+                if (error) throw error;
+            }
+        } else {
+            throw new Error('Supabase не підключено');
+        }
+
+        statusEl.textContent = '✅ Налаштування Люси збережено!';
+        statusEl.style.color = 'green';
+        setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch(e) {
+        statusEl.textContent = '❌ Помилка: ' + e.message;
+        statusEl.style.color = 'red';
     }
 }
 

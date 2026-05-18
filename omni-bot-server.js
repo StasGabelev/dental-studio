@@ -5,6 +5,8 @@ const TelegramBot = require('node-telegram-bot-api');
 const ViberBot = require('viber-bot').Bot;
 const TextMessage = require('viber-bot').Message.Text;
 const fetch = require('node-fetch');
+const { initLusya } = require('./lusya-agent');
+const { initCampaignRunner, updateSettings: updateCampaignSettings } = require('./campaign-runner');
 
 // --- Configuration & Initialization ---
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ckldvntrsiacbjpiydmn.supabase.co';
@@ -62,6 +64,12 @@ async function refreshSettings() {
 
         // Build Knowledge Base String
         await rebuildKnowledgeBase();
+
+        // Initialize Lusya internal agent
+        initLusya(supabase, data);
+
+        // Hot-reload campaign runner settings (bots may have changed)
+        updateCampaignSettings(data, tgBot, viberBot);
     } catch (e) {
         console.warn('Settings Refresh Error:', e.message);
     }
@@ -129,12 +137,20 @@ ${knowledgeBase}`;
                 description: "Сделать реальную бронь в системе для клиента.",
                 parameters: {
                     type: "object",
-                    properties: { 
-                        patient_name: { type: "string" }, phone: { type: "string" }, 
-                        doctor_name: { type: "string" }, datetime: { type: "string" } 
+                    properties: {
+                        patient_name: { type: "string" }, phone: { type: "string" },
+                        doctor_name: { type: "string" }, datetime: { type: "string" }
                     },
                     required: ["patient_name", "phone", "datetime"]
                 }
+            }
+        },
+        {
+            type: "function",
+            function: {
+                name: "get_doctors_list",
+                description: "Отримати список активних лікарів клініки з їх спеціалізацією",
+                parameters: { type: "object", properties: {}, required: [] }
             }
         }
     ];
@@ -153,6 +169,11 @@ ${knowledgeBase}`;
             apiUrl = 'https://api.deepseek.com/v1/chat/completions';
         } else if (provider === 'google') {
             apiUrl = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'; // OpenAI compatibility layer
+        } else if (provider === 'anthropic') {
+            apiUrl = 'https://api.anthropic.com/v1/messages';
+            headers['x-api-key'] = aiSettings.api_key;
+            headers['anthropic-version'] = '2023-06-01';
+            delete headers['Authorization'];
         } else if (provider === 'openrouter') {
             headers['HTTP-Referer'] = 'https://dentstudio.in.ua';
             headers['X-Title'] = 'Dental Studio AI';
@@ -201,21 +222,33 @@ async function handleAITools(toolCalls, previousMessages) {
             resultStr = `{"status": "success", "free_slots": ["10:00", "11:30", "15:00"]}`;
         } else if (tc.function.name === 'make_booking') {
             console.log(`🤖 AI: Booking ${args.patient_name} at ${args.datetime}...`);
-            
-            if (aiSettings.autonomous_booking) {
-                // AUTO: Bypass admin tasks, 'Book' directly in CRM
-                // fetch(cc/api/public/v1/schedule/post) ...
-                resultStr = `{"status": "success", "message": "Бронь успешно создана в CRM. Скажи клиенту что все ок."}`;
-                triggerAdminAlert('System', args.patient_name, `[АВТОМАТ] ШІ щойно успішно записав клієнта на ${args.datetime} (${args.phone})`);
+
+            // Check booking rules: some services auto-book, others need admin approval
+            const bookingRules = aiSettings.booking_rules || {};
+            const autoBookServices = bookingRules.auto_book || [];
+            const service = (args.service || '').toLowerCase();
+            const isAutoBook = aiSettings.autonomous_booking || autoBookServices.some(s => service.includes(s.toLowerCase()));
+
+            if (isAutoBook) {
+                // AUTO: Book directly in CRM
+                resultStr = `{"status": "success", "message": "Запис оформлено автоматично. Повідом клієнту що все підтверджено на ${args.datetime}."}`;
+                triggerAdminAlert('System', args.patient_name, `[АВТО] ШІ записав клієнта ${args.patient_name} на ${args.datetime} (${args.phone})`);
             } else {
-                // MANUAL: Create admin_task
+                // MANUAL: Create admin_task for approval
                 await supabase.from('admin_tasks').insert({
-                    task_type: 'Бронювання',
-                    description: `Клієнт ${args.patient_name} (${args.phone}) просить запис на ${args.datetime}`,
-                    status: 'pending'
+                    type: 'booking_request',
+                    client_name: args.patient_name,
+                    description: `Клієнт ${args.patient_name} (${args.phone}) — запис на ${args.datetime}${args.service ? ', послуга: ' + args.service : ''}`,
+                    status: 'new',
+                    priority: 'normal',
+                    payload: { patient_name: args.patient_name, phone: args.phone, datetime: args.datetime, service: args.service, doctor: args.doctor_name }
                 });
-                resultStr = `{"status": "success", "message": "Запрос отправлен в админку на ручное подтверждение. Скажи клиенту, что ждем подтверждения от администратора."}`;
+                resultStr = `{"status": "success", "message": "Запит надіслано адміністратору на підтвердження. Попередь клієнта що запис буде підтверджений найближчим часом."}`;
             }
+        } else if (tc.function.name === 'get_doctors_list') {
+            const { data: doctors } = await supabase.from('cc_doctors')
+                .select('full_name, specialization').eq('is_active', true);
+            resultStr = JSON.stringify({ doctors: doctors || [] });
         }
         
         toolResults.push({ tool_call_id: tc.id, role: "tool", content: resultStr });
@@ -525,14 +558,140 @@ async function syncCliniccardsDatabase() {
     }
 }
 
+async function syncDoctors() {
+    if (!aiSettings?.cc_api_token || !aiSettings?.cc_clinic_id) return;
+    console.log('🔄 CRON: Syncing doctors from Cliniccards...');
+    try {
+        // NOTE: Verify endpoint name from Postman docs: https://documenter.getpostman.com/view/29513893/2s9YBxZbqY
+        // Likely: /employees or /doctors
+        const url = `https://cliniccards.com/api/public/v1/employees?clinic_id=${aiSettings.cc_clinic_id}`;
+        const response = await fetch(url, {
+            headers: { 'Token': aiSettings.cc_api_token, 'Content-Type': 'application/json' }
+        });
+        const res = await response.json();
+        if (res.result === 'success' && res.data) {
+            console.log(`📥 CRON: Syncing ${res.data.length} doctors...`);
+            for (const d of res.data) {
+                await supabase.from('cc_doctors').upsert({
+                    cc_id: String(d.id),
+                    full_name: [d.first_name, d.last_name].filter(Boolean).join(' ') || d.name || '',
+                    specialization: d.specialization || d.position || '',
+                    photo_url: d.photo || d.avatar || null,
+                    is_active: d.is_active !== false,
+                    schedule_json: d.schedule || null,
+                    last_sync_at: new Date().toISOString()
+                }, { onConflict: 'cc_id' });
+            }
+            console.log('✅ CRON: Doctors sync done.');
+        }
+    } catch (e) {
+        console.error('❌ CRON syncDoctors error:', e.message);
+    }
+}
+
+async function syncServices() {
+    if (!aiSettings?.cc_api_token || !aiSettings?.cc_clinic_id) return;
+    console.log('🔄 CRON: Syncing services from Cliniccards...');
+    try {
+        // NOTE: Verify endpoint from Postman docs
+        const url = `https://cliniccards.com/api/public/v1/services?clinic_id=${aiSettings.cc_clinic_id}`;
+        const response = await fetch(url, {
+            headers: { 'Token': aiSettings.cc_api_token, 'Content-Type': 'application/json' }
+        });
+        const res = await response.json();
+        if (res.result === 'success' && res.data) {
+            console.log(`📥 CRON: Syncing ${res.data.length} services...`);
+            for (const s of res.data) {
+                await supabase.from('cc_services').upsert({
+                    cc_id: String(s.id),
+                    name: s.name || s.title || '',
+                    category: s.category || s.group || '',
+                    price_min: parseFloat(s.price_min || s.price || 0),
+                    price_max: parseFloat(s.price_max || s.price || 0),
+                    duration_min: parseInt(s.duration || 0),
+                    is_active: s.is_active !== false,
+                    last_sync_at: new Date().toISOString()
+                }, { onConflict: 'cc_id' });
+            }
+            console.log('✅ CRON: Services sync done.');
+        }
+    } catch (e) {
+        console.error('❌ CRON syncServices error:', e.message);
+    }
+}
+
+async function syncVisitsAndRevenue() {
+    if (!aiSettings?.cc_api_token || !aiSettings?.cc_clinic_id) return;
+    console.log('🔄 CRON: Syncing visits & revenue from Cliniccards...');
+    try {
+        // Get visits for the last 7 days to catch recent ones
+        const dateFrom = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().split('T')[0];
+        // NOTE: Verify endpoint and param names from Postman docs
+        const url = `https://cliniccards.com/api/public/v1/schedule?clinic_id=${aiSettings.cc_clinic_id}&date_from=${dateFrom}`;
+        const response = await fetch(url, {
+            headers: { 'Token': aiSettings.cc_api_token, 'Content-Type': 'application/json' }
+        });
+        const res = await response.json();
+        if (res.result === 'success' && res.data) {
+            console.log(`📥 CRON: Syncing ${res.data.length} recent visits...`);
+            for (const v of res.data) {
+                // Upsert visit record
+                const visitRow = {
+                    cc_id: String(v.id),
+                    doctor_cc_id: String(v.doctor_id || v.employee_id || ''),
+                    visit_date: v.date || v.visit_date || null,
+                    time_start: v.time_start || v.start_time || null,
+                    time_end: v.time_end || v.end_time || null,
+                    status: v.status || 'PLANNED',
+                    service_name: v.service_name || v.service || null,
+                    amount_paid: parseFloat(v.amount || v.price || v.paid || 0) || null,
+                    note: v.note || v.comment || null,
+                    last_sync_at: new Date().toISOString()
+                };
+
+                // Find patient by cc_id to link
+                if (v.patient_id) {
+                    const { data: pt } = await supabase.from('cc_patients')
+                        .select('id').eq('cc_id', String(v.patient_id)).single();
+                    if (pt) {
+                        visitRow.patient_id = pt.id;
+                        // Update last_visit_at on patient if visit is completed
+                        if (v.status === 'VISITED' || v.status === 'visited' || v.status === 'done') {
+                            const visitDateTime = new Date(`${v.date || v.visit_date}T${v.time_end || v.end_time || '18:00'}:00`);
+                            await supabase.from('cc_patients').update({
+                                last_visit_at: visitDateTime.toISOString()
+                            }).eq('id', pt.id).lt('last_visit_at', visitDateTime.toISOString());
+                        }
+                    }
+                }
+
+                await supabase.from('cc_visits').upsert(visitRow, { onConflict: 'cc_id' });
+            }
+            console.log('✅ CRON: Visits & revenue sync done.');
+        }
+    } catch (e) {
+        console.error('❌ CRON syncVisitsAndRevenue error:', e.message);
+    }
+}
+
 // Start Server
 app.listen(PORT, async () => {
     console.log(`🚀 AI Omni-Server running on port ${PORT}`);
     await refreshSettings();
-    setInterval(refreshSettings, 60000 * 5); // Refresh settings every 5 mins
-    
-    // Start 30 min full database sync
-    setInterval(syncCliniccardsDatabase, 1800000); // 30 mins
-    // Initial sync call 10 seconds after boot
+    setInterval(refreshSettings, 60000 * 5); // every 5 min
+
+    setInterval(syncCliniccardsDatabase, 1800000); // patients: every 30 min
     setTimeout(syncCliniccardsDatabase, 10000);
+
+    setInterval(syncVisitsAndRevenue, 3600000); // visits+revenue: every 1 hour
+    setTimeout(syncVisitsAndRevenue, 30000);
+
+    // doctors and services: once per day (86400000 ms)
+    setInterval(syncDoctors, 86400000);
+    setInterval(syncServices, 86400000);
+    setTimeout(syncDoctors, 60000);    // first run 60s after start
+    setTimeout(syncServices, 90000);   // first run 90s after start
+
+    // Campaign runner: campaigns, surveys, automated flows
+    initCampaignRunner(supabase, aiSettings, tgBot, viberBot);
 });
