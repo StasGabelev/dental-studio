@@ -367,7 +367,7 @@ async function handleCallbackQuery(query) {
         const patientId = parts[parts.length - 1];
 
         if (rating === 'great') {
-            const reviewUrl = 'https://g.page/r/YOUR_GOOGLE_MAPS_LINK'; // Update with real link
+            const reviewUrl = 'https://g.page/r/CRieZR5gW2LwEAE/review';
             await _patientBot.sendMessage(chatId,
                 `Отлично! Мы рады, что вам понравилось! 😊\n\nБудем очень благодарны, если вы оставите отзыв — это очень помогает нам! ⭐\n${reviewUrl}`
             );

@@ -2,7 +2,77 @@
 -- Lusya Schema Migration
 -- Dental Studio (rozetka.space)
 -- Safe to run multiple times (idempotent)
+-- Run this file ONCE in Supabase SQL Editor
 -- ============================================================
+
+
+-- ============================================================
+-- 0. Base tables (from cliniccards_hub_setup.sql — safe if already exist)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS cc_patients (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cc_id TEXT UNIQUE,
+    full_name TEXT,
+    phone TEXT,
+    email TEXT,
+    gender TEXT,
+    dob DATE,
+    profession TEXT,
+    note TEXT,
+    last_sync_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS cc_visits (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cc_id TEXT UNIQUE,
+    patient_id UUID REFERENCES cc_patients(id) ON DELETE CASCADE,
+    doctor_id TEXT,
+    visit_date DATE,
+    time_start TIME,
+    time_end TIME,
+    status TEXT,
+    note TEXT,
+    last_sync_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS cc_children (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    parent_id UUID REFERENCES cc_patients(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    age INTEGER,
+    dob DATE,
+    note TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS cc_segments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    description TEXT,
+    query_logic JSONB,
+    member_count INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    last_run_at TIMESTAMPTZ
+);
+
+CREATE TABLE IF NOT EXISTS admin_tasks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type TEXT,
+    source_platform TEXT,
+    client_name TEXT,
+    description TEXT,
+    payload JSONB,
+    metadata JSONB,
+    status TEXT DEFAULT 'new',
+    priority TEXT DEFAULT 'normal',
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Indexes for base tables
+CREATE INDEX IF NOT EXISTS idx_cc_patients_phone ON cc_patients(phone);
+CREATE INDEX IF NOT EXISTS idx_admin_tasks_status ON admin_tasks(status);
 
 
 -- ============================================================
