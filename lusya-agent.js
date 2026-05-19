@@ -238,7 +238,7 @@ const LUSYA_TOOLS = [
             parameters: {
                 type: 'object',
                 properties: {
-                    gender: { type: 'string', description: 'male | female' },
+                    gender: { type: 'string', description: 'M | F' },
                     age_min: { type: 'number' },
                     age_max: { type: 'number' },
                     has_children: { type: 'boolean' },
@@ -246,7 +246,11 @@ const LUSYA_TOOLS = [
                     tag: { type: 'string', description: 'Тег из custom_tags' },
                     has_telegram: { type: 'boolean' },
                     no_visit_days: { type: 'number', description: 'Пациенты без визита более N дней' },
-                    limit: { type: 'number', description: 'Максимум записей (по умолчанию 20)' }
+                    last_visit_from: { type: 'string', description: 'Последний визит не раньше YYYY-MM-DD' },
+                    last_visit_to: { type: 'string', description: 'Последний визит не позже YYYY-MM-DD' },
+                    no_visit_since_days: { type: 'number', description: 'Пациенты без визита более N дней (синоним no_visit_days)' },
+                    service_name: { type: 'string', description: 'Название услуги которую получал пациент (напр. "чистка", "имплант")' },
+                    limit: { type: 'number', description: 'Максимум записей (по умолчанию 50)' }
                 },
                 required: []
             }
@@ -399,6 +403,60 @@ const LUSYA_TOOLS = [
             description: 'Список всех автоматических потоков и их статус (активен/не активен)',
             parameters: { type: 'object', properties: {}, required: [] }
         }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'send_campaign_now',
+            description: 'Немедленно запустить кампанию (перевести в статус scheduled с текущим временем). Рассылка начнётся через ~5 минут.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    campaign_id: { type: 'string', description: 'ID кампании из create_campaign' }
+                },
+                required: ['campaign_id']
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'get_audience_reach',
+            description: 'Узнать охват аудитории перед рассылкой: сколько человек, у скольких есть Telegram/Viber. Поддерживает те же фильтры что и search_patients.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    gender: { type: 'string' },
+                    age_min: { type: 'number' },
+                    age_max: { type: 'number' },
+                    has_children: { type: 'boolean' },
+                    has_telegram: { type: 'boolean' },
+                    no_visit_days: { type: 'number' },
+                    last_visit_from: { type: 'string' },
+                    last_visit_to: { type: 'string' },
+                    no_visit_since_days: { type: 'number' },
+                    service_name: { type: 'string' },
+                    tag: { type: 'string' }
+                },
+                required: []
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'get_free_slots',
+            description: 'Свободные окна у докторов на указанный период. Рабочий день 09:00-18:00, слоты по 30 мин.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    doctor_name: { type: 'string', description: 'Имя доктора (частичное). Пусто = все доктора.' },
+                    date_from: { type: 'string', description: 'YYYY-MM-DD' },
+                    date_to: { type: 'string', description: 'YYYY-MM-DD (по умолчанию = date_from)' }
+                },
+                required: ['date_from']
+            }
+        }
     }
 ];
 
@@ -425,44 +483,54 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
     switch (toolName) {
 
         case 'get_clinic_summary': {
-            const [pRes, vRes, dRes] = await Promise.all([
-                supabase.from('cc_patients').select('id', { count: 'exact', head: true }),
-                supabase.from('cc_visits').select('id', { count: 'exact', head: true })
-                    .gte('visit_date', new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0]),
-                supabase.from('cc_doctors').select('id', { count: 'exact', head: true }).eq('is_active', true)
-            ]);
+            const last30 = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
             const todayStr = today.toISOString().split('T')[0];
-            const { count: todayVisits } = await supabase.from('cc_visits')
-                .select('id', { count: 'exact', head: true }).eq('visit_date', todayStr);
+
+            const [pRes, vRes, vTodayRes, dRes, invRes] = await Promise.all([
+                supabase.from('cc_patients').select('id', { count: 'exact', head: true }),
+                supabase.from('cc_visits').select('id', { count: 'exact', head: true }).gte('visit_date', last30),
+                supabase.from('cc_visits').select('id', { count: 'exact', head: true }).eq('visit_date', todayStr),
+                supabase.from('cc_doctors').select('cc_id', { count: 'exact', head: true }),
+                supabase.from('cc_invoices').select('amount').gte('date', new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0])
+            ]);
+
+            const monthRevenue = (invRes.data || []).reduce((s, i) => s + parseFloat(i.amount || 0), 0);
+
             return {
-                total_patients: pRes.count,
-                visits_last_30_days: vRes.count,
-                visits_today: todayVisits,
-                active_doctors: dRes.count
+                total_patients: pRes.count || 0,
+                visits_last_30_days: vRes.count || 0,
+                visits_today: vTodayRes.count || 0,
+                active_doctors: dRes.count || 0,
+                revenue_this_month: Math.round(monthRevenue)
             };
         }
 
         case 'get_doctor_stats': {
             const { from, to } = getPeriodDates(args.period);
-            let query = supabase.from('cc_visits').select('doctor_cc_id, amount_paid, status')
-                .gte('visit_date', from).lte('visit_date', to);
 
-            const { data: visits } = await query;
-            if (!visits) return { error: 'No data' };
+            // Use cc_invoices for revenue (more reliable than cc_visits.amount_paid)
+            const [{ data: visits }, { data: invoices }, { data: doctors }] = await Promise.all([
+                supabase.from('cc_visits').select('doctor_cc_id, status')
+                    .gte('visit_date', from).lte('visit_date', to),
+                supabase.from('cc_invoices').select('doctor_cc_id, amount')
+                    .gte('date', from).lte('date', to),
+                supabase.from('cc_doctors').select('cc_id, full_name')
+            ]);
 
-            // Group by doctor
+            const doctorMap = {};
+            (doctors || []).forEach(d => { doctorMap[d.cc_id] = d.full_name; });
+
             const stats = {};
-            for (const v of visits) {
+            for (const v of (visits || [])) {
                 const key = v.doctor_cc_id || 'unknown';
                 if (!stats[key]) stats[key] = { visits: 0, revenue: 0 };
                 stats[key].visits++;
-                stats[key].revenue += parseFloat(v.amount_paid || 0);
             }
-
-            // Get doctor names
-            const { data: doctors } = await supabase.from('cc_doctors').select('cc_id, full_name');
-            const doctorMap = {};
-            (doctors || []).forEach(d => { doctorMap[d.cc_id] = d.full_name; });
+            for (const inv of (invoices || [])) {
+                const key = inv.doctor_cc_id || 'unknown';
+                if (!stats[key]) stats[key] = { visits: 0, revenue: 0 };
+                stats[key].revenue += parseFloat(inv.amount || 0);
+            }
 
             const result = Object.entries(stats).map(([ccId, s]) => ({
                 doctor: doctorMap[ccId] || ccId,
@@ -479,29 +547,30 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
 
         case 'get_revenue_report': {
             const { from, to } = getPeriodDates(args.period);
-            const { data: visits } = await supabase.from('cc_visits')
-                .select('doctor_cc_id, service_name, amount_paid')
-                .gte('visit_date', from).lte('visit_date', to)
-                .not('amount_paid', 'is', null);
 
-            if (!visits) return { total: 0, breakdown: [] };
+            // Use cc_invoices (has real paid amounts with service details)
+            const { data: invoices } = await supabase.from('cc_invoices')
+                .select('doctor_cc_id, doctor_name, amount, items')
+                .gte('date', from).lte('date', to);
 
-            const total = visits.reduce((sum, v) => sum + parseFloat(v.amount_paid || 0), 0);
+            if (!invoices?.length) return { period: args.period, total: 0, breakdown: [] };
+
+            const total = invoices.reduce((sum, inv) => sum + parseFloat(inv.amount || 0), 0);
             const breakdown = {};
 
             if (args.group_by === 'service') {
-                visits.forEach(v => {
-                    const key = v.service_name || 'Неизвестная услуга';
-                    breakdown[key] = (breakdown[key] || 0) + parseFloat(v.amount_paid || 0);
-                });
+                for (const inv of invoices) {
+                    for (const item of (inv.items || [])) {
+                        const key = item.plan_item_name || 'Неизвестная услуга';
+                        const amount = (item.price || 0) * (item.quantity || 1) * (1 - (item.discount || 0) / 100);
+                        breakdown[key] = (breakdown[key] || 0) + amount;
+                    }
+                }
             } else {
-                const { data: doctors } = await supabase.from('cc_doctors').select('cc_id, full_name');
-                const doctorMap = {};
-                (doctors || []).forEach(d => { doctorMap[d.cc_id] = d.full_name; });
-                visits.forEach(v => {
-                    const key = doctorMap[v.doctor_cc_id] || v.doctor_cc_id || 'Неизвестно';
-                    breakdown[key] = (breakdown[key] || 0) + parseFloat(v.amount_paid || 0);
-                });
+                for (const inv of invoices) {
+                    const key = inv.doctor_name || inv.doctor_cc_id || 'Неизвестно';
+                    breakdown[key] = (breakdown[key] || 0) + parseFloat(inv.amount || 0);
+                }
             }
 
             const sorted = Object.entries(breakdown)
@@ -528,32 +597,59 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
         }
 
         case 'search_patients': {
-            const limit = args.limit || 20;
-            let query = supabase.from('cc_patients').select('id, full_name, phone, gender, dob, has_children, profession_verified, profession, custom_tags, last_visit_at, telegram_id');
+            const limit = args.limit || 50;
 
+            // If filtering by service — get patient UUIDs from cc_invoices first
+            let servicePatientIds = null;
+            if (args.service_name) {
+                const { data: invs } = await supabase.from('cc_invoices')
+                    .select('patient_id')
+                    .ilike('items::text', `%${args.service_name}%`)
+                    .not('patient_id', 'is', null);
+                servicePatientIds = [...new Set((invs || []).map(i => i.patient_id))];
+                if (!servicePatientIds.length) return { count: 0, patients: [], note: 'Нет пациентов с такой услугой' };
+            }
+
+            let query = supabase.from('cc_patients')
+                .select('id, full_name, phone, gender, dob, has_children, custom_tags, last_visit_at, telegram_id, viber_id');
+
+            if (servicePatientIds) query = query.in('id', servicePatientIds);
             if (args.gender) query = query.eq('gender', args.gender);
             if (args.has_children !== undefined) query = query.eq('has_children', args.has_children);
             if (args.has_telegram) query = query.not('telegram_id', 'is', null);
-            if (args.profession) query = query.or(`profession.ilike.%${args.profession}%,profession_verified.ilike.%${args.profession}%`);
             if (args.tag) query = query.contains('custom_tags', [args.tag]);
-            if (args.no_visit_days) {
-                const cutoff = new Date(Date.now() - args.no_visit_days * 86400000).toISOString();
+            if (args.profession) query = query.or(`profession.ilike.%${args.profession}%,profession_verified.ilike.%${args.profession}%`);
+
+            const noVisitDays = args.no_visit_days || args.no_visit_since_days;
+            if (noVisitDays) {
+                const cutoff = new Date(Date.now() - noVisitDays * 86400000).toISOString();
                 query = query.or(`last_visit_at.lt.${cutoff},last_visit_at.is.null`);
             }
+            if (args.last_visit_from) query = query.gte('last_visit_at', args.last_visit_from);
+            if (args.last_visit_to) query = query.lte('last_visit_at', args.last_visit_to + 'T23:59:59');
+
             if (args.age_min || args.age_max) {
-                const now = today;
                 if (args.age_max) {
-                    const minDob = new Date(now.getFullYear() - args.age_max - 1, now.getMonth(), now.getDate());
+                    const minDob = new Date(today.getFullYear() - args.age_max - 1, today.getMonth(), today.getDate());
                     query = query.gte('dob', minDob.toISOString().split('T')[0]);
                 }
                 if (args.age_min) {
-                    const maxDob = new Date(now.getFullYear() - args.age_min, now.getMonth(), now.getDate());
+                    const maxDob = new Date(today.getFullYear() - args.age_min, today.getMonth(), today.getDate());
                     query = query.lte('dob', maxDob.toISOString().split('T')[0]);
                 }
             }
 
-            const { data, count } = await query.limit(limit);
-            return { count: data?.length || 0, patients: data || [] };
+            const { data } = await query.limit(limit);
+            const patients = data || [];
+            return {
+                count: patients.length,
+                patients,
+                reach: {
+                    with_telegram: patients.filter(p => p.telegram_id).length,
+                    with_viber: patients.filter(p => p.viber_id).length,
+                    unreachable: patients.filter(p => !p.telegram_id && !p.viber_id).length
+                }
+            };
         }
 
         case 'get_patient_profile': {
@@ -651,6 +747,127 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             const { data } = await supabase.from('automated_flows')
                 .select('id, name, trigger_type, delay_hours, is_active, created_at');
             return data || [];
+        }
+
+        case 'send_campaign_now': {
+            const { error } = await supabase.from('campaigns').update({
+                status: 'scheduled',
+                scheduled_at: new Date().toISOString()
+            }).eq('id', args.campaign_id);
+            return error ? { error: error.message } : { ok: true, message: 'Кампания запущена, рассылка начнётся через ~5 минут' };
+        }
+
+        case 'get_audience_reach': {
+            // Same filter logic as search_patients, but only counts
+            let servicePatientIds = null;
+            if (args.service_name) {
+                const { data: invs } = await supabase.from('cc_invoices')
+                    .select('patient_id').ilike('items::text', `%${args.service_name}%`).not('patient_id', 'is', null);
+                servicePatientIds = [...new Set((invs || []).map(i => i.patient_id))];
+                if (!servicePatientIds.length) return { total: 0, with_telegram: 0, with_viber: 0, unreachable: 0 };
+            }
+
+            let query = supabase.from('cc_patients').select('telegram_id, viber_id');
+            if (servicePatientIds) query = query.in('id', servicePatientIds);
+            if (args.gender) query = query.eq('gender', args.gender);
+            if (args.has_children !== undefined) query = query.eq('has_children', args.has_children);
+            if (args.has_telegram) query = query.not('telegram_id', 'is', null);
+            if (args.tag) query = query.contains('custom_tags', [args.tag]);
+            const noVisitDays = args.no_visit_days || args.no_visit_since_days;
+            if (noVisitDays) {
+                const cutoff = new Date(Date.now() - noVisitDays * 86400000).toISOString();
+                query = query.or(`last_visit_at.lt.${cutoff},last_visit_at.is.null`);
+            }
+            if (args.last_visit_from) query = query.gte('last_visit_at', args.last_visit_from);
+            if (args.last_visit_to) query = query.lte('last_visit_at', args.last_visit_to + 'T23:59:59');
+            if (args.age_min || args.age_max) {
+                if (args.age_max) {
+                    const minDob = new Date(today.getFullYear() - args.age_max - 1, today.getMonth(), today.getDate());
+                    query = query.gte('dob', minDob.toISOString().split('T')[0]);
+                }
+                if (args.age_min) {
+                    const maxDob = new Date(today.getFullYear() - args.age_min, today.getMonth(), today.getDate());
+                    query = query.lte('dob', maxDob.toISOString().split('T')[0]);
+                }
+            }
+
+            const { data } = await query.limit(10000);
+            const patients = data || [];
+            return {
+                total: patients.length,
+                with_telegram: patients.filter(p => p.telegram_id).length,
+                with_viber: patients.filter(p => p.viber_id).length,
+                unreachable: patients.filter(p => !p.telegram_id && !p.viber_id).length
+            };
+        }
+
+        case 'get_free_slots': {
+            const dateTo = args.date_to || args.date_from;
+            const WORK_START = 9, WORK_END = 18, SLOT_MIN = 30;
+
+            // Get booked slots
+            let query = supabase.from('cc_visits')
+                .select('visit_date, time_start, time_end, doctor_cc_id')
+                .gte('visit_date', args.date_from).lte('visit_date', dateTo)
+                .not('status', 'eq', 'CANCELLED');
+
+            const { data: doctors } = await supabase.from('cc_doctors').select('cc_id, full_name').eq('is_active', true);
+            const doctorMap = {};
+            (doctors || []).forEach(d => { doctorMap[d.cc_id] = d.full_name; });
+
+            if (args.doctor_name) {
+                const ids = (doctors || []).filter(d => d.full_name.toLowerCase().includes(args.doctor_name.toLowerCase())).map(d => d.cc_id);
+                if (ids.length) query = query.in('doctor_cc_id', ids);
+            }
+
+            const { data: booked } = await query;
+
+            // Build free slots per doctor per date
+            const bookedByDoctorDate = {};
+            for (const v of (booked || [])) {
+                const key = `${v.doctor_cc_id}|${v.visit_date}`;
+                if (!bookedByDoctorDate[key]) bookedByDoctorDate[key] = [];
+                bookedByDoctorDate[key].push({ start: v.time_start, end: v.time_end });
+            }
+
+            const result = [];
+            const targetDoctors = args.doctor_name
+                ? (doctors || []).filter(d => d.full_name.toLowerCase().includes(args.doctor_name.toLowerCase()))
+                : (doctors || []);
+
+            // Iterate dates
+            const start = new Date(args.date_from);
+            const end = new Date(dateTo);
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                const dow = d.getDay();
+                if (dow === 0 || dow === 6) continue; // skip weekends
+
+                for (const doc of targetDoctors) {
+                    const key = `${doc.cc_id}|${dateStr}`;
+                    const occupied = (bookedByDoctorDate[key] || []).map(s => {
+                        const [sh, sm] = (s.start || '09:00').split(':').map(Number);
+                        const [eh, em] = (s.end || '09:30').split(':').map(Number);
+                        return { from: sh * 60 + sm, to: eh * 60 + em };
+                    });
+
+                    const free = [];
+                    for (let t = WORK_START * 60; t < WORK_END * 60; t += SLOT_MIN) {
+                        const slotEnd = t + SLOT_MIN;
+                        const isFree = !occupied.some(o => t < o.to && slotEnd > o.from);
+                        if (isFree) {
+                            const hh = String(Math.floor(t / 60)).padStart(2, '0');
+                            const mm = String(t % 60).padStart(2, '0');
+                            free.push(`${hh}:${mm}`);
+                        }
+                    }
+
+                    if (free.length) {
+                        result.push({ doctor: doc.full_name, date: dateStr, free_slots: free });
+                    }
+                }
+            }
+            return result.length ? result : [{ message: 'Свободных окон не найдено' }];
         }
 
         default:
