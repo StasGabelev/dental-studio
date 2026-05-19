@@ -536,21 +536,24 @@ async function syncCliniccardsDatabase() {
             const patients = res.data;
             console.log(`📥 CRON: Retrieved ${patients.length} patients from CRM. Upserting to Supabase...`);
 
-            for (const p of patients) {
-                const row = {
-                    cc_id: String(p.patient_id),
-                    full_name: [p.lastname, p.firstname].filter(Boolean).join(' '),
-                    phone: p.phone || p.phone2 || '',
-                    email: p.email || '',
-                    gender: p.gender || null,
-                    dob: p.birthday || null,
-                    note: p.note || p.important_note || '',
-                    last_visit_at: p.last_visit_date ? new Date(p.last_visit_date).toISOString() : null,
-                    last_sync_at: new Date().toISOString()
-                };
-                supabase.from('cc_patients').upsert(row, { onConflict: 'cc_id' }).then(({error}) => {
-                    if (error) console.error('CRON Upsert Error for patient', p.patient_id, error.message);
-                });
+            const now = new Date().toISOString();
+            const rows = patients.map(p => ({
+                cc_id: String(p.patient_id),
+                full_name: [p.lastname, p.firstname].filter(Boolean).join(' '),
+                phone: p.phone || p.phone2 || '',
+                email: p.email || '',
+                gender: p.gender || null,
+                dob: p.birthday || null,
+                note: p.note || p.important_note || '',
+                last_visit_at: p.last_visit_date ? new Date(p.last_visit_date).toISOString() : null,
+                last_sync_at: now
+            }));
+            // Batch upsert in chunks of 500
+            const CHUNK = 500;
+            for (let i = 0; i < rows.length; i += CHUNK) {
+                const { error } = await supabase.from('cc_patients')
+                    .upsert(rows.slice(i, i + CHUNK), { onConflict: 'cc_id' });
+                if (error) console.error('CRON Patients batch error:', error.message);
             }
             console.log('✅ CRON: Patients sync completed.');
         } else {
