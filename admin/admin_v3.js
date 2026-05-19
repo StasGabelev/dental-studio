@@ -2126,7 +2126,7 @@ async function saveLusyaSettings() {
         const updates = {
             lusya_bot_token: document.getElementById('lusyaBotToken').value.trim() || null,
             lusya_openrouter_key: document.getElementById('lusyaOpenrouterKey').value.trim() || null,
-            lusya_simple_model: document.getElementById('lusyaSimpleModel').value.trim() || 'google/gemini-flash-1.5',
+            lusya_simple_model: document.getElementById('lusyaSimpleModel').value.trim() || 'google/gemini-2.0-flash-001',
             lusya_complex_model: document.getElementById('lusyaComplexModel').value.trim() || 'anthropic/claude-sonnet-4-6',
             lusya_simple_keywords: document.getElementById('lusyaSimpleKeywords').value.trim() || null,
             lusya_system_prompt: document.getElementById('lusyaSystemPrompt').value.trim() || null,
