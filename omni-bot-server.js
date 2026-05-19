@@ -639,23 +639,63 @@ async function syncVisitsAndRevenue() {
     }
 }
 
+async function syncInvoices() {
+    if (!aiSettings?.cc_api_token) return;
+    console.log('🔄 CRON: Syncing invoices from Cliniccards...');
+    try {
+        const dateFrom = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().split('T')[0];
+        const dateTo = new Date().toISOString().split('T')[0];
+        const url = `https://cliniccards.com/api/invoices?from=${dateFrom}&to=${dateTo}`;
+        const response = await fetch(url, { headers: ccHeaders() });
+        const res = await response.json();
+        if (res.result === 'success' && res.data) {
+            console.log(`📥 CRON: Syncing ${res.data.length} invoices...`);
+            for (const inv of res.data) {
+                const row = {
+                    cc_id: String(inv.id),
+                    patient_cc_id: String(inv.patient_id || ''),
+                    amount: parseFloat(inv.amount) || 0,
+                    date: inv.date_created || null,
+                    doctor_name: inv.issuer_name || null,
+                    doctor_cc_id: String(inv.issuer_id || ''),
+                    items: inv.invoice_items || [],
+                    performers: inv.performers || [],
+                    last_sync_at: new Date().toISOString()
+                };
+
+                // Link to patient UUID
+                if (inv.patient_id) {
+                    const { data: pt } = await supabase.from('cc_patients')
+                        .select('id').eq('cc_id', String(inv.patient_id)).single();
+                    if (pt) row.patient_id = pt.id;
+                }
+
+                await supabase.from('cc_invoices').upsert(row, { onConflict: 'cc_id' });
+            }
+            console.log('✅ CRON: Invoices sync done.');
+        }
+    } catch (e) {
+        console.error('❌ CRON syncInvoices error:', e.message);
+    }
+}
+
 // Start Server
 app.listen(PORT, async () => {
     console.log(`🚀 AI Omni-Server running on port ${PORT}`);
     await refreshSettings();
     setInterval(refreshSettings, 60000 * 5); // every 5 min
 
-    setInterval(syncCliniccardsDatabase, 1800000); // patients: every 30 min
+    setInterval(syncCliniccardsDatabase, 1800000);  // patients: every 30 min
     setTimeout(syncCliniccardsDatabase, 10000);
 
-    setInterval(syncVisitsAndRevenue, 3600000); // visits+revenue: every 1 hour
+    setInterval(syncVisitsAndRevenue, 600000);      // visits: every 10 min
     setTimeout(syncVisitsAndRevenue, 30000);
 
-    // doctors and services: once per day (86400000 ms)
-    setInterval(syncDoctors, 86400000);
-    setInterval(syncServices, 86400000);
-    setTimeout(syncDoctors, 60000);    // first run 60s after start
-    setTimeout(syncServices, 90000);   // first run 90s after start
+    setInterval(syncInvoices, 600000);              // invoices/finance: every 10 min
+    setTimeout(syncInvoices, 45000);
+
+    setInterval(syncDoctors, 86400000);             // doctors: once per day
+    setTimeout(syncDoctors, 60000);
 
     // Campaign runner: campaigns, surveys, automated flows
     initCampaignRunner(supabase, aiSettings, tgBot, viberBot);
