@@ -1987,13 +1987,20 @@ async function loadAISettings() {
                 if (autoBookEl) autoBookEl.checked = data.autonomous_booking || false;
 
                 // Populate Lusya fields
-                if (data.lusya_bot_token) document.getElementById('lusyaBotToken').value = data.lusya_bot_token;
-                if (data.lusya_openrouter_key) document.getElementById('lusyaOpenrouterKey').value = data.lusya_openrouter_key;
-                if (data.lusya_simple_model) document.getElementById('lusyaSimpleModel').value = data.lusya_simple_model;
-                if (data.lusya_complex_model) document.getElementById('lusyaComplexModel').value = data.lusya_complex_model;
-                if (data.lusya_simple_keywords) document.getElementById('lusyaSimpleKeywords').value = data.lusya_simple_keywords;
-                if (data.lusya_system_prompt) document.getElementById('lusyaSystemPrompt').value = data.lusya_system_prompt;
-                if (data.booking_rules) document.getElementById('bookingRules').value = JSON.stringify(data.booking_rules, null, 2);
+                const lusyaBotEl = document.getElementById('lusyaBotToken');
+                if (lusyaBotEl) lusyaBotEl.value = data.lusya_bot_token || '';
+                const lusyaOrEl = document.getElementById('lusyaOpenrouterKey');
+                if (lusyaOrEl) lusyaOrEl.value = data.lusya_openrouter_key || '';
+                const lusyaSimpleEl = document.getElementById('lusyaSimpleModel');
+                if (lusyaSimpleEl) lusyaSimpleEl.value = data.lusya_simple_model || '';
+                const lusyaComplexEl = document.getElementById('lusyaComplexModel');
+                if (lusyaComplexEl) lusyaComplexEl.value = data.lusya_complex_model || '';
+                const lusyaKwEl = document.getElementById('lusyaSimpleKeywords');
+                if (lusyaKwEl) lusyaKwEl.value = data.lusya_simple_keywords || '';
+                const lusyaPromptEl = document.getElementById('lusyaSystemPrompt');
+                if (lusyaPromptEl) lusyaPromptEl.value = data.lusya_system_prompt || '';
+                const bookingRulesEl = document.getElementById('bookingRules');
+                if (bookingRulesEl) bookingRulesEl.value = data.booking_rules ? JSON.stringify(data.booking_rules, null, 2) : '';
 
                 return;
             }
