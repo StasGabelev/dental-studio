@@ -2050,7 +2050,6 @@ async function saveAISettings() {
         waBotToken: document.getElementById('waBotToken').value,
         waLink: document.getElementById('waLink').value,
         ccApiToken: document.getElementById('ccApiToken').value,
-        ccClinicId: document.getElementById('ccClinicId').value,
         tgBotUsername: document.getElementById('tgBotUsername').value,
         viberBotUri: document.getElementById('viberBotUri').value,
         autonomousBooking: document.getElementById('aiAutonomousBooking').checked
