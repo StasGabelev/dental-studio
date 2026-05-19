@@ -770,6 +770,7 @@ function switchSection(sectionId, navEl) {
     if (sectionId === 'doctors') loadDoctors();
     if (sectionId === 'portfolio') loadCases();
     if (sectionId === 'ai-settings') loadAISettings();
+    if (sectionId === 'lusya-settings') loadAISettings();
     if (sectionId === 'ai-hub') loadAIHub();
     if (sectionId === 'chat-logs') loadChatLogs();
     if (sectionId === 'setup') loadSetupForm();
