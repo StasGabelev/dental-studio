@@ -1979,8 +1979,6 @@ async function loadAISettings() {
                 // Cliniccards & URIs
                 const ccTokenEl = document.getElementById('ccApiToken');
                 if (ccTokenEl) ccTokenEl.value = data.cc_api_token || '';
-                const ccIdEl = document.getElementById('ccClinicId');
-                if (ccIdEl) ccIdEl.value = data.cc_clinic_id || '';
                 const tgUserEl = document.getElementById('tgBotUsername');
                 if (tgUserEl) tgUserEl.value = data.tg_bot_username || '';
                 const viberUriEl = document.getElementById('viberBotUri');
@@ -2079,7 +2077,6 @@ async function saveAISettings() {
                 wa_bot_token: settings.waBotToken,
                 wa_link: settings.waLink,
                 cc_api_token: settings.ccApiToken,
-                cc_clinic_id: settings.ccClinicId,
                 tg_bot_username: settings.tgBotUsername,
                 viber_bot_uri: settings.viberBotUri,
                 autonomous_booking: settings.autonomousBooking,
@@ -2689,23 +2686,22 @@ async function sendToAIHub() {
 
 async function syncNow() {
     const ccToken = document.getElementById('ccApiToken')?.value;
-    const ccId = document.getElementById('ccClinicId')?.value;
-    
-    if (!ccToken || !ccId) {
-        showToast('❌ Спочатку введіть API Token та Clinic ID');
+
+    if (!ccToken) {
+        showToast('❌ Спочатку введіть Cliniccards API Token');
         return;
     }
 
     showToast('⏳ Початок синхронізації з Cliniccards...');
     const serverUrl = localStorage.getItem('ds_bot_server_url') || window.location.origin.replace('/admin', '');
-    
+
     try {
-        // 1. Fetch Patients via Proxy
+        // Fetch Patients via server proxy (token-only auth, no clinic_id needed)
         const response = await fetch(`${serverUrl}/api/proxy/cliniccards`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                endpoint: `https://cliniccards.com/api/public/v1/patients?clinic_id=${ccId}`,
+                endpoint: 'https://cliniccards.com/api/patients',
                 token: ccToken
             })
         });
@@ -2715,21 +2711,22 @@ async function syncNow() {
             const patients = res.data;
             showToast(`📥 Отримано ${patients.length} пацієнтів. Оновлюємо базу...`);
 
-            // 2. Upsert to Supabase
             for (const p of patients) {
                 const row = {
-                    cc_id: String(p.id),
-                    first_name: p.first_name || '',
-                    last_name: p.last_name || '',
-                    phone: p.phone || '',
-                    birthday: p.birthday || null,
-                    comment: p.comment || '',
+                    cc_id: String(p.patient_id),
+                    full_name: [p.lastname, p.firstname].filter(Boolean).join(' '),
+                    phone: p.phone || p.phone2 || '',
+                    email: p.email || '',
+                    gender: p.gender || null,
+                    dob: p.birthday || null,
+                    note: p.note || p.important_note || '',
+                    last_visit_at: p.last_visit_date ? new Date(p.last_visit_date).toISOString() : null,
                     last_sync_at: new Date().toISOString()
                 };
                 await sb.from('cc_patients').upsert(row, { onConflict: 'cc_id' });
             }
-            
-            showToast('✅ База дзеркальована успішно');
+
+            showToast('✅ База синхронізована успішно');
             updateSyncStatusUI();
         } else {
             throw new Error(res.error || 'Невірний формат відповіді');

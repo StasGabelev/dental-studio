@@ -516,40 +516,43 @@ app.post('/api/admin/task-action', async (req, res) => {
 });
 
 // --- 7. Autonomous 30-Min Sync Cron ---
+// Cliniccards API base: https://cliniccards.com/api
+// Auth: Token header only (no clinic_id param needed — token identifies the clinic)
+function ccHeaders() {
+    return { 'Token': aiSettings.cc_api_token, 'Content-Type': 'application/json' };
+}
+
 async function syncCliniccardsDatabase() {
-    if (!aiSettings || !aiSettings.cc_api_token || !aiSettings.cc_clinic_id) {
-        console.log('⏳ CRON: Skipping sync, Cliniccards credentials missing in ai_settings.');
+    if (!aiSettings || !aiSettings.cc_api_token) {
+        console.log('⏳ CRON: Skipping sync, cc_api_token missing in ai_settings.');
         return;
     }
 
     console.log('🔄 CRON: Starting 30-min background sync with Cliniccards API...');
     try {
-        const url = `https://cliniccards.com/api/public/v1/patients?clinic_id=${aiSettings.cc_clinic_id}`;
-        const response = await fetch(url, {
-            headers: { 'Token': aiSettings.cc_api_token, 'Content-Type': 'application/json' }
-        });
-        
+        const response = await fetch('https://cliniccards.com/api/patients', { headers: ccHeaders() });
         const res = await response.json();
         if (res.result === 'success' && res.data) {
             const patients = res.data;
             console.log(`📥 CRON: Retrieved ${patients.length} patients from CRM. Upserting to Supabase...`);
-            
+
             for (const p of patients) {
                 const row = {
-                    cc_id: String(p.id),
-                    first_name: p.first_name || '',
-                    last_name: p.last_name || '',
-                    phone: p.phone || '',
-                    birthday: p.birthday || null,
-                    comment: p.comment || '',
+                    cc_id: String(p.patient_id),
+                    full_name: [p.lastname, p.firstname].filter(Boolean).join(' '),
+                    phone: p.phone || p.phone2 || '',
+                    email: p.email || '',
+                    gender: p.gender || null,
+                    dob: p.birthday || null,
+                    note: p.note || p.important_note || '',
+                    last_visit_at: p.last_visit_date ? new Date(p.last_visit_date).toISOString() : null,
                     last_sync_at: new Date().toISOString()
                 };
-                // Fire and forget upserts for speed in background
                 supabase.from('cc_patients').upsert(row, { onConflict: 'cc_id' }).then(({error}) => {
-                    if (error) console.error('CRON Upsert Error for ID', p.id, error);
+                    if (error) console.error('CRON Upsert Error for patient', p.patient_id, error.message);
                 });
             }
-            console.log('✅ CRON: Background sync completed successfully.');
+            console.log('✅ CRON: Patients sync completed.');
         } else {
             console.warn('⚠️ CRON API Warning:', res);
         }
@@ -559,26 +562,19 @@ async function syncCliniccardsDatabase() {
 }
 
 async function syncDoctors() {
-    if (!aiSettings?.cc_api_token || !aiSettings?.cc_clinic_id) return;
+    if (!aiSettings?.cc_api_token) return;
     console.log('🔄 CRON: Syncing doctors from Cliniccards...');
     try {
-        // NOTE: Verify endpoint name from Postman docs: https://documenter.getpostman.com/view/29513893/2s9YBxZbqY
-        // Likely: /employees or /doctors
-        const url = `https://cliniccards.com/api/public/v1/employees?clinic_id=${aiSettings.cc_clinic_id}`;
-        const response = await fetch(url, {
-            headers: { 'Token': aiSettings.cc_api_token, 'Content-Type': 'application/json' }
-        });
+        const response = await fetch('https://cliniccards.com/api/staff', { headers: ccHeaders() });
         const res = await response.json();
         if (res.result === 'success' && res.data) {
-            console.log(`📥 CRON: Syncing ${res.data.length} doctors...`);
+            console.log(`📥 CRON: Syncing ${res.data.length} staff members...`);
             for (const d of res.data) {
                 await supabase.from('cc_doctors').upsert({
-                    cc_id: String(d.id),
-                    full_name: [d.first_name, d.last_name].filter(Boolean).join(' ') || d.name || '',
-                    specialization: d.specialization || d.position || '',
-                    photo_url: d.photo || d.avatar || null,
-                    is_active: d.is_active !== false,
-                    schedule_json: d.schedule || null,
+                    cc_id: String(d.doctor_id),
+                    full_name: [d.lastname, d.firstname].filter(Boolean).join(' '),
+                    specialization: d.role || '',
+                    is_active: true,
                     last_sync_at: new Date().toISOString()
                 }, { onConflict: 'cc_id' });
             }
@@ -590,84 +586,53 @@ async function syncDoctors() {
 }
 
 async function syncServices() {
-    if (!aiSettings?.cc_api_token || !aiSettings?.cc_clinic_id) return;
-    console.log('🔄 CRON: Syncing services from Cliniccards...');
-    try {
-        // NOTE: Verify endpoint from Postman docs
-        const url = `https://cliniccards.com/api/public/v1/services?clinic_id=${aiSettings.cc_clinic_id}`;
-        const response = await fetch(url, {
-            headers: { 'Token': aiSettings.cc_api_token, 'Content-Type': 'application/json' }
-        });
-        const res = await response.json();
-        if (res.result === 'success' && res.data) {
-            console.log(`📥 CRON: Syncing ${res.data.length} services...`);
-            for (const s of res.data) {
-                await supabase.from('cc_services').upsert({
-                    cc_id: String(s.id),
-                    name: s.name || s.title || '',
-                    category: s.category || s.group || '',
-                    price_min: parseFloat(s.price_min || s.price || 0),
-                    price_max: parseFloat(s.price_max || s.price || 0),
-                    duration_min: parseInt(s.duration || 0),
-                    is_active: s.is_active !== false,
-                    last_sync_at: new Date().toISOString()
-                }, { onConflict: 'cc_id' });
-            }
-            console.log('✅ CRON: Services sync done.');
-        }
-    } catch (e) {
-        console.error('❌ CRON syncServices error:', e.message);
-    }
+    // Services endpoint not available in Cliniccards API — skip silently
+    console.log('ℹ️ CRON: Services sync skipped (no API endpoint available).');
 }
 
 async function syncVisitsAndRevenue() {
-    if (!aiSettings?.cc_api_token || !aiSettings?.cc_clinic_id) return;
-    console.log('🔄 CRON: Syncing visits & revenue from Cliniccards...');
+    if (!aiSettings?.cc_api_token) return;
+    console.log('🔄 CRON: Syncing visits from Cliniccards...');
     try {
-        // Get visits for the last 7 days to catch recent ones
         const dateFrom = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().split('T')[0];
-        // NOTE: Verify endpoint and param names from Postman docs
-        const url = `https://cliniccards.com/api/public/v1/schedule?clinic_id=${aiSettings.cc_clinic_id}&date_from=${dateFrom}`;
-        const response = await fetch(url, {
-            headers: { 'Token': aiSettings.cc_api_token, 'Content-Type': 'application/json' }
-        });
+        const dateTo = new Date().toISOString().split('T')[0];
+        const url = `https://cliniccards.com/api/visits?from=${dateFrom}&to=${dateTo}`;
+        const response = await fetch(url, { headers: ccHeaders() });
         const res = await response.json();
         if (res.result === 'success' && res.data) {
             console.log(`📥 CRON: Syncing ${res.data.length} recent visits...`);
             for (const v of res.data) {
-                // Upsert visit record
+                const visitStart = v.visit_start ? new Date(v.visit_start) : null;
+                const visitEnd = v.visit_end ? new Date(v.visit_end) : null;
+
                 const visitRow = {
-                    cc_id: String(v.id),
-                    doctor_cc_id: String(v.doctor_id || v.employee_id || ''),
-                    visit_date: v.date || v.visit_date || null,
-                    time_start: v.time_start || v.start_time || null,
-                    time_end: v.time_end || v.end_time || null,
+                    cc_id: String(v.visit_id),
+                    doctor_cc_id: String(v.doctor_id || ''),
+                    doctor_id: String(v.doctor_id || ''),
+                    visit_date: visitStart ? visitStart.toISOString().split('T')[0] : null,
+                    time_start: visitStart ? visitStart.toTimeString().slice(0, 5) : null,
+                    time_end: visitEnd ? visitEnd.toTimeString().slice(0, 5) : null,
                     status: v.status || 'PLANNED',
-                    service_name: v.service_name || v.service || null,
-                    amount_paid: parseFloat(v.amount || v.price || v.paid || 0) || null,
-                    note: v.note || v.comment || null,
+                    note: v.note || null,
                     last_sync_at: new Date().toISOString()
                 };
 
-                // Find patient by cc_id to link
                 if (v.patient_id) {
                     const { data: pt } = await supabase.from('cc_patients')
                         .select('id').eq('cc_id', String(v.patient_id)).single();
                     if (pt) {
                         visitRow.patient_id = pt.id;
-                        // Update last_visit_at on patient if visit is completed
-                        if (v.status === 'VISITED' || v.status === 'visited' || v.status === 'done') {
-                            const visitDateTime = new Date(`${v.date || v.visit_date}T${v.time_end || v.end_time || '18:00'}:00`);
+                        if (v.status === 'VISITED' && visitEnd) {
                             await supabase.from('cc_patients').update({
-                                last_visit_at: visitDateTime.toISOString()
-                            }).eq('id', pt.id).lt('last_visit_at', visitDateTime.toISOString());
+                                last_visit_at: visitEnd.toISOString()
+                            }).eq('id', pt.id).or(`last_visit_at.is.null,last_visit_at.lt.${visitEnd.toISOString()}`);
                         }
                     }
                 }
 
                 await supabase.from('cc_visits').upsert(visitRow, { onConflict: 'cc_id' });
             }
-            console.log('✅ CRON: Visits & revenue sync done.');
+            console.log('✅ CRON: Visits sync done.');
         }
     } catch (e) {
         console.error('❌ CRON syncVisitsAndRevenue error:', e.message);
