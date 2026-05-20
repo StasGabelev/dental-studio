@@ -378,8 +378,20 @@ function setupTelegramHandlers() {
         const text = msg.text;
         if (!text) return;
 
-        // --- Очікуємо номер телефону ---
-        if (waitingForPhone.get(chatId)) {
+        // --- /start (завжди має пріоритет, скидає будь-який стан) ---
+        if (text === '/start') {
+            waitingForPhone.delete(chatId);
+            await tgBot.sendMessage(chatId,
+                'Привіт! 👋 Я — Люся, AI-асистент стоматології Dental Studio.\n\n' +
+                '🎁 Для нових підписників — знижка 10% на перший або наступний візит!\n' +
+                'Просто покажіть це повідомлення адміністратору.\n\n' +
+                'Чим можу допомогти?',
+                MAIN_MENU);
+            return;
+        }
+
+        // --- Очікуємо номер телефону (тільки якщо не команда меню) ---
+        if (waitingForPhone.get(chatId) && !text.startsWith('📅') && !text.startsWith('📋') && !text.startsWith('💰') && !text.startsWith('🤝') && !text.startsWith('📍') && !text.startsWith('⭐') && !text.startsWith('📞')) {
             const digits = text.replace(/\D/g, '');
             if (digits.length < 9) {
                 await tgBot.sendMessage(chatId,
@@ -389,17 +401,6 @@ function setupTelegramHandlers() {
             }
             waitingForPhone.delete(chatId);
             await showPatientHistory(chatId, digits.slice(-9));
-            return;
-        }
-
-        // --- /start ---
-        if (text === '/start') {
-            await tgBot.sendMessage(chatId,
-                'Привіт! 👋 Я — Люся, AI-асистент стоматології Dental Studio.\n\n' +
-                '🎁 Для нових підписників — знижка 10% на перший або наступний візит!\n' +
-                'Просто покажіть це повідомлення адміністратору.\n\n' +
-                'Чим можу допомогти?',
-                MAIN_MENU);
             return;
         }
 
