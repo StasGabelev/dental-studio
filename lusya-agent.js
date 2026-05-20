@@ -1200,13 +1200,11 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
         }
 
         case 'get_patient_stats': {
-            const { data: allPatients, error: spErr } = await supabase
-                .from('cc_patients')
-                .select('gender', { count: 'exact' });
-            if (spErr) throw spErr;
-            const total = allPatients.length;
-            const female = allPatients.filter(p => p.gender === 'F').length;
-            const male   = allPatients.filter(p => p.gender === 'M').length;
+            const [{ count: total }, { count: female }, { count: male }] = await Promise.all([
+                supabase.from('cc_patients').select('*', { count: 'exact', head: true }),
+                supabase.from('cc_patients').select('*', { count: 'exact', head: true }).eq('gender', 'F'),
+                supabase.from('cc_patients').select('*', { count: 'exact', head: true }).eq('gender', 'M'),
+            ]);
             const unknown = total - female - male;
             return { total, female, male, unknown };
         }
