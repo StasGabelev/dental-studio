@@ -309,8 +309,10 @@ async function handleAITools(toolCalls, previousMessages) {
 const MAIN_MENU = {
     reply_markup: {
         keyboard: [
-            [{ text: '📅 Записатися' }, { text: '💰 Моя знижка' }],
-            [{ text: '🤝 Наші партнери' }, { text: '📞 Контакти' }]
+            [{ text: '📅 Записатися онлайн' }, { text: '📋 Моя історія' }],
+            [{ text: '💰 Моя знижка' },         { text: '🤝 Наші партнери' }],
+            [{ text: '📍 Як нас знайти' },       { text: '⭐ Залишити відгук' }],
+            [{ text: '📞 Зворотний дзвінок' }]
         ],
         resize_keyboard: true,
         one_time_keyboard: false
@@ -318,41 +320,103 @@ const MAIN_MENU = {
 };
 
 function setupTelegramHandlers() {
+    // Handle shared phone number (for "Моя історія")
+    tgBot.on('contact', async (msg) => {
+        const chatId = msg.chat.id;
+        const rawPhone = msg.contact.phone_number.replace(/\D/g, '');
+        const phoneLast9 = rawPhone.slice(-9);
+
+        const { data: patients } = await supabase
+            .from('cc_patients')
+            .select('cc_id, full_name')
+            .ilike('phone', `%${phoneLast9}%`)
+            .limit(1);
+
+        if (!patients || patients.length === 0) {
+            await tgBot.sendMessage(chatId,
+                'На жаль, ми не знайшли вас у нашій базі.\nМожливо, ви реєструвались під іншим номером.\n\nЗателефонуйте нам: (077) 600 7 800',
+                MAIN_MENU);
+            return;
+        }
+
+        const patient = patients[0];
+        const { data: visits } = await supabase
+            .from('cc_visits')
+            .select('visit_date, service_name, doctor_name')
+            .eq('patient_id', patient.cc_id)
+            .order('visit_date', { ascending: false })
+            .limit(5);
+
+        if (!visits || visits.length === 0) {
+            await tgBot.sendMessage(chatId,
+                `Привіт, ${patient.full_name}!\n\nІсторія ваших візитів поки що порожня.`,
+                MAIN_MENU);
+            return;
+        }
+
+        const lines = visits.map(v => {
+            const date = v.visit_date ? v.visit_date.slice(0, 10) : '—';
+            const doc  = v.doctor_name   || 'Лікар';
+            const svc  = v.service_name  || 'Послуга';
+            return `📅 ${date}\n👨‍⚕️ ${doc}\n🦷 ${svc}`;
+        });
+        await tgBot.sendMessage(chatId,
+            `📋 Ваша історія візитів, ${patient.full_name}:\n\n${lines.join('\n\n')}`,
+            MAIN_MENU);
+    });
+
     tgBot.on('message', async (msg) => {
         const chatId = msg.chat.id;
         const text = msg.text;
         if (!text) return;
 
-        // --- /start command (no session needed) ---
+        // --- /start ---
         if (text === '/start') {
-            const welcomeText =
+            await tgBot.sendMessage(chatId,
                 'Привіт! 👋 Я — Люся, AI-асистент стоматології Dental Studio.\n\n' +
                 '🎁 Для нових підписників — знижка 10% на перший або наступний візит!\n' +
                 'Просто покажіть це повідомлення адміністратору.\n\n' +
-                'Чим можу допомогти?';
-            await tgBot.sendMessage(chatId, welcomeText, MAIN_MENU);
+                'Чим можу допомогти?',
+                MAIN_MENU);
             return;
         }
 
-        // --- Static menu buttons (no session needed) ---
+        // --- Записатися онлайн ---
+        if (text === '📅 Записатися онлайн') {
+            await tgBot.sendMessage(chatId, 'Оберіть зручний час для запису:', {
+                reply_markup: {
+                    inline_keyboard: [[
+                        { text: '📅 Відкрити онлайн-запис', url: 'https://cliniccards.com/booking/F4GL5d_VJuiZHbRWoE-xIdr86ciDnhBJ' }
+                    ]]
+                }
+            });
+            return;
+        }
+
+        // --- Моя історія ---
+        if (text === '📋 Моя історія') {
+            await tgBot.sendMessage(chatId,
+                'Для перегляду вашої історії візитів поділіться, будь ласка, номером телефону:',
+                {
+                    reply_markup: {
+                        keyboard: [[{ text: '📱 Поділитися номером телефону', request_contact: true }]],
+                        resize_keyboard: true,
+                        one_time_keyboard: true
+                    }
+                });
+            return;
+        }
+
+        // --- Моя знижка ---
         if (text === '💰 Моя знижка') {
-            const discountText =
+            await tgBot.sendMessage(chatId,
                 '🎁 Ваша знижка: 10% на лікування в Dental Studio.\n' +
-                'Покажіть це повідомлення адміністратору при наступному візиті.';
-            await tgBot.sendMessage(chatId, discountText, MAIN_MENU);
+                'Покажіть це повідомлення адміністратору при наступному візиті.',
+                MAIN_MENU);
             return;
         }
 
-        if (text === '📞 Контакти') {
-            const contactsText =
-                '📍 Dental Studio\n' +
-                'Чернігів, просп. Незалежності, 21\n' +
-                '📞 (077) 600 7 800\n' +
-                '🕐 Пн-Пт: 10:00 - 18:00';
-            await tgBot.sendMessage(chatId, contactsText, MAIN_MENU);
-            return;
-        }
-
+        // --- Наші партнери ---
         if (text === '🤝 Наші партнери') {
             try {
                 const { data: partners } = await supabase
@@ -364,44 +428,81 @@ function setupTelegramHandlers() {
                 let partnersText;
                 if (partners && partners.length > 0) {
                     const lines = partners.map(p => {
-                        let line = `🏢 *${p.name}*`;
-                        if (p.description) line += `\n${p.description}`;
+                        let line = `🏢 ${p.name}`;
+                        if (p.description)   line += `\n${p.description}`;
                         if (p.discount_text) line += `\n🎁 ${p.discount_text}`;
-                        if (p.contact) line += `\n📍 ${p.contact}`;
+                        if (p.contact)       line += `\n📍 ${p.contact}`;
                         return line;
                     });
-                    partnersText = '🤝 *Наші партнери*\n\n' + lines.join('\n\n');
+                    partnersText = '🤝 Наші партнери\n\n' + lines.join('\n\n');
                 } else {
-                    partnersText =
-                        '🤝 Наші партнери\n' +
-                        'Незабаром тут з\'являться знижки від наших партнерів!\n' +
-                        'Слідкуйте за оновленнями.';
+                    partnersText = '🤝 Наші партнери\n\nНезабаром тут з\'являться знижки від наших партнерів!\nСлідкуйте за оновленнями.';
                 }
-                await tgBot.sendMessage(chatId, partnersText, { parse_mode: 'Markdown', ...MAIN_MENU });
+                await tgBot.sendMessage(chatId, partnersText, MAIN_MENU);
             } catch (e) {
-                console.error('Partners fetch error:', e);
                 await tgBot.sendMessage(chatId,
-                    '🤝 Наші партнери\nНезабаром тут з\'являться знижки від наших партнерів!\nСлідкуйте за оновленнями.',
-                    MAIN_MENU
-                );
+                    '🤝 Наші партнери\n\nНезабаром тут з\'являться знижки від наших партнерів!',
+                    MAIN_MENU);
             }
             return;
         }
 
-        // --- "Записатися" button — pass to AI ---
-        const aiText = text === '📅 Записатися' ? 'Хочу записатися на прийом' : text;
+        // --- Як нас знайти ---
+        if (text === '📍 Як нас знайти') {
+            await tgBot.sendMessage(chatId,
+                '📍 Dental Studio\nЧернігів, просп. Незалежності, 21\n📞 (077) 600 7 800\n🕐 Пн-Пт: 10:00 - 18:00',
+                {
+                    reply_markup: {
+                        inline_keyboard: [[
+                            { text: '🗺 Відкрити в Google Maps', url: 'https://maps.google.com/?q=Chernihiv,+Nezalezhnosti+21' }
+                        ]]
+                    }
+                });
+            return;
+        }
 
+        // --- Залишити відгук ---
+        if (text === '⭐ Залишити відгук') {
+            await tgBot.sendMessage(chatId,
+                'Будемо дуже вдячні за ваш відгук! Це займе лише хвилину 🙏',
+                {
+                    reply_markup: {
+                        inline_keyboard: [[
+                            { text: '⭐ Залишити відгук в Google', url: 'https://g.page/r/CRieZR5gW2LwEAE/review' }
+                        ]]
+                    }
+                });
+            return;
+        }
+
+        // --- Зворотний дзвінок ---
+        if (text === '📞 Зворотний дзвінок') {
+            if (aiSettings?.tg_bot_token && aiSettings?.tg_chat_id) {
+                const alertBot = new TelegramBot(aiSettings.tg_bot_token);
+                const name = [msg.from.first_name, msg.from.last_name].filter(Boolean).join(' ');
+                const uname = msg.from.username ? ` (@${msg.from.username})` : '';
+                alertBot.sendMessage(aiSettings.tg_chat_id,
+                    `☎️ *Зворотний дзвінок*\n\nКлієнт ${name}${uname} просить передзвонити.`,
+                    { parse_mode: 'Markdown' });
+            }
+            await tgBot.sendMessage(chatId,
+                '☎️ Ваш запит передано адміністратору.\nМи зателефонуємо вам найближчим часом!\n\n🕐 Графік роботи: Пн-Пт 10:00-18:00',
+                MAIN_MENU);
+            return;
+        }
+
+        // --- Default: AI ---
         let session = await getOrCreateSession('telegram', chatId, msg.from.first_name);
         const history = await getChatHistory(session.id);
-        const reply = await getAIResponse(aiText, history);
+        const reply = await getAIResponse(text, history);
 
-        await saveMessage(session.id, 'user', aiText);
+        await saveMessage(session.id, 'user', text);
         await saveMessage(session.id, 'bot', reply);
 
         await tgBot.sendMessage(chatId, reply.replace(/\[\[.*?\]\]/g, ''), MAIN_MENU);
 
         if (reply.includes('[[CALLBACK:TRUE]]')) {
-            triggerAdminAlert('Telegram', msg.from.first_name, aiText, session.id);
+            triggerAdminAlert('Telegram', msg.from.first_name, text, session.id);
         }
     });
 }
