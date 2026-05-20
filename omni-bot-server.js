@@ -434,6 +434,48 @@ function setupTelegramHandlers() {
     // Inline button: "Підв'язати номер"
     tgBot.on('callback_query', async (query) => {
         const chatId = query.message.chat.id;
+        if (query.data === 'booking_request') {
+            await tgBot.answerCallbackQuery(query.id, { text: '✅ Дякуємо! Незабаром зателефонуємо.' });
+
+            // Get client info
+            const { data: mu } = await supabase
+                .from('messenger_users')
+                .select('patient_phone, patient_cc_id')
+                .eq('platform', 'telegram')
+                .eq('platform_user_id', String(chatId))
+                .single();
+
+            let clientName = [query.from.first_name, query.from.last_name].filter(Boolean).join(' ') || 'Клієнт';
+            let phone = mu?.patient_phone || '—';
+
+            if (mu?.patient_cc_id) {
+                const { data: pt } = await supabase
+                    .from('cc_patients')
+                    .select('full_name, phone')
+                    .eq('cc_id', mu.patient_cc_id)
+                    .single();
+                if (pt) {
+                    clientName = pt.full_name || clientName;
+                    phone = pt.phone || phone;
+                }
+            }
+
+            // Notify admin
+            if (aiSettings?.tg_bot_token && aiSettings?.tg_chat_id) {
+                const alertBot = new TelegramBot(aiSettings.tg_bot_token);
+                alertBot.sendMessage(aiSettings.tg_chat_id,
+                    `📅 *Хоче записатися!*\n\n👤 ${clientName}\n📞 ${phone}\n\n_Натиснув кнопку в розсилці — передзвоніть для підтвердження._`,
+                    { parse_mode: 'Markdown' }
+                );
+            }
+
+            await tgBot.sendMessage(chatId,
+                '✅ Дякуємо! Наш адміністратор зателефонує вам найближчим часом для уточнення зручного часу.\n\n🕐 Графік роботи: Пн–Пт 10:00–18:00',
+                MAIN_MENU
+            );
+            return;
+        }
+
         if (query.data === 'link_phone') {
             await tgBot.answerCallbackQuery(query.id);
             waitingForPhone.set(chatId, true);

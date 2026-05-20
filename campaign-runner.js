@@ -115,9 +115,13 @@ async function runPendingCampaigns() {
                 const vars = getPatientVars(patient);
                 const text = renderTemplate(campaign.message_template, vars);
 
+                const bookingBtn = campaign.add_booking_button !== false
+                    ? [[{ text: '📅 Записатися', callback_data: 'booking_request' }]]
+                    : null;
+
                 let delivery;
                 try {
-                    delivery = await sendToPatient(patient, text);
+                    delivery = await sendToPatient(patient, text, bookingBtn);
                 } catch (e) {
                     delivery = { channel: null, success: false, error: e.message };
                 }
