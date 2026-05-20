@@ -5,6 +5,13 @@ const fetch = require('node-fetch');
 let lusyaBot = null;
 let lusyaBotToken = null;
 
+// Balance monitoring state
+let _adminChatId = null;          // auto-detected from first incoming message
+let _lastBalanceWarnAt = 0;        // timestamp of last warning to avoid spam
+const BALANCE_WARN_USD  = 3;       // ⚠️ warn below $3
+const BALANCE_CRIT_USD  = 1;       // 🔴 critical below $1
+const BALANCE_WARN_EVERY_MS = 6 * 3600 * 1000;  // at most once per 6 hours
+
 // ─── Init ────────────────────────────────────────────────────────────────────
 
 function initLusya(supabase, aiSettings) {
@@ -19,10 +26,20 @@ function initLusya(supabase, aiSettings) {
     lusyaBotToken = token;
     lusyaBot = new TelegramBot(token, { polling: true });
 
+    // Start hourly balance check
+    const apiKey = aiSettings?.lusya_openrouter_key || aiSettings?.api_key;
+    if (apiKey) {
+        runBalanceCheck(apiKey); // check immediately on startup
+        setInterval(() => runBalanceCheck(apiKey), 3600 * 1000); // then every hour
+    }
+
     lusyaBot.on('message', async (msg) => {
         const chatId = String(msg.chat.id);
         const text = msg.text;
         if (!text) return;
+
+        // Track who writes to Lusya — last sender becomes the alert recipient
+        _adminChatId = chatId;
 
         // Only respond to text messages, ignore commands except /start
         if (text === '/start') {
@@ -43,6 +60,72 @@ function initLusya(supabase, aiSettings) {
     lusyaBot.on('polling_error', (e) => console.error('Lusya polling error:', e.message));
     console.log('🌸 Lusya agent initialized.');
     return lusyaBot;
+}
+
+// ─── Balance monitoring ───────────────────────────────────────────────────────
+
+async function getOpenRouterBalance(apiKey) {
+    // /api/v1/credits — works for prepaid accounts (returns USD)
+    try {
+        const res = await fetch('https://openrouter.ai/api/v1/credits', {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
+        if (res.ok) {
+            const j = await res.json();
+            if (j.data) {
+                const remaining = (j.data.total_credits || 0) - (j.data.total_usage || 0);
+                return { remaining, usage: j.data.total_usage, limit: j.data.total_credits };
+            }
+        }
+    } catch (_) {}
+
+    // Fallback: /api/v1/auth/key — works when key has explicit spend limit
+    try {
+        const res = await fetch('https://openrouter.ai/api/v1/auth/key', {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
+        if (res.ok) {
+            const j = await res.json();
+            const usage = j.data?.usage || 0;
+            const limit = j.data?.limit;
+            if (limit != null) return { remaining: limit - usage, usage, limit };
+        }
+    } catch (_) {}
+
+    return null; // can't determine balance
+}
+
+async function runBalanceCheck(apiKey) {
+    if (!lusyaBot || !_adminChatId) return;
+
+    const bal = await getOpenRouterBalance(apiKey);
+    if (!bal) return; // balance unknown — skip
+
+    const { remaining } = bal;
+    const isCritical = remaining < BALANCE_CRIT_USD;
+    const isWarning  = remaining < BALANCE_WARN_USD;
+
+    if (!isWarning) return;
+
+    const now = Date.now();
+    // For critical: warn every 6h; for warning: only once until it drops further
+    if (now - _lastBalanceWarnAt < BALANCE_WARN_EVERY_MS) return;
+    _lastBalanceWarnAt = now;
+
+    const icon = isCritical ? '🔴' : '⚠️';
+    const level = isCritical ? 'КРИТИЧНО' : 'Попередження';
+    const advice = isCritical
+        ? 'Люся може перестати відповідати. Поповніть зараз!'
+        : 'Поповніть баланс щоб Люся продовжувала працювати.';
+
+    const text = `${icon} *OpenRouter — ${level}*\n\nЗалишилось на балансі: *$${remaining.toFixed(2)}*\n${advice}\n\n👉 https://openrouter.ai/credits`;
+
+    try {
+        await lusyaBot.sendMessage(_adminChatId, text, { parse_mode: 'Markdown' });
+        console.log(`💰 Balance warning sent: $${remaining.toFixed(2)} remaining`);
+    } catch (e) {
+        console.error('Balance warning send error:', e.message);
+    }
 }
 
 // ─── Core message handler ────────────────────────────────────────────────────
