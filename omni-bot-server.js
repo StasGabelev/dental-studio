@@ -323,10 +323,7 @@ function setupTelegramHandlers() {
         const text = msg.text;
         if (!text) return;
 
-        // Get or Create Session
-        let session = await getOrCreateSession('telegram', chatId, msg.from.first_name);
-
-        // --- /start command ---
+        // --- /start command (no session needed) ---
         if (text === '/start') {
             const welcomeText =
                 'Привіт! 👋 Я — Люся, AI-асистент стоматології Dental Studio.\n\n' +
@@ -337,7 +334,7 @@ function setupTelegramHandlers() {
             return;
         }
 
-        // --- Static menu buttons ---
+        // --- Static menu buttons (no session needed) ---
         if (text === '💰 Моя знижка') {
             const discountText =
                 '🎁 Ваша знижка: 10% на лікування в Dental Studio.\n' +
@@ -394,6 +391,7 @@ function setupTelegramHandlers() {
         // --- "Записатися" button — pass to AI ---
         const aiText = text === '📅 Записатися' ? 'Хочу записатися на прийом' : text;
 
+        let session = await getOrCreateSession('telegram', chatId, msg.from.first_name);
         const history = await getChatHistory(session.id);
         const reply = await getAIResponse(aiText, history);
 
