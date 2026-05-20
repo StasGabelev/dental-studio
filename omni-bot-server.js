@@ -306,6 +306,17 @@ async function handleAITools(toolCalls, previousMessages) {
 
 // --- 3. Platform Handlers ---
 
+const MAIN_MENU = {
+    reply_markup: {
+        keyboard: [
+            [{ text: '📅 Записатися' }, { text: '💰 Моя знижка' }],
+            [{ text: '🤝 Наші партнери' }, { text: '📞 Контакти' }]
+        ],
+        resize_keyboard: true,
+        one_time_keyboard: false
+    }
+};
+
 function setupTelegramHandlers() {
     tgBot.on('message', async (msg) => {
         const chatId = msg.chat.id;
@@ -314,30 +325,188 @@ function setupTelegramHandlers() {
 
         // Get or Create Session
         let session = await getOrCreateSession('telegram', chatId, msg.from.first_name);
-        
-        const history = await getChatHistory(session.id);
-        const reply = await getAIResponse(text, history);
 
-        await saveMessage(session.id, 'user', text);
+        // --- /start command ---
+        if (text === '/start') {
+            const welcomeText =
+                'Привіт! 👋 Я — Люся, AI-асистент стоматології Dental Studio.\n\n' +
+                '🎁 Для нових підписників — знижка 10% на перший або наступний візит!\n' +
+                'Просто покажіть це повідомлення адміністратору.\n\n' +
+                'Чим можу допомогти?';
+            await tgBot.sendMessage(chatId, welcomeText, MAIN_MENU);
+            return;
+        }
+
+        // --- Static menu buttons ---
+        if (text === '💰 Моя знижка') {
+            const discountText =
+                '🎁 Ваша знижка: 10% на лікування в Dental Studio.\n' +
+                'Покажіть це повідомлення адміністратору при наступному візиті.';
+            await tgBot.sendMessage(chatId, discountText, MAIN_MENU);
+            return;
+        }
+
+        if (text === '📞 Контакти') {
+            const contactsText =
+                '📍 Dental Studio\n' +
+                'Чернігів, просп. Незалежності, 21\n' +
+                '📞 (077) 600 7 800\n' +
+                '🕐 Пн-Пт: 10:00 - 18:00';
+            await tgBot.sendMessage(chatId, contactsText, MAIN_MENU);
+            return;
+        }
+
+        if (text === '🤝 Наші партнери') {
+            try {
+                const { data: partners } = await supabase
+                    .from('partners')
+                    .select('name, description, discount_text, contact')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: true });
+
+                let partnersText;
+                if (partners && partners.length > 0) {
+                    const lines = partners.map(p => {
+                        let line = `🏢 *${p.name}*`;
+                        if (p.description) line += `\n${p.description}`;
+                        if (p.discount_text) line += `\n🎁 ${p.discount_text}`;
+                        if (p.contact) line += `\n📍 ${p.contact}`;
+                        return line;
+                    });
+                    partnersText = '🤝 *Наші партнери*\n\n' + lines.join('\n\n');
+                } else {
+                    partnersText =
+                        '🤝 Наші партнери\n' +
+                        'Незабаром тут з\'являться знижки від наших партнерів!\n' +
+                        'Слідкуйте за оновленнями.';
+                }
+                await tgBot.sendMessage(chatId, partnersText, { parse_mode: 'Markdown', ...MAIN_MENU });
+            } catch (e) {
+                console.error('Partners fetch error:', e);
+                await tgBot.sendMessage(chatId,
+                    '🤝 Наші партнери\nНезабаром тут з\'являться знижки від наших партнерів!\nСлідкуйте за оновленнями.',
+                    MAIN_MENU
+                );
+            }
+            return;
+        }
+
+        // --- "Записатися" button — pass to AI ---
+        const aiText = text === '📅 Записатися' ? 'Хочу записатися на прийом' : text;
+
+        const history = await getChatHistory(session.id);
+        const reply = await getAIResponse(aiText, history);
+
+        await saveMessage(session.id, 'user', aiText);
         await saveMessage(session.id, 'bot', reply);
-        
-        tgBot.sendMessage(chatId, reply.replace(/\[\[.*?\]\]/g, ''));
+
+        await tgBot.sendMessage(chatId, reply.replace(/\[\[.*?\]\]/g, ''), MAIN_MENU);
 
         if (reply.includes('[[CALLBACK:TRUE]]')) {
-            triggerAdminAlert('Telegram', msg.from.first_name, text, session.id);
+            triggerAdminAlert('Telegram', msg.from.first_name, aiText, session.id);
         }
     });
 }
 
+function getViberMenuKeyboard() {
+    return {
+        Type: "keyboard",
+        DefaultHeight: false,
+        Buttons: [
+            { ActionType: "reply", ActionBody: "📅 Записатися", Text: "📅 Записатися", TextSize: "regular" },
+            { ActionType: "reply", ActionBody: "💰 Моя знижка", Text: "💰 Моя знижка", TextSize: "regular" },
+            { ActionType: "reply", ActionBody: "🤝 Наші партнери", Text: "🤝 Наші партнери", TextSize: "regular" },
+            { ActionType: "reply", ActionBody: "📞 Контакти", Text: "📞 Контакти", TextSize: "regular" }
+        ]
+    };
+}
+
 function setupViberHandlers() {
     viberBot.onSubscribe(response => {
-        response.send(new TextMessage(`Вітаю, ${response.userProfile.name}! Я AI-асистент Dental Studio. Чим можу допомогти?`));
+        const keyboard = getViberMenuKeyboard();
+        const welcomeText =
+            `Привіт! 👋 Я — Люся, AI-асистент стоматології Dental Studio.\n\n` +
+            `🎁 Для нових підписників — знижка 10% на перший або наступний візит!\n` +
+            `Просто покажіть це повідомлення адміністратору.\n\n` +
+            `Оберіть дію нижче або напишіть своє питання.`;
+        response.send(new TextMessage(welcomeText, undefined, undefined, undefined, undefined, keyboard));
     });
 
     viberBot.onTextMessage(async (message, response) => {
         const userId = response.userProfile.id;
         const text = message.text;
 
+        const keyboard = getViberMenuKeyboard();
+
+        // --- Menu button: Записатися ---
+        if (text === '📅 Записатися') {
+            let session = await getOrCreateSession('viber', userId, response.userProfile.name);
+            const history = await getChatHistory(session.id);
+            const aiText = 'Хочу записатися на прийом';
+            const reply = await getAIResponse(aiText, history);
+
+            await saveMessage(session.id, 'user', aiText);
+            await saveMessage(session.id, 'bot', reply);
+
+            response.send(new TextMessage(reply.replace(/\[\[.*?\]\]/g, ''), undefined, undefined, undefined, undefined, keyboard));
+
+            if (reply.includes('[[CALLBACK:TRUE]]')) {
+                triggerAdminAlert('Viber', response.userProfile.name, aiText, session.id);
+            }
+            return;
+        }
+
+        // --- Menu button: Моя знижка ---
+        if (text === '💰 Моя знижка') {
+            const discountText =
+                `🎁 Ваша знижка: 10% на лікування в Dental Studio.\n` +
+                `Покажіть це повідомлення адміністратору при наступному візиті.`;
+            response.send(new TextMessage(discountText, undefined, undefined, undefined, undefined, keyboard));
+            return;
+        }
+
+        // --- Menu button: Наші партнери ---
+        if (text === '🤝 Наші партнери') {
+            try {
+                const { data: partners } = await supabase.from('partners').select('*').eq('is_active', true);
+                if (partners && partners.length > 0) {
+                    const list = partners.map(p => {
+                        let line = `• ${p.name}`;
+                        if (p.discount_text) line += ` — ${p.discount_text}`;
+                        if (p.description) line += `\n  ${p.description}`;
+                        if (p.contact) line += `\n  📍 ${p.contact}`;
+                        return line;
+                    }).join('\n\n');
+                    response.send(new TextMessage(`🤝 Наші партнери\n\n${list}`, undefined, undefined, undefined, undefined, keyboard));
+                } else {
+                    const emptyText =
+                        `🤝 Наші партнери\n\n` +
+                        `Незабаром тут з'являться знижки від наших партнерів!\n` +
+                        `Слідкуйте за оновленнями.`;
+                    response.send(new TextMessage(emptyText, undefined, undefined, undefined, undefined, keyboard));
+                }
+            } catch (e) {
+                console.error('Viber partners fetch error:', e);
+                response.send(new TextMessage(
+                    `🤝 Наші партнери\n\nНезабаром тут з'являться знижки від наших партнерів!\nСлідкуйте за оновленнями.`,
+                    undefined, undefined, undefined, undefined, keyboard
+                ));
+            }
+            return;
+        }
+
+        // --- Menu button: Контакти ---
+        if (text === '📞 Контакти') {
+            const contactsText =
+                `📍 Dental Studio\n` +
+                `Чернігів, просп. Незалежності, 21\n` +
+                `📞 (077) 600 7 800\n` +
+                `🕐 Пн-Пт: 10:00 - 18:00`;
+            response.send(new TextMessage(contactsText, undefined, undefined, undefined, undefined, keyboard));
+            return;
+        }
+
+        // --- Default: pass to AI ---
         let session = await getOrCreateSession('viber', userId, response.userProfile.name);
         const history = await getChatHistory(session.id);
         const reply = await getAIResponse(text, history);
@@ -345,7 +514,7 @@ function setupViberHandlers() {
         await saveMessage(session.id, 'user', text);
         await saveMessage(session.id, 'bot', reply);
 
-        response.send(new TextMessage(reply.replace(/\[\[.*?\]\]/g, '')));
+        response.send(new TextMessage(reply.replace(/\[\[.*?\]\]/g, ''), undefined, undefined, undefined, undefined, keyboard));
 
         if (reply.includes('[[CALLBACK:TRUE]]')) {
             triggerAdminAlert('Viber', response.userProfile.name, text, session.id);
