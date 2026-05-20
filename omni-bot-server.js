@@ -415,6 +415,14 @@ function setupTelegramHandlers() {
 
         // --- /start (завжди має пріоритет, скидає будь-який стан) ---
         if (text === '/start') {
+            waitingForPhone.delete(chatId);
+
+            // Ensure row exists in messenger_users (creates on first /start)
+            await supabase.from('messenger_users').upsert({
+                platform: 'telegram',
+                platform_user_id: String(chatId)
+            }, { onConflict: 'platform,platform_user_id', ignoreDuplicates: true });
+
             // Check if already linked
             const { data: mu } = await supabase
                 .from('messenger_users')
