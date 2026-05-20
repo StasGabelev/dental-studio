@@ -322,10 +322,10 @@ const MAIN_MENU = {
     }
 };
 
-async function showPatientHistory(chatId, phoneLast9) {
-    // Always save phone — user is "linked" regardless of CRM match
+async function showPatientHistory(chatId, phoneLast9, fullPhone) {
+    // Save full phone (with country code) if available, else last 9
     await supabase.from('messenger_users')
-        .update({ patient_phone: phoneLast9 })
+        .update({ patient_phone: fullPhone || phoneLast9 })
         .eq('platform', 'telegram')
         .eq('platform_user_id', String(chatId));
 
@@ -426,8 +426,9 @@ function setupTelegramHandlers() {
         // --- Contact shared via Telegram button ---
         if (msg.contact) {
             waitingForPhone.delete(chatId);
-            const phone = msg.contact.phone_number.replace(/\D/g, '').slice(-9);
-            await showPatientHistory(chatId, phone);
+            const fullPhone = msg.contact.phone_number.replace(/\D/g, '');
+            const phoneLast9 = fullPhone.slice(-9);
+            await showPatientHistory(chatId, phoneLast9, fullPhone);
             return;
         }
 
