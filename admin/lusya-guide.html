@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Люся — Инструкция для администратора</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f7f3ff;
+    color: #2d2d2d;
+    line-height: 1.6;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #c084fc 0%, #818cf8 100%);
+    color: white;
+    padding: 40px 24px 32px;
+    text-align: center;
+  }
+
+  .hero h1 { font-size: 2rem; margin-bottom: 8px; }
+  .hero p { opacity: 0.9; font-size: 1.05rem; max-width: 540px; margin: 0 auto; }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85rem;
+    margin-top: 14px;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 16px 60px;
+  }
+
+  .tip {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 32px;
+    font-size: 0.95rem;
+  }
+
+  .tip strong { color: #92400e; }
+
+  .section {
+    background: white;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 22px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid transparent;
+    transition: background 0.15s;
+  }
+
+  .section-header:hover { background: #fafafa; }
+
+  .section-header.open { border-bottom-color: #e5e7eb; }
+
+  .section-icon {
+    font-size: 1.5rem;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .section-title { flex: 1; }
+  .section-title h2 { font-size: 1.05rem; font-weight: 700; }
+  .section-title p { font-size: 0.85rem; color: #6b7280; margin-top: 1px; }
+
+  .chevron {
+    color: #9ca3af;
+    font-size: 1.1rem;
+    transition: transform 0.2s;
+  }
+
+  .chevron.open { transform: rotate(90deg); }
+
+  .section-body {
+    display: none;
+    padding: 20px 22px;
+  }
+
+  .section-body.open { display: block; }
+
+  .examples {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .example {
+    background: #f3f4f6;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .example:hover { background: #ede9fe; border-color: #c4b5fd; }
+
+  .example::before {
+    content: '💬';
+    margin-right: 8px;
+  }
+
+  .example.copied { border-color: #a7f3d0; background: #ecfdf5; }
+  .example.copied::before { content: '✅'; }
+
+  .note {
+    margin-top: 14px;
+    font-size: 0.83rem;
+    color: #6b7280;
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+
+  .note strong { color: #374151; }
+
+  .rules {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .rule {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .rule-num {
+    background: #ede9fe;
+    color: #7c3aed;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .contact-block {
+    background: linear-gradient(135deg, #ede9fe, #dbeafe);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: center;
+    margin-top: 32px;
+  }
+
+  .contact-block h3 { font-size: 1.15rem; margin-bottom: 8px; color: #1e1b4b; }
+  .contact-block p { color: #4b5563; font-size: 0.93rem; margin-bottom: 18px; }
+
+  .tg-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2563eb;
+    color: white;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+
+  .tg-btn:hover { background: #1d4ed8; }
+
+  .tag {
+    display: inline-block;
+    background: #ede9fe;
+    color: #6d28d9;
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .tag.green { background: #d1fae5; color: #065f46; }
+  .tag.blue  { background: #dbeafe; color: #1e40af; }
+  .tag.orange{ background: #fef3c7; color: #92400e; }
+
+  @media print {
+    .section-body { display: block !important; }
+    .chevron { display: none; }
+    .section-header { cursor: default; }
+    body { background: white; }
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.5rem; }
+    .section-header { padding: 14px 16px; }
+    .section-body { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div style="font-size:3rem;margin-bottom:10px">🌸</div>
+  <h1>Люся — ваш AI-ассистент</h1>
+  <p>Всё что умеет Люся и как с ней общаться.<br>Пишите в Telegram-бот Люси — она понимает русский и украинский.</p>
+  <div class="badge">Dental Studio · Чернигов</div>
+</div>
+
+<div class="container">
+
+  <div class="tip">
+    <strong>Совет:</strong> Нажмите на любой пример запроса — он скопируется в буфер обмена, можно сразу вставить в Telegram.
+  </div>
+
+  <!-- АНАЛИТИКА -->
+  <div class="section">
+    <div class="section-header open" onclick="toggle(this)">
+      <div class="section-icon" style="background:#fce7f3">📊</div>
+      <div class="section-title">
+        <h2>Аналитика и отчёты <span class="tag">Бухгалтер</span></h2>
+        <p>Цифры по клинике, доходу, врачам за любой период</p>
+      </div>
+      <div class="chevron open">›</div>
+    </div>
+    <div class="section-body open">
+      <div class="examples">
+        <div class="example" onclick="copy(this)">Сколько у нас клиентов было вчера?</div>
+        <div class="example" onclick="copy(this)">Сколько визитов за этот месяц?</div>
+        <div class="example" onclick="copy(this)">Какой доход за прошлый месяц?</div>
+        <div class="example" onclick="copy(this)">Порівняй цей місяць з минулим — візити і виручка</div>
+        <div class="example" onclick="copy(this)">Средний чек по каждому врачу за последние 30 дней</div>
+        <div class="example" onclick="copy(this)">Показатели клиники за этот год</div>
+        <div class="example" onclick="copy(this)">Выручка по услугам за этот квартал</div>
+        <div class="example" onclick="copy(this)">Статистика по врачам за последний квартал</div>
+      </div>
+      <div class="note">
+        <strong>Доступные периоды:</strong> сегодня, вчера, эта неделя, прошлая неделя, этот месяц, прошлый месяц, квартал, год, все время, последние 30/90 дней
+      </div>
+    </div>
+  </div>
+
+  <!-- ПАЦИЕНТЫ И СЕГМЕНТАЦИЯ -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-icon" style="background:#dbeafe">👥</div>
+      <div class="section-title">
+        <h2>Пациенты и сегментация <span class="tag blue">Таргетолог</span></h2>
+        <p>Поиск, фильтрация, VIP-клиенты, LTV</p>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="section-body">
+      <div class="examples">
+        <div class="example" onclick="copy(this)">Сколько у нас женщин в базе?</div>
+        <div class="example" onclick="copy(this)">Покажи клиентов старше 50 лет с Telegram</div>
+        <div class="example" onclick="copy(this)">Кто из клиентов делал чистку зубов?</div>
+        <div class="example" onclick="copy(this)">Скільки у нас клієнтів з дітьми?</div>
+        <div class="example" onclick="copy(this)">Топ-10 клиентов по сумме трат за этот год</div>
+        <div class="example" onclick="copy(this)">Хто найчастіше відвідує клініку?</div>
+        <div class="example" onclick="copy(this)">Сколько клиентов не приходили больше 3 месяцев?</div>
+        <div class="example" onclick="copy(this)">Какой LTV наших клиентов-женщин?</div>
+        <div class="example" onclick="copy(this)">Обнови пациенту +380501234567 — есть двое детей</div>
+      </div>
+      <div class="note">
+        <strong>Фильтры:</strong> пол, возраст, дети, услуга, тег, наличие Telegram/Viber, дата последнего визита
+      </div>
+    </div>
+  </div>
+
+  <!-- РАССЫЛКИ -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-icon" style="background:#d1fae5">📣</div>
+      <div class="section-title">
+        <h2>Рассылки и акции <span class="tag green">Маркетолог</span></h2>
+        <p>Создание, планирование и запуск рассылок</p>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="section-body">
+      <div class="examples">
+        <div class="example" onclick="copy(this)">Придумай акцию на профессиональную чистку зубов</div>
+        <div class="example" onclick="copy(this)">Зроби розсилку для мам до 1 червня</div>
+        <div class="example" onclick="copy(this)">Напиши 3 варианта поздравления с Новым годом для всех клиентов</div>
+        <div class="example" onclick="copy(this)">Отправь напоминание клиентам, которые не были 2 месяца</div>
+        <div class="example" onclick="copy(this)">Скільки клієнтів отримають розсилку, якщо відправити всім жінкам з Telegram?</div>
+        <div class="example" onclick="copy(this)">Покажи все кампании за последний месяц</div>
+        <div class="example" onclick="copy(this)">Запланируй рассылку на завтра в 10:00 для клиентов с детьми</div>
+      </div>
+      <div class="note">
+        <strong>Важно:</strong> Люся всегда покажет черновик текста и количество получателей <em>перед</em> отправкой — нужно подтвердить «ок» или «отправляй».
+      </div>
+    </div>
+  </div>
+
+  <!-- CRM / ИМЕНИННИКИ / ОТТОК -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-icon" style="background:#fef3c7">🎂</div>
+      <div class="section-title">
+        <h2>CRM и удержание клиентов <span class="tag orange">CRM-менеджер</span></h2>
+        <p>Именинники, риск оттока, реактивация</p>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="section-body">
+      <div class="examples">
+        <div class="example" onclick="copy(this)">Хто сьогодні іменинник?</div>
+        <div class="example" onclick="copy(this)">Кто из клиентов именинник на этой неделе?</div>
+        <div class="example" onclick="copy(this)">Поздравь именинников этого месяца с днем рождения</div>
+        <div class="example" onclick="copy(this)">Кто под риском оттока — не был 3 месяца, но раньше ходил регулярно?</div>
+        <div class="example" onclick="copy(this)">Реактивуй клієнтів, які не були 90 днів — придумай текст</div>
+        <div class="example" onclick="copy(this)">Покажи клиентов, которые не приходили больше полугода</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ВРАЧИ И РАСПИСАНИЕ -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-icon" style="background:#e0e7ff">🩺</div>
+      <div class="section-title">
+        <h2>Врачи и расписание <span class="tag">Менеджер</span></h2>
+        <p>Загруженность, свободные окна, рекомендации</p>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="section-body">
+      <div class="examples">
+        <div class="example" onclick="copy(this)">Кого из врачей нужно больше загрузить клиентами?</div>
+        <div class="example" onclick="copy(this)">Хто з лікарів найменш завантажений цього місяця?</div>
+        <div class="example" onclick="copy(this)">Свободные окна у доктора Ковальчук на завтра</div>
+        <div class="example" onclick="copy(this)">Сколько записей у каждого врача на этой неделе?</div>
+        <div class="example" onclick="copy(this)">Покажи расписание на следующий понедельник</div>
+        <div class="example" onclick="copy(this)">Статистика врачей за этот месяц: визиты и выручка</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ОПРОСЫ -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-icon" style="background:#fce7f3">📋</div>
+      <div class="section-title">
+        <h2>Опросы и обратная связь</h2>
+        <p>Создание опросов, сбор ответов, аналитика</p>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="section-body">
+      <div class="examples">
+        <div class="example" onclick="copy(this)">Создай опрос после визита — спроси как всё прошло и есть ли дети</div>
+        <div class="example" onclick="copy(this)">Зроби анкету: чи є діти, вік дітей, чи задоволені послугою</div>
+        <div class="example" onclick="copy(this)">Покажи результаты последнего опроса</div>
+        <div class="example" onclick="copy(this)">Отправь опрос всем клиентам, которые были на прошлой неделе</div>
+      </div>
+      <div class="note">
+        Если в опросе есть вопрос про детей — Люся автоматически обновит профиль пациента.
+      </div>
+    </div>
+  </div>
+
+  <!-- АВТОПОТОКИ -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-icon" style="background:#d1fae5">⚙️</div>
+      <div class="section-title">
+        <h2>Автоматические потоки</h2>
+        <p>Авто-поздравления, напоминания, реактивация</p>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="section-body">
+      <div class="examples">
+        <div class="example" onclick="copy(this)">Включи авто-поздравление с днем рождения</div>
+        <div class="example" onclick="copy(this)">Покажи все активные потоки</div>
+        <div class="example" onclick="copy(this)">Настрой авто-сообщение после визита через 3 часа с просьбой оставить отзыв</div>
+        <div class="example" onclick="copy(this)">Вимкни авто-реактивацію через 90 днів</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- КАК ОБЩАТЬСЯ -->
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <div class="section-icon" style="background:#f3f4f6">💡</div>
+      <div class="section-title">
+        <h2>Как правильно общаться с Люсей</h2>
+        <p>Советы для получения точных ответов</p>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+    <div class="section-body">
+      <div class="rules">
+        <div class="rule">
+          <div class="rule-num">1</div>
+          <div>Пишите <strong>конкретно</strong>: «сколько клиентов <em>за этот месяц</em>» лучше чем просто «сколько клиентов»</div>
+        </div>
+        <div class="rule">
+          <div class="rule-num">2</div>
+          <div>Люся спросит уточнение, если запрос неоднозначный — просто ответьте ей</div>
+        </div>
+        <div class="rule">
+          <div class="rule-num">3</div>
+          <div>Перед важными действиями (рассылка, изменение данных) Люся покажет что именно будет делать и попросит подтверждение — напишите <strong>«ок»</strong> или <strong>«отправляй»</strong></div>
+        </div>
+        <div class="rule">
+          <div class="rule-num">4</div>
+          <div>Финансы — всегда в гривнах (₴), даты — любым способом: «вчера», «на прошлой неделе», «в апреле»</div>
+        </div>
+        <div class="rule">
+          <div class="rule-num">5</div>
+          <div>Можно писать по-русски и по-украински — Люся ответит на том же языке</div>
+        </div>
+        <div class="rule">
+          <div class="rule-num">6</div>
+          <div>Люся <strong>не меняет данные в CRM</strong> (Cliniccards) — только читает. Изменения вносятся только в нашу базу (теги, заметки, дети)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- КОНТАКТ -->
+  <div class="contact-block">
+    <h3>🆕 Нужна новая функция?</h3>
+    <p>Если Люся не умеет что-то, что было бы полезно для работы —<br>напишите разработчику, добавим.</p>
+    <a class="tg-btn" href="https://t.me/sgabelev" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.008 9.455c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.44 14.402l-2.95-.924c-.641-.2-.654-.641.136-.949l11.532-4.448c.537-.194 1.006.131.404.167z"/></svg>
+      Написать @sgabelev
+    </a>
+    <p style="margin-top:14px;font-size:0.8rem;color:#9ca3af">Dental Studio · Чернигов · Версия инструкции: май 2026</p>
+  </div>
+
+</div>
+
+<script>
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.chevron');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  header.classList.toggle('open', !isOpen);
+  chevron.classList.toggle('open', !isOpen);
+}
+
+function copy(el) {
+  const text = el.textContent.replace(/^💬|^✅/,'').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    el.classList.add('copied');
+    setTimeout(() => el.classList.remove('copied'), 1800);
+  });
+}
+</script>
+
+</body>
+</html>
