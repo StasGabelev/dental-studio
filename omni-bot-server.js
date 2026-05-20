@@ -323,6 +323,12 @@ const MAIN_MENU = {
 };
 
 async function showPatientHistory(chatId, phoneLast9) {
+    // Always save phone — user is "linked" regardless of CRM match
+    await supabase.from('messenger_users')
+        .update({ patient_phone: phoneLast9 })
+        .eq('platform', 'telegram')
+        .eq('platform_user_id', String(chatId));
+
     const { data: patients } = await supabase
         .from('cc_patients')
         .select('cc_id, full_name')
@@ -331,8 +337,9 @@ async function showPatientHistory(chatId, phoneLast9) {
 
     if (!patients || patients.length === 0) {
         await tgBot.sendMessage(chatId,
-            'На жаль, ми не знайшли вас у нашій базі.\n' +
-            'Можливо, ви реєструвались під іншим номером.\n\n' +
+            '✅ Ваш номер збережено!\n\n' +
+            'На жаль, ми не знайшли вас у нашій базі пацієнтів.\n' +
+            'Можливо, ви ще не відвідували нашу клініку.\n\n' +
             'Зателефонуйте нам: (077) 600 7 800',
             MAIN_MENU);
         return false;
@@ -340,9 +347,9 @@ async function showPatientHistory(chatId, phoneLast9) {
 
     const patient = patients[0];
 
-    // Save link for future use
+    // Also save CRM link
     await supabase.from('messenger_users')
-        .update({ patient_phone: phoneLast9, patient_cc_id: String(patient.cc_id) })
+        .update({ patient_cc_id: String(patient.cc_id) })
         .eq('platform', 'telegram')
         .eq('platform_user_id', String(chatId));
 
@@ -375,19 +382,19 @@ async function showPatientHistory(chatId, phoneLast9) {
 async function requireLinked(chatId, message) {
     const { data: mu } = await supabase
         .from('messenger_users')
-        .select('patient_cc_id')
+        .select('patient_phone')
         .eq('platform', 'telegram')
         .eq('platform_user_id', String(chatId))
         .single();
 
-    if (mu?.patient_cc_id) return true;
+    if (mu?.patient_phone) return true;
 
     const text = message || '🔗 Щоб отримати персональний сервіс, підв\'яжіть ваш номер телефону.';
     await tgBot.sendMessage(chatId, text, {
         reply_markup: {
-            inline_keyboard: [[
-                { text: '📱 Підв\'язати номер', callback_data: 'link_phone' }
-            ]]
+            keyboard: [[{ text: '📱 Поділитися номером телефону', request_contact: true }]],
+            resize_keyboard: true,
+            one_time_keyboard: true
         }
     });
     return false;
@@ -453,20 +460,31 @@ function setupTelegramHandlers() {
                 return;
             }
 
-            // New user — ask for phone via contact-share button
+            // New user — offer phone sharing, but allow skipping
             waitingForPhone.set(chatId, true);
             await tgBot.sendMessage(chatId,
                 'Привіт! 👋 Я — Люся, AI-асистент стоматології Dental Studio.\n\n' +
-                'Щоб персоналізувати сервіс та надати вам знижки від нас і партнерів — ' +
-                'поділіться, будь ласка, номером телефону.',
+                'Поділіться номером телефону — і ми персоналізуємо сервіс, знижки та запис для вас.',
                 {
                     reply_markup: {
-                        keyboard: [[{ text: '📱 Поділитися номером телефону', request_contact: true }]],
+                        keyboard: [
+                            [{ text: '📱 Поділитися номером телефону', request_contact: true }],
+                            [{ text: '⏭ Пропустити' }]
+                        ],
                         resize_keyboard: true,
                         one_time_keyboard: true
                     }
                 }
             );
+            return;
+        }
+
+        // --- Пропустити прив'язку ---
+        if (text === '⏭ Пропустити') {
+            waitingForPhone.delete(chatId);
+            await tgBot.sendMessage(chatId,
+                'Добре! Ви завжди можете підв\'язати номер пізніше — просто натисніть будь-яку кнопку меню.',
+                MAIN_MENU);
             return;
         }
 
