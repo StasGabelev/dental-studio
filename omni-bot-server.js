@@ -372,7 +372,42 @@ async function showPatientHistory(chatId, phoneLast9) {
     return true;
 }
 
+async function requireLinked(chatId) {
+    const { data: mu } = await supabase
+        .from('messenger_users')
+        .select('patient_cc_id')
+        .eq('platform', 'telegram')
+        .eq('platform_user_id', String(chatId))
+        .single();
+
+    if (mu?.patient_cc_id) return true;
+
+    await tgBot.sendMessage(chatId,
+        '🔗 Щоб отримати персональний сервіс, підв\'яжіть ваш номер телефону.',
+        {
+            reply_markup: {
+                inline_keyboard: [[
+                    { text: '📱 Підв\'язати номер', callback_data: 'link_phone' }
+                ]]
+            }
+        }
+    );
+    return false;
+}
+
 function setupTelegramHandlers() {
+    // Inline button: "Підв'язати номер"
+    tgBot.on('callback_query', async (query) => {
+        const chatId = query.message.chat.id;
+        if (query.data === 'link_phone') {
+            await tgBot.answerCallbackQuery(query.id);
+            waitingForPhone.set(chatId, true);
+            await tgBot.sendMessage(chatId,
+                'Введіть ваш номер телефону:\nНаприклад: 0771234567',
+                MAIN_MENU);
+        }
+    });
+
     tgBot.on('message', async (msg) => {
         const chatId = msg.chat.id;
         const text = msg.text;
@@ -435,7 +470,6 @@ function setupTelegramHandlers() {
 
         // --- Моя історія ---
         if (text === '📋 Моя історія') {
-            // Check if already linked
             const { data: mu } = await supabase
                 .from('messenger_users')
                 .select('patient_phone, patient_cc_id')
@@ -448,17 +482,12 @@ function setupTelegramHandlers() {
                 return;
             }
 
-            // Not linked yet — ask for phone as text
-            waitingForPhone.set(chatId, true);
-            await tgBot.sendMessage(chatId,
-                'Введіть ваш номер телефону, і ми покажемо історію ваших візитів.\n\n' +
-                'Приклад: 0771234567',
-                MAIN_MENU);
-            return;
+            if (!await requireLinked(chatId)) return;
         }
 
         // --- Моя знижка ---
         if (text === '💰 Моя знижка') {
+            if (!await requireLinked(chatId)) return;
             await tgBot.sendMessage(chatId,
                 '🎁 Ваша знижка: 10% на лікування в Dental Studio.\n' +
                 'Покажіть це повідомлення адміністратору при наступному візиті.',
