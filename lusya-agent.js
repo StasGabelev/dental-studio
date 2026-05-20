@@ -63,8 +63,11 @@ async function handleLusyaMessage(chatId, userText, supabase, aiSettings) {
     // 2. Select model based on request complexity
     const model = selectModel(userText, aiSettings);
 
-    // 3. Build system prompt
-    const systemPrompt = aiSettings?.lusya_system_prompt || DEFAULT_SYSTEM_PROMPT;
+    // 3. Build system prompt — inject current date so Lusya can resolve "tomorrow", "next week" etc.
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const systemPrompt = (aiSettings?.lusya_system_prompt || DEFAULT_SYSTEM_PROMPT)
+        + `\n\n[СИСТЕМНА ІНФОРМАЦІЯ]\nПоточна дата: ${dateStr}\nДля дат у інструментах використовуй формат YYYY-MM-DD.`;
 
     // 4. Build messages array
     const messages = [
@@ -180,8 +183,14 @@ const LUSYA_TOOLS = [
         type: 'function',
         function: {
             name: 'get_clinic_summary',
-            description: 'Общая сводка по клинике: количество пациентов, визитов за разные периоды, активные доктора',
-            parameters: { type: 'object', properties: {}, required: [] }
+            description: 'Загальна зведення по клініці: кількість пацієнтів, візитів за період, виручка. Використовуй коли питають "скільки клієнтів вчора/сьогодні/за тиждень".',
+            parameters: {
+                type: 'object',
+                properties: {
+                    period: { type: 'string', description: 'today | yesterday | this_week | last_week | this_month | last_month | this_quarter | last_quarter | this_year | last_year | last_30_days | all_time. Якщо не вказано — повертає загальну зведення.' }
+                },
+                required: []
+            }
         }
     },
     {
@@ -218,7 +227,7 @@ const LUSYA_TOOLS = [
         type: 'function',
         function: {
             name: 'get_schedule',
-            description: 'Расписание доктора: занятые и свободные слоты',
+            description: 'Розклад візитів: минулі та майбутні записи. Використовуй для "скільки записано на завтра/наступний тиждень", "хто приймає сьогодні", "записи лікаря на дату".',
             parameters: {
                 type: 'object',
                 properties: {
@@ -534,9 +543,29 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
     switch (toolName) {
 
         case 'get_clinic_summary': {
-            const last30 = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
             const todayStr = today.toISOString().split('T')[0];
 
+            if (args.period) {
+                // Period-specific query
+                const { from, to } = getPeriodDates(args.period);
+                const [vRes, invRes] = await Promise.all([
+                    supabase.from('cc_visits').select('id', { count: 'exact', head: true })
+                        .gte('visit_date', from).lte('visit_date', to),
+                    supabase.from('cc_invoices').select('amount')
+                        .gte('date', from).lte('date', to)
+                ]);
+                const revenue = (invRes.data || []).reduce((s, i) => s + parseFloat(i.amount || 0), 0);
+                return {
+                    period: args.period,
+                    date_from: from,
+                    date_to: to,
+                    visits: vRes.count || 0,
+                    revenue: Math.round(revenue)
+                };
+            }
+
+            // General summary (no period)
+            const last30 = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
             const [pRes, vRes, vTodayRes, dRes, invRes] = await Promise.all([
                 supabase.from('cc_patients').select('id', { count: 'exact', head: true }),
                 supabase.from('cc_visits').select('id', { count: 'exact', head: true }).gte('visit_date', last30),
@@ -546,7 +575,6 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             ]);
 
             const monthRevenue = (invRes.data || []).reduce((s, i) => s + parseFloat(i.amount || 0), 0);
-
             return {
                 total_patients: pRes.count || 0,
                 visits_last_30_days: vRes.count || 0,
@@ -690,10 +718,13 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
                 }
             }
 
+            // Get server-side count first (correct even for large datasets)
+            const { count: totalCount } = await query.select('id', { count: 'exact', head: true });
             const { data } = await query.limit(limit);
             const patients = data || [];
             return {
-                count: patients.length,
+                total_count: totalCount || 0,
+                shown: patients.length,
                 patients,
                 reach: {
                     with_telegram: patients.filter(p => p.telegram_id).length,
