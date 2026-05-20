@@ -379,3 +379,38 @@ window.submitCallbackForm = async function(e) {
         btn.textContent = 'ПЕРЕДЗВОНІТЬ МЕНІ';
     }
 };
+
+// --- Telegram Floating Button ---
+(function() {
+    const btn = document.createElement('a');
+    btn.href = 'https://t.me/DentalStudioUA_bot';
+    btn.target = '_blank';
+    btn.title = 'Наш Telegram-бот';
+    btn.setAttribute('aria-label', 'Telegram бот');
+    btn.style.cssText = [
+        'position:fixed',
+        'bottom:100px',
+        'right:30px',
+        'width:60px',
+        'height:60px',
+        'background:linear-gradient(135deg,#B8924A,#D4AF72)',
+        'border-radius:50%',
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'z-index:9998',
+        'box-shadow:0 4px 20px rgba(184,146,74,0.35)',
+        'transition:transform 0.2s,box-shadow 0.2s',
+        'text-decoration:none'
+    ].join(';');
+    btn.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.64-.203-.658-.64.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>';
+    btn.addEventListener('mouseenter', () => {
+        btn.style.transform = 'scale(1.1)';
+        btn.style.boxShadow = '0 6px 28px rgba(184,146,74,0.5)';
+    });
+    btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'scale(1)';
+        btn.style.boxShadow = '0 4px 20px rgba(184,146,74,0.35)';
+    });
+    document.addEventListener('DOMContentLoaded', () => document.body.appendChild(btn));
+})();
