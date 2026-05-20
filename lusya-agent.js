@@ -378,6 +378,8 @@ const LUSYA_TOOLS = [
                 type: 'object',
                 properties: {
                     name: { type: 'string', description: 'Пошук по імені або прізвищу (часткове співпадіння). Використовувати коли шукають конкретну людину за ім\'ям/прізвищем.' },
+                    phone: { type: 'string', description: 'Пошук по номеру телефону (часткове співпадіння, напр. "0501234567" або "+38050")' },
+                    visit_date: { type: 'string', description: 'Знайти пацієнтів що були на прийомі в конкретний день YYYY-MM-DD' },
                     gender: { type: 'string', description: 'M | F' },
                     age_min: { type: 'number' },
                     age_max: { type: 'number' },
@@ -944,8 +946,18 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             let query = supabase.from('cc_patients')
                 .select('id, full_name, phone, gender, dob, has_children, custom_tags, last_visit_at, telegram_id, viber_id');
 
+            // If filtering by visit_date — get patient IDs from cc_visits first
+            if (args.visit_date) {
+                const { data: visitRows } = await supabase.from('cc_visits')
+                    .select('patient_id').eq('visit_date', args.visit_date).not('patient_id', 'is', null);
+                const visitPatientIds = [...new Set((visitRows || []).map(v => v.patient_id))];
+                if (!visitPatientIds.length) return { count: 0, patients: [], note: `Немає пацієнтів з візитом ${args.visit_date}` };
+                query = query.in('id', visitPatientIds);
+            }
+
             if (servicePatientIds) query = query.in('id', servicePatientIds);
             if (args.name) query = query.ilike('full_name', `%${args.name}%`);
+            if (args.phone) query = query.ilike('phone', `%${args.phone.replace(/\D/g, '').slice(-9)}%`);
             if (args.gender) query = query.eq('gender', args.gender);
             if (args.has_children !== undefined) query = query.eq('has_children', args.has_children);
             if (args.has_telegram) query = query.not('telegram_id', 'is', null);
