@@ -466,6 +466,113 @@ const LUSYA_TOOLS = [
                 required: ['date_from']
             }
         }
+    },
+    // ─── NEW: Analytics & CRM roles ──────────────────────────────────────────
+    {
+        type: 'function',
+        function: {
+            name: 'get_top_patients',
+            description: 'Топ-пацієнти за сумою витрат або кількістю візитів. Роль: Таргетолог, VIP-сегмент.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    limit: { type: 'number', description: 'Кількість пацієнтів (за замовчуванням 10)' },
+                    order_by: { type: 'string', description: 'spent — за витратами, visits — за візитами' },
+                    period: { type: 'string', description: 'all_time | this_year | last_year | this_month | last_month | last_30_days | last_90_days' }
+                },
+                required: []
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'get_patient_ltv',
+            description: 'Lifetime Value пацієнта: загальна сума витрат, кількість візитів, середній чек. Роль: Таргетолог, Бухгалтер.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    patient_id: { type: 'string', description: 'UUID пацієнта (якщо конкретний пацієнт)' },
+                    phone: { type: 'string', description: 'Телефон пацієнта (альтернатива patient_id)' },
+                    segment: { type: 'object', description: 'Фільтр сегменту (gender, age_min, age_max) для середнього LTV по групі' }
+                },
+                required: []
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'compare_periods',
+            description: 'Порівняння двох будь-яких періодів: візити, виручка, середній чек. Роль: Бухгалтер, Аналітик. Приклад: "цей місяць vs минулий".',
+            parameters: {
+                type: 'object',
+                properties: {
+                    period1: { type: 'string', description: 'Перший період: this_month | last_month | this_week | last_week | this_year | last_year | last_30_days тощо' },
+                    period2: { type: 'string', description: 'Другий період для порівняння' }
+                },
+                required: ['period1', 'period2']
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'get_average_check',
+            description: 'Середній чек по клініці, лікарю або послузі за період. Роль: Бухгалтер.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    period: { type: 'string', description: 'today | this_week | this_month | last_month | this_year | last_30_days тощо' },
+                    group_by: { type: 'string', description: 'doctor | service | null (загальний по клініці)' }
+                },
+                required: ['period']
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'get_birthday_patients',
+            description: 'Іменинники: пацієнти з днем народження сьогодні, цього тижня або цього місяця. Роль: CRM-менеджер.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    when: { type: 'string', description: 'today | this_week | this_month' }
+                },
+                required: ['when']
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'get_churn_risk',
+            description: 'Пацієнти з ризиком відтоку: не приходили N днів, але раніше були регулярними. Роль: Аналітик, CRM-менеджер.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    days_inactive: { type: 'number', description: 'Кількість днів без візиту (за замовчуванням 90)' },
+                    min_past_visits: { type: 'number', description: 'Мінімум візитів в минулому щоб вважатись регулярним (за замовчуванням 2)' },
+                    limit: { type: 'number', description: 'Максимум результатів (за замовчуванням 50)' }
+                },
+                required: []
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'get_doctor_recommendation',
+            description: 'Рекомендація по завантаженості лікарів: хто недозавантажений і потребує більше клієнтів. Роль: Менеджер.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    period: { type: 'string', description: 'this_month | last_month | this_week (за замовчуванням this_month)' }
+                },
+                required: []
+            }
+        }
     }
 ];
 
@@ -950,6 +1057,267 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
                 }
             }
             return result.length ? result : [{ message: 'Свободных окон не найдено' }];
+        }
+
+        case 'get_top_patients': {
+            const limit = args.limit || 10;
+            const orderBy = args.order_by || 'spent';
+            const period = args.period || 'all_time';
+            const { from, to } = getPeriodDates(period);
+
+            if (orderBy === 'visits') {
+                const { data: visits } = await supabase.from('cc_visits')
+                    .select('patient_id').gte('visit_date', from).lte('visit_date', to).not('patient_id', 'is', null);
+                const counts = {};
+                for (const v of (visits || [])) counts[v.patient_id] = (counts[v.patient_id] || 0) + 1;
+                const topIds = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, limit).map(([id]) => id);
+                if (!topIds.length) return { top_patients: [] };
+                const { data: patients } = await supabase.from('cc_patients')
+                    .select('id, full_name, phone, telegram_id, last_visit_at').in('id', topIds);
+                const patMap = {};
+                (patients || []).forEach(p => { patMap[p.id] = p; });
+                return {
+                    period, order_by: 'visits',
+                    top_patients: topIds.map((id, i) => ({
+                        rank: i + 1,
+                        full_name: patMap[id]?.full_name || 'Невідомо',
+                        phone: patMap[id]?.phone,
+                        visit_count: counts[id],
+                        last_visit_at: patMap[id]?.last_visit_at,
+                        has_telegram: !!patMap[id]?.telegram_id
+                    }))
+                };
+            } else {
+                const { data: invoices } = await supabase.from('cc_invoices')
+                    .select('patient_id, amount').gte('date', from).lte('date', to).not('patient_id', 'is', null);
+                const totals = {};
+                for (const inv of (invoices || [])) totals[inv.patient_id] = (totals[inv.patient_id] || 0) + parseFloat(inv.amount || 0);
+                const topIds = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, limit).map(([id]) => id);
+                if (!topIds.length) return { top_patients: [] };
+                const { data: visits } = await supabase.from('cc_visits')
+                    .select('patient_id').in('patient_id', topIds).gte('visit_date', from).lte('visit_date', to);
+                const visitCounts = {};
+                (visits || []).forEach(v => { visitCounts[v.patient_id] = (visitCounts[v.patient_id] || 0) + 1; });
+                const { data: patients } = await supabase.from('cc_patients')
+                    .select('id, full_name, phone, telegram_id, last_visit_at').in('id', topIds);
+                const patMap = {};
+                (patients || []).forEach(p => { patMap[p.id] = p; });
+                return {
+                    period, order_by: 'spent',
+                    top_patients: topIds.map((id, i) => ({
+                        rank: i + 1,
+                        full_name: patMap[id]?.full_name || 'Невідомо',
+                        phone: patMap[id]?.phone,
+                        total_spent: Math.round(totals[id]),
+                        visit_count: visitCounts[id] || 0,
+                        last_visit_at: patMap[id]?.last_visit_at,
+                        has_telegram: !!patMap[id]?.telegram_id
+                    }))
+                };
+            }
+        }
+
+        case 'get_patient_ltv': {
+            if (args.patient_id || args.phone) {
+                let patQuery = supabase.from('cc_patients').select('id, full_name, phone, last_visit_at');
+                if (args.patient_id) patQuery = patQuery.eq('id', args.patient_id);
+                else patQuery = patQuery.eq('phone', args.phone);
+                const { data: patient } = await patQuery.single();
+                if (!patient) return { error: 'Пацієнта не знайдено' };
+                const [{ data: invoices }, { data: visits }] = await Promise.all([
+                    supabase.from('cc_invoices').select('amount, date').eq('patient_id', patient.id),
+                    supabase.from('cc_visits').select('visit_date').eq('patient_id', patient.id).order('visit_date')
+                ]);
+                const totalSpent = (invoices || []).reduce((s, i) => s + parseFloat(i.amount || 0), 0);
+                const visitCount = (visits || []).length;
+                return {
+                    patient: patient.full_name,
+                    phone: patient.phone,
+                    total_spent: Math.round(totalSpent),
+                    visit_count: visitCount,
+                    avg_per_visit: visitCount ? Math.round(totalSpent / visitCount) : 0,
+                    first_visit: visits?.[0]?.visit_date,
+                    last_visit: visits?.[visits.length - 1]?.visit_date
+                };
+            } else {
+                const seg = args.segment || {};
+                let patQuery = supabase.from('cc_patients').select('id');
+                if (seg.gender) patQuery = patQuery.eq('gender', seg.gender);
+                if (seg.age_min) {
+                    const maxDob = new Date(today.getFullYear() - seg.age_min, today.getMonth(), today.getDate());
+                    patQuery = patQuery.lte('dob', maxDob.toISOString().split('T')[0]);
+                }
+                if (seg.age_max) {
+                    const minDob = new Date(today.getFullYear() - seg.age_max - 1, today.getMonth(), today.getDate());
+                    patQuery = patQuery.gte('dob', minDob.toISOString().split('T')[0]);
+                }
+                const { data: patients } = await patQuery.limit(5000);
+                if (!patients?.length) return { total_patients: 0, avg_ltv: 0 };
+                const ids = patients.map(p => p.id);
+                const { data: invoices } = await supabase.from('cc_invoices').select('patient_id, amount').in('patient_id', ids);
+                const spentByPatient = {};
+                (invoices || []).forEach(inv => {
+                    spentByPatient[inv.patient_id] = (spentByPatient[inv.patient_id] || 0) + parseFloat(inv.amount || 0);
+                });
+                const values = Object.values(spentByPatient);
+                const avgLtv = values.length ? values.reduce((s, v) => s + v, 0) / values.length : 0;
+                return {
+                    segment: seg,
+                    total_patients: patients.length,
+                    patients_with_purchases: values.length,
+                    avg_ltv: Math.round(avgLtv),
+                    total_revenue: Math.round(values.reduce((s, v) => s + v, 0))
+                };
+            }
+        }
+
+        case 'compare_periods': {
+            const p1 = getPeriodDates(args.period1);
+            const p2 = getPeriodDates(args.period2);
+            const [v1, v2, inv1, inv2] = await Promise.all([
+                supabase.from('cc_visits').select('id', { count: 'exact', head: true }).gte('visit_date', p1.from).lte('visit_date', p1.to),
+                supabase.from('cc_visits').select('id', { count: 'exact', head: true }).gte('visit_date', p2.from).lte('visit_date', p2.to),
+                supabase.from('cc_invoices').select('amount').gte('date', p1.from).lte('date', p1.to),
+                supabase.from('cc_invoices').select('amount').gte('date', p2.from).lte('date', p2.to)
+            ]);
+            const rev1 = (inv1.data || []).reduce((s, i) => s + parseFloat(i.amount || 0), 0);
+            const rev2 = (inv2.data || []).reduce((s, i) => s + parseFloat(i.amount || 0), 0);
+            const vis1 = v1.count || 0;
+            const vis2 = v2.count || 0;
+            const avg1 = vis1 ? rev1 / vis1 : 0;
+            const avg2 = vis2 ? rev2 / vis2 : 0;
+            const pct = (a, b) => b === 0 ? null : Math.round((a - b) / b * 100);
+            return {
+                period1: { name: args.period1, from: p1.from, to: p1.to, visits: vis1, revenue: Math.round(rev1), avg_check: Math.round(avg1) },
+                period2: { name: args.period2, from: p2.from, to: p2.to, visits: vis2, revenue: Math.round(rev2), avg_check: Math.round(avg2) },
+                diff: { visits_pct: pct(vis1, vis2), revenue_pct: pct(rev1, rev2), avg_check_pct: pct(avg1, avg2) }
+            };
+        }
+
+        case 'get_average_check': {
+            const { from, to } = getPeriodDates(args.period);
+            const { data: invoices } = await supabase.from('cc_invoices')
+                .select('doctor_cc_id, doctor_name, amount, items').gte('date', from).lte('date', to);
+            if (!invoices?.length) return { period: args.period, avg_check: 0, total: 0, invoice_count: 0 };
+            if (!args.group_by) {
+                const total = invoices.reduce((s, i) => s + parseFloat(i.amount || 0), 0);
+                return { period: args.period, total: Math.round(total), invoice_count: invoices.length, avg_check: Math.round(total / invoices.length) };
+            }
+            const groups = {};
+            if (args.group_by === 'doctor') {
+                for (const inv of invoices) {
+                    const key = inv.doctor_name || inv.doctor_cc_id || 'Невідомо';
+                    if (!groups[key]) groups[key] = { total: 0, count: 0 };
+                    groups[key].total += parseFloat(inv.amount || 0);
+                    groups[key].count++;
+                }
+            } else if (args.group_by === 'service') {
+                for (const inv of invoices) {
+                    for (const item of (inv.items || [])) {
+                        const key = item.plan_item_name || 'Невідома послуга';
+                        const amount = (item.price || 0) * (item.quantity || 1) * (1 - (item.discount || 0) / 100);
+                        if (!groups[key]) groups[key] = { total: 0, count: 0 };
+                        groups[key].total += amount;
+                        groups[key].count++;
+                    }
+                }
+            }
+            return {
+                period: args.period,
+                group_by: args.group_by,
+                breakdown: Object.entries(groups)
+                    .map(([name, g]) => ({ name, total: Math.round(g.total), invoice_count: g.count, avg_check: Math.round(g.total / g.count) }))
+                    .sort((a, b) => b.avg_check - a.avg_check)
+            };
+        }
+
+        case 'get_birthday_patients': {
+            const when = args.when || 'today';
+            const now = new Date();
+            const todayM = now.getMonth() + 1;
+            const todayD = now.getDate();
+            const { data: patients } = await supabase.from('cc_patients')
+                .select('id, full_name, phone, dob, telegram_id, last_visit_at').not('dob', 'is', null);
+            if (!patients?.length) return { when, total: 0, patients: [] };
+            const matches = (patients || []).filter(p => {
+                if (!p.dob) return false;
+                const d = new Date(p.dob);
+                const m = d.getUTCMonth() + 1;
+                const day = d.getUTCDate();
+                if (when === 'today') return m === todayM && day === todayD;
+                if (when === 'this_week') {
+                    const weekDay = now.getDay() || 7;
+                    const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - weekDay + 1);
+                    for (let i = 0; i < 7; i++) {
+                        const check = new Date(monday); check.setDate(monday.getDate() + i);
+                        if (m === check.getMonth() + 1 && day === check.getDate()) return true;
+                    }
+                    return false;
+                }
+                if (when === 'this_month') return m === todayM;
+                return false;
+            }).map(p => {
+                const dobDate = new Date(p.dob);
+                const age = now.getFullYear() - dobDate.getUTCFullYear();
+                return { full_name: p.full_name, phone: p.phone, dob: p.dob, age, last_visit_at: p.last_visit_at, has_telegram: !!p.telegram_id };
+            });
+            return { when, total: matches.length, patients: matches };
+        }
+
+        case 'get_churn_risk': {
+            const daysInactive = args.days_inactive || 90;
+            const minPastVisits = args.min_past_visits || 2;
+            const limit = args.limit || 50;
+            const cutoff = new Date(Date.now() - daysInactive * 86400000).toISOString().split('T')[0];
+            const { data: patients } = await supabase.from('cc_patients')
+                .select('id, full_name, phone, last_visit_at, telegram_id')
+                .lt('last_visit_at', cutoff + 'T00:00:00')
+                .not('last_visit_at', 'is', null)
+                .limit(limit * 5);
+            if (!patients?.length) return { days_inactive: daysInactive, total: 0, patients: [] };
+            const ids = patients.map(p => p.id);
+            const { data: visits } = await supabase.from('cc_visits').select('patient_id').in('patient_id', ids);
+            const visitCounts = {};
+            (visits || []).forEach(v => { visitCounts[v.patient_id] = (visitCounts[v.patient_id] || 0) + 1; });
+            const atRisk = patients
+                .filter(p => (visitCounts[p.id] || 0) >= minPastVisits)
+                .slice(0, limit)
+                .map(p => {
+                    const lastDate = p.last_visit_at ? new Date(p.last_visit_at) : null;
+                    const daysSince = lastDate ? Math.floor((Date.now() - lastDate) / 86400000) : null;
+                    return {
+                        full_name: p.full_name, phone: p.phone,
+                        last_visit_at: p.last_visit_at, days_since_visit: daysSince,
+                        total_visits: visitCounts[p.id] || 0, has_telegram: !!p.telegram_id,
+                        risk_level: daysSince > 180 ? 'high' : daysSince > 90 ? 'medium' : 'low'
+                    };
+                })
+                .sort((a, b) => (b.days_since_visit || 0) - (a.days_since_visit || 0));
+            return { days_inactive: daysInactive, min_past_visits: minPastVisits, total: atRisk.length, patients: atRisk };
+        }
+
+        case 'get_doctor_recommendation': {
+            const period = args.period || 'this_month';
+            const { from, to } = getPeriodDates(period);
+            let workingDays = 0;
+            const d = new Date(from);
+            const endDate = new Date(to);
+            while (d <= endDate) { const dow = d.getDay(); if (dow !== 0 && dow !== 6) workingDays++; d.setDate(d.getDate() + 1); }
+            const [{ data: doctors }, { data: visits }] = await Promise.all([
+                supabase.from('cc_doctors').select('cc_id, full_name').eq('is_active', true),
+                supabase.from('cc_visits').select('doctor_cc_id').gte('visit_date', from).lte('visit_date', to).not('status', 'eq', 'CANCELLED')
+            ]);
+            const visitCounts = {};
+            (visits || []).forEach(v => { visitCounts[v.doctor_cc_id] = (visitCounts[v.doctor_cc_id] || 0) + 1; });
+            const SLOTS_PER_DAY = 8;
+            const capacity = workingDays * SLOTS_PER_DAY;
+            const result = (doctors || []).map(doc => {
+                const actual = visitCounts[doc.cc_id] || 0;
+                const loadPct = capacity > 0 ? Math.round(actual / capacity * 100) : 0;
+                const recommendation = loadPct < 50 ? 'потребує більше клієнтів' : loadPct < 80 ? 'оптимальне завантаження' : 'перевантажений';
+                return { doctor: doc.full_name, actual_visits: actual, capacity, working_days: workingDays, load_pct: loadPct, recommendation };
+            }).sort((a, b) => a.load_pct - b.load_pct);
+            return { period, working_days: workingDays, capacity_per_doctor: capacity, doctors: result };
         }
 
         default:
