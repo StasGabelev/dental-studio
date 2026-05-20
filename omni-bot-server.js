@@ -380,12 +380,29 @@ function setupTelegramHandlers() {
 
         // --- /start (завжди має пріоритет, скидає будь-який стан) ---
         if (text === '/start') {
-            waitingForPhone.delete(chatId);
+            // Check if already linked
+            const { data: mu } = await supabase
+                .from('messenger_users')
+                .select('patient_cc_id')
+                .eq('platform', 'telegram')
+                .eq('platform_user_id', String(chatId))
+                .single();
+
+            if (mu?.patient_cc_id) {
+                // Already linked — just show menu
+                await tgBot.sendMessage(chatId,
+                    'Привіт! 👋 Раді бачити вас знову.\nЧим можу допомогти?',
+                    MAIN_MENU);
+                return;
+            }
+
+            // New user — ask for phone
+            waitingForPhone.set(chatId, true);
             await tgBot.sendMessage(chatId,
                 'Привіт! 👋 Я — Люся, AI-асистент стоматології Dental Studio.\n\n' +
-                '🎁 Для нових підписників — знижка 10% на перший або наступний візит!\n' +
-                'Просто покажіть це повідомлення адміністратору.\n\n' +
-                'Чим можу допомогти?',
+                'Щоб персоналізувати сервіс та надати вам знижки від нас і партнерів — ' +
+                'будь ласка, введіть ваш номер телефону.\n\n' +
+                'Наприклад: 0771234567',
                 MAIN_MENU);
             return;
         }
