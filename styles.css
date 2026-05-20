@@ -3837,7 +3837,7 @@ main {
 #callback-fab svg { flex-shrink: 0; }
 @media (max-width: 600px) {
     #callback-fab span { display: none; }
-    #callback-fab { padding: 14px; border-radius: 50%; bottom: 24px; left: 20px; }
+    #callback-fab { width: 56px; height: 56px; padding: 0; justify-content: center; border-radius: 50%; bottom: 30px; left: 20px; }
 }
 
 /* ─────────── GOOGLE REVIEWS ─────────── */

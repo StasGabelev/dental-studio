@@ -389,10 +389,10 @@ window.submitCallbackForm = async function(e) {
     btn.setAttribute('aria-label', 'Telegram бот');
     btn.style.cssText = [
         'position:fixed',
-        'bottom:100px',
-        'right:30px',
-        'width:60px',
-        'height:60px',
+        'bottom:30px',
+        'right:20px',
+        'width:56px',
+        'height:56px',
         'background:linear-gradient(135deg,#B8924A,#D4AF72)',
         'border-radius:50%',
         'display:flex',
