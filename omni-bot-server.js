@@ -309,6 +309,12 @@ async function handleAITools(toolCalls, previousMessages) {
 // In-memory: chatId -> true (waiting for phone input)
 const waitingForPhone = new Map();
 
+function detectGender(firstName) {
+    if (!firstName) return null;
+    const n = firstName.trim().split(/\s+/)[0].toLowerCase();
+    return /[ая]$/.test(n) ? 'female' : 'male';
+}
+
 const MAIN_MENU = {
     reply_markup: {
         keyboard: [
@@ -322,10 +328,12 @@ const MAIN_MENU = {
     }
 };
 
-async function showPatientHistory(chatId, phoneLast9, fullPhone) {
-    // Save full phone (with country code) if available, else last 9
+async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
+    const savedPhone = fullPhone || phoneLast9;
+
+    // Save phone — user is "linked" regardless of CRM match
     await supabase.from('messenger_users')
-        .update({ patient_phone: fullPhone || phoneLast9 })
+        .update({ patient_phone: savedPhone })
         .eq('platform', 'telegram')
         .eq('platform_user_id', String(chatId));
 
@@ -336,18 +344,35 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone) {
         .limit(1);
 
     if (!patients || patients.length === 0) {
+        // Auto-create as new prospect in cc_patients
+        const botCcId = 'bot_' + chatId;
+        const firstName = (tgName || '').split(' ')[0];
+        const gender = detectGender(firstName);
+        await supabase.from('cc_patients').upsert({
+            cc_id: botCcId,
+            full_name: tgName || 'Новий клієнт',
+            phone: savedPhone,
+            telegram_id: String(chatId),
+            gender,
+            note: 'Зареєстрований через Telegram-бот'
+        }, { onConflict: 'cc_id' });
+        await supabase.from('messenger_users')
+            .update({ patient_cc_id: botCcId })
+            .eq('platform', 'telegram')
+            .eq('platform_user_id', String(chatId));
+
+        const greeting = firstName ? `, ${firstName}` : '';
         await tgBot.sendMessage(chatId,
-            '✅ Ваш номер збережено!\n\n' +
-            'На жаль, ми не знайшли вас у нашій базі пацієнтів.\n' +
-            'Можливо, ви ще не відвідували нашу клініку.\n\n' +
-            'Зателефонуйте нам: (077) 600 7 800',
+            `✅ Дякуємо${greeting}! Ваш номер збережено.\n\n` +
+            'Схоже, ви ще не були у нашій клініці — будемо раді вас прийняти! 🦷\n\n' +
+            'Всі можливості бота вже доступні для вас.',
             MAIN_MENU);
         return false;
     }
 
     const patient = patients[0];
 
-    // Also save CRM link
+    // Save CRM link
     await supabase.from('messenger_users')
         .update({ patient_cc_id: String(patient.cc_id) })
         .eq('platform', 'telegram')
@@ -433,7 +458,8 @@ function setupTelegramHandlers() {
             waitingForPhone.delete(chatId);
             const fullPhone = msg.contact.phone_number.replace(/\D/g, '');
             const phoneLast9 = fullPhone.slice(-9);
-            await showPatientHistory(chatId, phoneLast9, fullPhone);
+            const tgName = [msg.from.first_name, msg.from.last_name].filter(Boolean).join(' ');
+            await showPatientHistory(chatId, phoneLast9, fullPhone, tgName);
             return;
         }
 
@@ -504,7 +530,8 @@ function setupTelegramHandlers() {
                 return;
             }
             waitingForPhone.delete(chatId);
-            await showPatientHistory(chatId, digits.slice(-9));
+            const tgName = [msg.from.first_name, msg.from.last_name].filter(Boolean).join(' ');
+            await showPatientHistory(chatId, digits.slice(-9), null, tgName);
             return;
         }
 

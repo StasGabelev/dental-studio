@@ -305,22 +305,48 @@
       <div class="section-icon" style="background:#d1fae5">📣</div>
       <div class="section-title">
         <h2>Рассылки и акции <span class="tag green">Маркетолог</span></h2>
-        <p>Создание, планирование и запуск рассылок</p>
+        <p>Все подписчики бота, клиенты с фильтрами, каскад Telegram→Viber</p>
       </div>
       <div class="chevron">›</div>
     </div>
     <div class="section-body">
-      <div class="examples">
-        <div class="example" onclick="copy(this)">Придумай акцию на профессиональную чистку зубов</div>
-        <div class="example" onclick="copy(this)">Зроби розсилку для мам до 1 червня</div>
-        <div class="example" onclick="copy(this)">Напиши 3 варианта поздравления с Новым годом для всех клиентов</div>
-        <div class="example" onclick="copy(this)">Отправь напоминание клиентам, которые не были 2 месяца</div>
-        <div class="example" onclick="copy(this)">Скільки клієнтів отримають розсилку, якщо відправити всім жінкам з Telegram?</div>
-        <div class="example" onclick="copy(this)">Покажи все кампании за последний месяц</div>
-        <div class="example" onclick="copy(this)">Запланируй рассылку на завтра в 10:00 для клиентов с детьми</div>
+
+      <div class="note" style="margin-bottom:18px;background:#f0fdf4;border-left:4px solid #22c55e">
+        <strong>Две аудитории:</strong><br><br>
+        📱 <strong>Подписчики бота</strong> — все, кто зашёл в Telegram или Viber бот и оставил номер. Сюда входят и клиенты клиники, и новые люди из рекламы/соцсетей.<br><br>
+        🏥 <strong>Клиенты клиники</strong> — только те, кто есть в нашей базе (Cliniccards). По ним можно фильтровать: пол, возраст, наличие детей, дата последнего визита и т.д.<br><br>
+        📡 <strong>Каскад доставки</strong>: если у человека есть Telegram — отправляем туда. Нет Telegram, но есть Viber — отправляем в Viber.
       </div>
+
+      <p style="font-weight:700;margin-bottom:10px;color:#065f46">📱 Рассылка ВСЕМ подписчикам бота:</p>
+      <div class="examples" style="margin-bottom:18px">
+        <div class="example" onclick="copy(this)">Відправ усім підписникам боту: [текст повідомлення]</div>
+        <div class="example" onclick="copy(this)">Скільки людей зараз підписані на наш бот?</div>
+        <div class="example" onclick="copy(this)">Відправ акцію всім хто є в нашому Telegram або Viber боті: У нас знижка 20% на чистку зубів цього тижня!</div>
+        <div class="example" onclick="copy(this)">Зроби розсилку по всій базі боту — придумай текст про весняну акцію</div>
+      </div>
+
+      <p style="font-weight:700;margin-bottom:10px;color:#1e40af">🏥 Рассылка по клиентам клиники с фильтрами:</p>
+      <div class="examples" style="margin-bottom:18px">
+        <div class="example" onclick="copy(this)">Відправ усім жінкам-клієнткам у Telegram: [текст]</div>
+        <div class="example" onclick="copy(this)">Зроби розсилку мамам з дітьми: [текст]</div>
+        <div class="example" onclick="copy(this)">Відправ клієнтам, які не були більше 3 місяців: Ми сумуємо за вами! Спеціальна знижка 15% на наступний візит.</div>
+        <div class="example" onclick="copy(this)">Скільки жінок-клієнток з Telegram отримають розсилку?</div>
+        <div class="example" onclick="copy(this)">Відправ іменинникам цього тижня привітання через бот</div>
+        <div class="example" onclick="copy(this)">Розсилка клієнтам старше 40 років: [текст про імплантацію]</div>
+      </div>
+
+      <p style="font-weight:700;margin-bottom:10px;color:#7c3aed">📋 Подготовка и планирование:</p>
+      <div class="examples" style="margin-bottom:18px">
+        <div class="example" onclick="copy(this)">Придумай акцію на профессиональну чистку зубів і відправ усім підписникам</div>
+        <div class="example" onclick="copy(this)">Напиши 3 варіанти привітання з Новим роком — потім вибираємо який відправити</div>
+        <div class="example" onclick="copy(this)">Запланируй розсилку на завтра о 10:00 для клієнтів з дітьми</div>
+        <div class="example" onclick="copy(this)">Покажи всі кампанії за останній місяць</div>
+      </div>
+
       <div class="note">
-        <strong>Важно:</strong> Люся всегда покажет черновик текста и количество получателей <em>перед</em> отправкой — нужно подтвердить «ок» или «отправляй».
+        <strong>⚠️ Важно:</strong> Люся <em>всегда</em> покажет черновик текста и количество получателей <strong>до отправки</strong>. Подтвердить: «ок», «відправляй», «так». Отменить: «скасуй», «не відправляй».<br><br>
+        <strong>Новые люди из бота</strong> (не клиенты клиники) попадают только в рассылку «всім підписникам». Для фильтрованных рассылок нужно быть в базе Cliniccards.
       </div>
     </div>
   </div>
