@@ -50,10 +50,30 @@ function initLusya(supabase, aiSettings) {
         try {
             lusyaBot.sendChatAction(chatId, 'typing');
             const reply = await handleLusyaMessage(chatId, text, supabase, aiSettings);
-            await lusyaBot.sendMessage(chatId, reply, { parse_mode: 'Markdown' });
+            // Try with Markdown first; if Telegram rejects (bad formatting) — send as plain text
+            try {
+                await lusyaBot.sendMessage(chatId, reply, { parse_mode: 'Markdown' });
+            } catch (mdErr) {
+                console.warn('Markdown send failed, retrying as plain text:', mdErr.message);
+                await lusyaBot.sendMessage(chatId, reply);
+            }
         } catch (e) {
-            console.error('Lusya message error:', e.message);
-            lusyaBot.sendMessage(chatId, '⚠️ Произошла ошибка при обработке запроса. Попробуйте ещё раз.');
+            console.error('Lusya message error:', e.message, e.stack);
+            let userMsg = 'Щось пішло не так, спробуйте ще раз.';
+            if (/402|payment|balance|credit/i.test(e.message)) {
+                userMsg = '💳 Закінчився баланс OpenRouter. Поповніть на openrouter.ai/credits';
+            } else if (/401|unauthorized|api.?key/i.test(e.message)) {
+                userMsg = '🔑 Проблема з API-ключем OpenRouter. Перевірте в налаштуваннях Люсі.';
+            } else if (/429|rate.?limit/i.test(e.message)) {
+                userMsg = '⏳ Занадто багато запитів, почекайте хвилину і спробуйте ще раз.';
+            } else if (/404|not.?found|model/i.test(e.message)) {
+                userMsg = '🤖 Модель AI недоступна. Зверніться до розробника @sgabelev.';
+            } else if (/timeout|ETIMEDOUT|ECONNRESET/i.test(e.message)) {
+                userMsg = '🌐 Тайм-аут з\'єднання. Спробуйте ще раз.';
+            }
+            try {
+                await lusyaBot.sendMessage(chatId, userMsg);
+            } catch (_) {}
         }
     });
 
@@ -252,7 +272,9 @@ async function callOpenRouter(model, messages, tools, apiKey) {
 
     if (!response.ok) {
         const err = await response.text();
-        throw new Error(`OpenRouter error ${response.status}: ${err.slice(0, 200)}`);
+        const msg = `OpenRouter error ${response.status}: ${err.slice(0, 300)}`;
+        console.error('🔴', msg);
+        throw new Error(msg);
     }
 
     const data = await response.json();
