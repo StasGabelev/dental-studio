@@ -602,7 +602,7 @@ const LUSYA_TOOLS = [
         type: 'function',
         function: {
             name: 'get_patient_stats',
-            description: 'Загальна статистика по базі пацієнтів: кількість за статтю (M/F), загальна кількість, кількість без статі. Використовувати коли питають "скільки жінок/чоловіків в базі", "загальна кількість пацієнтів", "статистика по базі".',
+            description: 'Загальна статистика по базі пацієнтів. Використовувати коли питають: "скільки жінок/мужчин в базі", "скільки пацієнтів мають дату народження / день народження / birthdate / dob", "скільки з телефоном/email", "загальна кількість пацієнтів", "статистика по базі", "заповненість бази". Повертає: total, female, male, with_dob, without_dob, with_phone, with_email.',
             parameters: {
                 type: 'object',
                 properties: {
@@ -678,11 +678,11 @@ const LUSYA_TOOLS = [
         type: 'function',
         function: {
             name: 'get_birthday_patients',
-            description: 'Іменинники: пацієнти з днем народження сьогодні, цього тижня або цього місяця. Роль: CRM-менеджер.',
+            description: 'Іменинники: пацієнти з днем народження. Використовувати коли питають "хто іменинник сьогодні/цього тижня/цього місяця/наступного місяця", "у кого день народження", "у кого ДН в цьому місяці", "birthday this month/next month". Роль: CRM-менеджер.',
             parameters: {
                 type: 'object',
                 properties: {
-                    when: { type: 'string', description: 'today | this_week | this_month' }
+                    when: { type: 'string', description: 'today | this_week | this_month | next_month | next_30_days' }
                 },
                 required: ['when']
             }
@@ -1413,6 +1413,17 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
                     return false;
                 }
                 if (when === 'this_month') return m === todayM;
+                if (when === 'next_month') {
+                    const nextMonth = todayM === 12 ? 1 : todayM + 1;
+                    return m === nextMonth;
+                }
+                if (when === 'next_30_days') {
+                    for (let i = 1; i <= 30; i++) {
+                        const check = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+                        if (m === check.getMonth() + 1 && day === check.getDate()) return true;
+                    }
+                    return false;
+                }
                 return false;
             }).map(p => {
                 const dobDate = new Date(p.dob);
