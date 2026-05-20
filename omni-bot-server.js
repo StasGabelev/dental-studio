@@ -353,6 +353,11 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone) {
         .eq('platform', 'telegram')
         .eq('platform_user_id', String(chatId));
 
+    // Sync telegram_id to cc_patients so Lusya and campaign-runner can find this subscriber
+    await supabase.from('cc_patients')
+        .update({ telegram_id: String(chatId) })
+        .eq('cc_id', String(patient.cc_id));
+
     const { data: visits } = await supabase
         .from('cc_visits')
         .select('visit_date, service_name, doctor_name')
