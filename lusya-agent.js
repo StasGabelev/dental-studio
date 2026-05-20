@@ -634,6 +634,22 @@ const LUSYA_TOOLS = [
     {
         type: 'function',
         function: {
+            name: 'get_patient_history',
+            description: 'Історія лікування конкретного пацієнта: всі візити з датами, лікарями, послугами та сумами. Використовувати коли питають "що лікували", "яка історія", "які послуги", "коли були", "покажи візити пацієнта". Можна передати patient_id (з попереднього пошуку) АБО name для пошуку по імені.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    patient_id: { type: 'string', description: 'UUID пацієнта з попереднього результату search_patients' },
+                    name: { type: 'string', description: 'Ім\'я або прізвище пацієнта якщо немає patient_id' },
+                    limit: { type: 'number', description: 'Кількість останніх візитів (за замовчуванням 20)' }
+                },
+                required: []
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
             name: 'get_patient_ltv',
             description: 'Lifetime Value пацієнта: загальна сума витрат, кількість візитів, середній чек. Роль: Таргетолог, Бухгалтер.',
             parameters: {
@@ -1289,6 +1305,59 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             }
         }
 
+        case 'get_patient_history': {
+            const histLimit = args.limit || 20;
+            let patient = null;
+            if (args.patient_id) {
+                const { data } = await supabase.from('cc_patients')
+                    .select('id, full_name, phone, dob, gender').eq('id', args.patient_id).single();
+                patient = data;
+            } else if (args.name) {
+                const { data } = await supabase.from('cc_patients')
+                    .select('id, full_name, phone, dob, gender').ilike('full_name', `%${args.name}%`).limit(1).single();
+                patient = data;
+            }
+            if (!patient) return { error: 'Пацієнта не знайдено' };
+
+            const [{ data: visits }, { data: invoices }] = await Promise.all([
+                supabase.from('cc_visits')
+                    .select('visit_date, time_start, doctor_cc_id, service_name, status')
+                    .eq('patient_id', patient.id)
+                    .order('visit_date', { ascending: false })
+                    .limit(histLimit),
+                supabase.from('cc_invoices')
+                    .select('date, amount, items, doctor_name')
+                    .eq('patient_id', patient.id)
+                    .order('date', { ascending: false })
+                    .limit(histLimit)
+            ]);
+
+            const formattedVisits = (visits || []).map(v => ({
+                date: v.visit_date,
+                time: v.time_start,
+                service: v.service_name,
+                status: v.status
+            }));
+
+            const formattedInvoices = (invoices || []).map(inv => {
+                const services = (inv.items || []).map(i => `${i.plan_item_name} (${i.quantity || 1}×${i.price}₴)`).join(', ');
+                return { date: inv.date, amount: parseFloat(inv.amount || 0), doctor: inv.doctor_name, services };
+            });
+
+            const totalSpent = formattedInvoices.reduce((s, i) => s + i.amount, 0);
+
+            return {
+                patient: patient.full_name,
+                phone: patient.phone,
+                gender: patient.gender,
+                dob: patient.dob,
+                total_spent: Math.round(totalSpent),
+                visit_count: formattedVisits.length,
+                visits: formattedVisits,
+                invoices: formattedInvoices
+            };
+        }
+
         case 'get_patient_ltv': {
             if (args.patient_id || args.phone) {
                 let patQuery = supabase.from('cc_patients').select('id, full_name, phone, last_visit_at');
@@ -1523,6 +1592,8 @@ const DEFAULT_SYSTEM_PROMPT = `Ты — Люся, внутренний ИИ-ас
 - Для поиска пациентов → search_patients.
 - Для финансов/визитов → get_revenue, get_visits_stats.
 - Если не знаешь ответа без инструмента — скажи "дай мне секунду" и вызови инструмент.
+- НИКОГДА не спрашивай у администратора ID пациента — ты сама находишь его через search_patients или get_patient_history по имени. ID нужен только для внутренних вызовов между инструментами.
+- Когда нашла пациента через search_patients и спрашивают "что лечили / история / когда были" — сразу вызывай get_patient_history с patient_id из предыдущего результата.
 
 ПРАВИЛА:
 1. Перед выполнением важных действий (отправить рассылку, изменить данные пациентов) — кратко опиши что именно будешь делать и жди подтверждения.
