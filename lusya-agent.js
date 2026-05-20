@@ -1204,13 +1204,17 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
         }
 
         case 'get_patient_stats': {
-            const [{ count: total }, { count: female }, { count: male }] = await Promise.all([
+            const [{ count: total }, { count: female }, { count: male }, { count: with_dob }, { count: with_phone }, { count: with_email }] = await Promise.all([
                 supabase.from('cc_patients').select('*', { count: 'exact', head: true }),
                 supabase.from('cc_patients').select('*', { count: 'exact', head: true }).eq('gender', 'F'),
                 supabase.from('cc_patients').select('*', { count: 'exact', head: true }).eq('gender', 'M'),
+                supabase.from('cc_patients').select('*', { count: 'exact', head: true }).not('dob', 'is', null),
+                supabase.from('cc_patients').select('*', { count: 'exact', head: true }).neq('phone', ''),
+                supabase.from('cc_patients').select('*', { count: 'exact', head: true }).neq('email', ''),
             ]);
-            const unknown = total - female - male;
-            return { total, female, male, unknown };
+            const unknown_gender = total - female - male;
+            const without_dob = total - with_dob;
+            return { total, female, male, unknown_gender, with_dob, without_dob, with_phone, with_email };
         }
 
         case 'get_top_patients': {
