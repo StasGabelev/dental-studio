@@ -151,7 +151,11 @@ async function runBalanceCheck(apiKey) {
 // ─── Core message handler ────────────────────────────────────────────────────
 
 async function handleLusyaMessage(chatId, userText, supabase, aiSettings) {
-    // 1. Load or create conversation session
+    // 1. Always fetch fresh settings so API key / model changes take effect without restart
+    const { data: freshSettings } = await supabase.from('ai_settings').select('*').single();
+    const s = freshSettings || aiSettings || {};
+
+    // 2. Load or create conversation session
     const { data: sessionRow } = await supabase
         .from('lusya_sessions')
         .select('*')
@@ -163,27 +167,37 @@ async function handleLusyaMessage(chatId, userText, supabase, aiSettings) {
     // Keep only last 20 messages to avoid token bloat
     if (history.length > 20) history = history.slice(-20);
 
-    // 2. Select model based on request complexity
-    const model = selectModel(userText, aiSettings);
+    // 3. Select model based on request complexity
+    const model = selectModel(userText, s);
 
-    // 3. Build system prompt — inject current date so Lusya can resolve "tomorrow", "next week" etc.
+    // 4. Build system prompt — inject current date so Lusya can resolve "tomorrow", "next week" etc.
     const now = new Date();
     const dateStr = now.toLocaleDateString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const systemPrompt = (aiSettings?.lusya_system_prompt || DEFAULT_SYSTEM_PROMPT)
+    const systemPrompt = (s.lusya_system_prompt || DEFAULT_SYSTEM_PROMPT)
         + `\n\n[СИСТЕМНА ІНФОРМАЦІЯ]\nПоточна дата: ${dateStr}\nДля дат у інструментах використовуй формат YYYY-MM-DD.`;
 
-    // 4. Build messages array
+    // 5. Build messages array
     const messages = [
         { role: 'system', content: systemPrompt },
         ...history,
         { role: 'user', content: userText }
     ];
 
-    // 5. Call OpenRouter
-    const apiKey = aiSettings?.lusya_openrouter_key || aiSettings?.api_key;
-    let response = await callOpenRouter(model, messages, LUSYA_TOOLS, apiKey);
+    // 6. Call OpenRouter (retry once on 429 rate-limit)
+    const apiKey = s.lusya_openrouter_key || s.api_key;
+    if (!apiKey) throw new Error('401: Missing Authentication header — API key not set');
+    let response;
+    try {
+        response = await callOpenRouter(model, messages, LUSYA_TOOLS, apiKey);
+    } catch (e) {
+        if (/429/.test(e.message)) {
+            console.warn('429 rate-limit, retrying in 5s...');
+            await new Promise(r => setTimeout(r, 5000));
+            response = await callOpenRouter(model, messages, LUSYA_TOOLS, apiKey);
+        } else throw e;
+    }
 
-    // 6. Handle tool calls (agentic loop — up to 5 iterations)
+    // 7. Handle tool calls (agentic loop — up to 5 iterations)
     let iterations = 0;
     while (response.tool_calls && iterations < 5) {
         iterations++;
@@ -195,7 +209,7 @@ async function handleLusyaMessage(chatId, userText, supabase, aiSettings) {
 
             let result;
             try {
-                result = await executeLusyaTool(tc.function.name, args, supabase, aiSettings);
+                result = await executeLusyaTool(tc.function.name, args, supabase, s);
             } catch (e) {
                 result = { error: e.message };
             }
@@ -211,8 +225,15 @@ async function handleLusyaMessage(chatId, userText, supabase, aiSettings) {
         messages.push({ role: 'assistant', content: response.content || null, tool_calls: response.tool_calls });
         messages.push(...toolMessages);
 
-        // Call model again with tool results
-        response = await callOpenRouter(model, messages, LUSYA_TOOLS, apiKey);
+        // Call model again with tool results — if 429, wait 5s and retry once
+        try {
+            response = await callOpenRouter(model, messages, LUSYA_TOOLS, apiKey);
+        } catch (e) {
+            if (/429/.test(e.message)) {
+                await new Promise(r => setTimeout(r, 5000));
+                response = await callOpenRouter(model, messages, LUSYA_TOOLS, apiKey);
+            } else throw e;
+        }
     }
 
     const replyText = response.content || '_(нет ответа)_';
@@ -238,7 +259,7 @@ async function handleLusyaMessage(chatId, userText, supabase, aiSettings) {
 const ALWAYS_COMPLEX_TOOLS = ['create_campaign', 'create_survey', 'create_flow', 'send_campaign_now'];
 
 function selectModel(text, aiSettings) {
-    const simpleModel = aiSettings?.lusya_simple_model || 'google/gemini-flash-1.5';
+    const simpleModel = aiSettings?.lusya_simple_model || 'google/gemini-2.0-flash-001';
     const complexModel = aiSettings?.lusya_complex_model || 'anthropic/claude-sonnet-4-6';
 
     const keywordsRaw = aiSettings?.lusya_simple_keywords ||
