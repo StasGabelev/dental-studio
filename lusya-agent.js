@@ -193,7 +193,7 @@ const LUSYA_TOOLS = [
                 type: 'object',
                 properties: {
                     doctor_name: { type: 'string', description: 'Имя доктора или "all" для всех' },
-                    period: { type: 'string', description: 'today | this_week | this_month | last_month | last_30_days' }
+                    period: { type: 'string', description: 'today | yesterday | this_week | last_week | this_month | last_month | this_quarter | last_quarter | this_year | last_year | last_30_days | last_90_days | all_time' }
                 },
                 required: ['period']
             }
@@ -207,7 +207,7 @@ const LUSYA_TOOLS = [
             parameters: {
                 type: 'object',
                 properties: {
-                    period: { type: 'string', description: 'this_week | this_month | last_month | last_30_days | last_90_days' },
+                    period: { type: 'string', description: 'today | yesterday | this_week | last_week | this_month | last_month | this_quarter | last_quarter | this_year | last_year | last_30_days | last_90_days | all_time' },
                     group_by: { type: 'string', description: 'doctor | service' }
                 },
                 required: ['period']
@@ -467,17 +467,68 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
 
     function getPeriodDates(period) {
         const now = new Date();
-        let from;
+        let from, to = new Date(now);
+
         switch (period) {
-            case 'today': from = new Date(now.toDateString()); break;
-            case 'this_week': from = new Date(now); from.setDate(now.getDate() - now.getDay()); break;
-            case 'this_month': from = new Date(now.getFullYear(), now.getMonth(), 1); break;
-            case 'last_month': from = new Date(now.getFullYear(), now.getMonth() - 1, 1); break;
-            case 'last_30_days': from = new Date(Date.now() - 30 * 86400000); break;
-            case 'last_90_days': from = new Date(Date.now() - 90 * 86400000); break;
-            default: from = new Date(Date.now() - 30 * 86400000);
+            case 'today':
+                from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                break;
+            case 'yesterday': {
+                const y = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                from = y;
+                to = new Date(y);
+                break;
+            }
+            case 'this_week': {
+                // Monday of current week
+                const day = now.getDay() || 7;
+                from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day + 1);
+                break;
+            }
+            case 'last_week': {
+                const day = now.getDay() || 7;
+                from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day - 6);
+                to = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day);
+                break;
+            }
+            case 'this_month':
+                from = new Date(now.getFullYear(), now.getMonth(), 1);
+                break;
+            case 'last_month':
+                from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                to = new Date(now.getFullYear(), now.getMonth(), 0);
+                break;
+            case 'this_quarter': {
+                const q = Math.floor(now.getMonth() / 3);
+                from = new Date(now.getFullYear(), q * 3, 1);
+                break;
+            }
+            case 'last_quarter': {
+                const q = Math.floor(now.getMonth() / 3);
+                from = new Date(now.getFullYear(), (q - 1) * 3, 1);
+                to = new Date(now.getFullYear(), q * 3, 0);
+                break;
+            }
+            case 'this_year':
+                from = new Date(now.getFullYear(), 0, 1);
+                break;
+            case 'last_year':
+                from = new Date(now.getFullYear() - 1, 0, 1);
+                to = new Date(now.getFullYear() - 1, 11, 31);
+                break;
+            case 'last_30_days':
+                from = new Date(Date.now() - 30 * 86400000);
+                break;
+            case 'last_90_days':
+                from = new Date(Date.now() - 90 * 86400000);
+                break;
+            case 'all_time':
+                from = new Date(2020, 0, 1);
+                break;
+            default:
+                from = new Date(Date.now() - 30 * 86400000);
         }
-        return { from: from.toISOString().split('T')[0], to: now.toISOString().split('T')[0] };
+        return { from: from.toISOString().split('T')[0], to: to.toISOString().split('T')[0] };
     }
 
     switch (toolName) {
