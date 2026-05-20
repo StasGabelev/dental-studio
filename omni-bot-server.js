@@ -401,13 +401,29 @@ function setupTelegramHandlers() {
             await tgBot.answerCallbackQuery(query.id);
             waitingForPhone.set(chatId, true);
             await tgBot.sendMessage(chatId,
-                'Введіть ваш номер телефону:\nНаприклад: 0771234567',
-                MAIN_MENU);
+                '📱 Натисніть кнопку нижче, щоб поділитися номером телефону.\n\nАбо введіть вручну: 0771234567',
+                {
+                    reply_markup: {
+                        keyboard: [[{ text: '📱 Поділитися номером телефону', request_contact: true }]],
+                        resize_keyboard: true,
+                        one_time_keyboard: true
+                    }
+                }
+            );
         }
     });
 
     tgBot.on('message', async (msg) => {
         const chatId = msg.chat.id;
+
+        // --- Contact shared via Telegram button ---
+        if (msg.contact) {
+            waitingForPhone.delete(chatId);
+            const phone = msg.contact.phone_number.replace(/\D/g, '').slice(-9);
+            await showPatientHistory(chatId, phone);
+            return;
+        }
+
         const text = msg.text;
         if (!text) return;
 
@@ -437,14 +453,20 @@ function setupTelegramHandlers() {
                 return;
             }
 
-            // New user — ask for phone
+            // New user — ask for phone via contact-share button
             waitingForPhone.set(chatId, true);
             await tgBot.sendMessage(chatId,
                 'Привіт! 👋 Я — Люся, AI-асистент стоматології Dental Studio.\n\n' +
                 'Щоб персоналізувати сервіс та надати вам знижки від нас і партнерів — ' +
-                'будь ласка, введіть ваш номер телефону.\n\n' +
-                'Наприклад: 0771234567',
-                MAIN_MENU);
+                'поділіться, будь ласка, номером телефону.',
+                {
+                    reply_markup: {
+                        keyboard: [[{ text: '📱 Поділитися номером телефону', request_contact: true }]],
+                        resize_keyboard: true,
+                        one_time_keyboard: true
+                    }
+                }
+            );
             return;
         }
 
