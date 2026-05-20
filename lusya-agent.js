@@ -373,10 +373,11 @@ const LUSYA_TOOLS = [
         type: 'function',
         function: {
             name: 'search_patients',
-            description: 'Поиск и фильтрация пациентов по различным критериям. Возвращает количество и список',
+            description: 'Поиск и фильтрация пациентов по различным критериям. Для поиска по имени или фамилии — использовать параметр name. Возвращает количество и список.',
             parameters: {
                 type: 'object',
                 properties: {
+                    name: { type: 'string', description: 'Пошук по імені або прізвищу (часткове співпадіння). Використовувати коли шукають конкретну людину за ім\'ям/прізвищем.' },
                     gender: { type: 'string', description: 'M | F' },
                     age_min: { type: 'number' },
                     age_max: { type: 'number' },
@@ -944,6 +945,7 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
                 .select('id, full_name, phone, gender, dob, has_children, custom_tags, last_visit_at, telegram_id, viber_id');
 
             if (servicePatientIds) query = query.in('id', servicePatientIds);
+            if (args.name) query = query.ilike('full_name', `%${args.name}%`);
             if (args.gender) query = query.eq('gender', args.gender);
             if (args.has_children !== undefined) query = query.eq('has_children', args.has_children);
             if (args.has_telegram) query = query.not('telegram_id', 'is', null);
