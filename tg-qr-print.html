@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Dental Studio — Telegram QR</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px;
+  }
+  .card {
+    background: #111;
+    color: #fff;
+    padding: 52px 48px;
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #B8924A, transparent);
+  }
+  .card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #B8924A, transparent);
+  }
+  .logo-text {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #B8924A;
+    margin-bottom: 6px;
+  }
+  .clinic-name {
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 36px;
+  }
+  .divider {
+    width: 40px; height: 1px;
+    background: #B8924A;
+    margin: 0 auto 32px;
+  }
+  .qr-wrap {
+    background: #fff;
+    padding: 16px;
+    display: inline-block;
+    margin-bottom: 28px;
+  }
+  .qr-wrap img { display: block; width: 200px; height: 200px; }
+  .scan-text {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 28px;
+  }
+  .benefits {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 32px;
+  }
+  .benefits li {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.65);
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .benefits li:last-child { border-bottom: none; }
+  .benefits .icon { font-size: 16px; }
+  .bot-link {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #B8924A;
+    text-decoration: none;
+  }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .card { margin: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-text">Dental Studio</div>
+  <div class="clinic-name">Чернігів</div>
+  <div class="divider"></div>
+
+  <div class="qr-wrap">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/YOUR_BOT_USERNAME&color=111111&bgcolor=ffffff&margin=0" alt="QR Telegram Bot">
+  </div>
+
+  <div class="scan-text">Відскануйте для входу в бот</div>
+
+  <ul class="benefits">
+    <li><span class="icon">🎁</span> Знижка 10% на наступний візит</li>
+    <li><span class="icon">📋</span> Повна історія ваших візитів</li>
+    <li><span class="icon">🤝</span> Ексклюзивні знижки від партнерів</li>
+    <li><span class="icon">📅</span> Онлайн-запис без дзвінків</li>
+    <li><span class="icon">📞</span> Зворотній дзвінок в один дотик</li>
+  </ul>
+
+  <a class="bot-link" href="https://t.me/YOUR_BOT_USERNAME">t.me/YOUR_BOT_USERNAME</a>
+</div>
+</body>
+</html>
