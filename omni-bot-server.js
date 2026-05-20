@@ -537,17 +537,21 @@ async function syncCliniccardsDatabase() {
             console.log(`📥 CRON: Retrieved ${patients.length} patients from CRM. Upserting to Supabase...`);
 
             const now = new Date().toISOString();
-            const rows = patients.map(p => ({
-                cc_id: String(p.patient_id),
-                full_name: [p.lastname, p.firstname].filter(Boolean).join(' '),
-                phone: p.phone || p.phone2 || '',
-                email: p.email || '',
-                gender: p.gender || null,
-                dob: p.birthday || null,
-                note: p.note || p.important_note || '',
-                last_visit_at: p.last_visit_date ? new Date(p.last_visit_date).toISOString() : null,
-                last_sync_at: now
-            }));
+            const rows = patients.map(p => {
+                const row = {
+                    cc_id: String(p.patient_id),
+                    full_name: [p.lastname, p.firstname].filter(Boolean).join(' '),
+                    phone: p.phone || p.phone2 || '',
+                    email: p.email || '',
+                    dob: p.birthday || null,
+                    note: p.note || p.important_note || '',
+                    last_visit_at: p.last_visit_date ? new Date(p.last_visit_date).toISOString() : null,
+                    last_sync_at: now
+                };
+                // Only sync gender if CRM has it — otherwise keep the value set manually in Supabase
+                if (p.gender) row.gender = p.gender;
+                return row;
+            });
             // Batch upsert in chunks of 500
             const CHUNK = 500;
             for (let i = 0; i < rows.length; i += CHUNK) {
