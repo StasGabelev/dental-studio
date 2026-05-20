@@ -597,6 +597,20 @@ const LUSYA_TOOLS = [
     {
         type: 'function',
         function: {
+            name: 'get_patient_stats',
+            description: 'Загальна статистика по базі пацієнтів: кількість за статтю (M/F), загальна кількість, кількість без статі. Використовувати коли питають "скільки жінок/чоловіків в базі", "загальна кількість пацієнтів", "статистика по базі".',
+            parameters: {
+                type: 'object',
+                properties: {
+                    group_by: { type: 'string', description: 'gender — розбивка по статі (за замовчуванням)' }
+                },
+                required: []
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
             name: 'get_top_patients',
             description: 'Топ-пацієнти за сумою витрат або кількістю візитів. Роль: Таргетолог, VIP-сегмент.',
             parameters: {
@@ -1183,6 +1197,18 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
                 }
             }
             return result.length ? result : [{ message: 'Свободных окон не найдено' }];
+        }
+
+        case 'get_patient_stats': {
+            const { data: allPatients, error: spErr } = await supabase
+                .from('cc_patients')
+                .select('gender', { count: 'exact' });
+            if (spErr) throw spErr;
+            const total = allPatients.length;
+            const female = allPatients.filter(p => p.gender === 'F').length;
+            const male   = allPatients.filter(p => p.gender === 'M').length;
+            const unknown = total - female - male;
+            return { total, female, male, unknown };
         }
 
         case 'get_top_patients': {
