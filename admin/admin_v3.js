@@ -2724,12 +2724,13 @@ async function syncNow() {
                     full_name: [p.lastname, p.firstname].filter(Boolean).join(' '),
                     phone: p.phone || p.phone2 || '',
                     email: p.email || '',
-                    gender: p.gender || null,
                     dob: p.birthday || null,
                     note: p.note || p.important_note || '',
                     last_visit_at: p.last_visit_date ? new Date(p.last_visit_date).toISOString() : null,
                     last_sync_at: new Date().toISOString()
                 };
+                // Only sync gender if CRM has it — otherwise keep the value we set manually
+                if (p.gender) row.gender = p.gender;
                 await sb.from('cc_patients').upsert(row, { onConflict: 'cc_id' });
             }
 
