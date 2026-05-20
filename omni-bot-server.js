@@ -662,20 +662,27 @@ async function getOrCreateSession(platform, platformId, name) {
 
     if (link) {
         let { data: session } = await supabase.from('chat_sessions').select('*').eq('id', link.session_id).single();
-        return session;
+        if (session) return session;
     }
 
-    // New User
-    const { data: session } = await supabase.from('chat_sessions').insert({
+    // New User — insert session
+    const { data: session, error: sessionErr } = await supabase.from('chat_sessions').insert({
         client_name: name,
         contact_type: platform
     }).select('*').single();
 
-    await supabase.from('messenger_users').insert({
+    if (sessionErr || !session) {
+        console.error('❌ chat_sessions insert failed:', sessionErr?.message || 'null returned');
+        return { id: null };
+    }
+
+    const { error: muErr } = await supabase.from('messenger_users').insert({
         platform,
         platform_user_id: String(platformId),
         session_id: session.id
     });
+
+    if (muErr) console.error('❌ messenger_users insert failed:', muErr.message);
 
     return session;
 }
