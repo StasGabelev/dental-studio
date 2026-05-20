@@ -372,7 +372,7 @@ async function showPatientHistory(chatId, phoneLast9) {
     return true;
 }
 
-async function requireLinked(chatId) {
+async function requireLinked(chatId, message) {
     const { data: mu } = await supabase
         .from('messenger_users')
         .select('patient_cc_id')
@@ -382,16 +382,14 @@ async function requireLinked(chatId) {
 
     if (mu?.patient_cc_id) return true;
 
-    await tgBot.sendMessage(chatId,
-        '🔗 Щоб отримати персональний сервіс, підв\'яжіть ваш номер телефону.',
-        {
-            reply_markup: {
-                inline_keyboard: [[
-                    { text: '📱 Підв\'язати номер', callback_data: 'link_phone' }
-                ]]
-            }
+    const text = message || '🔗 Щоб отримати персональний сервіс, підв\'яжіть ваш номер телефону.';
+    await tgBot.sendMessage(chatId, text, {
+        reply_markup: {
+            inline_keyboard: [[
+                { text: '📱 Підв\'язати номер', callback_data: 'link_phone' }
+            ]]
         }
-    );
+    });
     return false;
 }
 
@@ -466,6 +464,9 @@ function setupTelegramHandlers() {
 
         // --- Записатися онлайн ---
         if (text === '📅 Записатися онлайн') {
+            if (!await requireLinked(chatId,
+                '📅 Щоб записатися, будь ласка, підв\'яжіть номер телефону — ми зможемо передзвонити, уточнити зручний час та якісно вас обслужити.'))
+                return;
             await tgBot.sendMessage(chatId, 'Оберіть зручний час для запису:', {
                 reply_markup: {
                     inline_keyboard: [[
@@ -505,6 +506,9 @@ function setupTelegramHandlers() {
 
         // --- Наші партнери ---
         if (text === '🤝 Наші партнери') {
+            if (!await requireLinked(chatId,
+                '🤝 Щоб отримати персональні знижки від наших партнерів — підв\'яжіть ваш номер телефону.'))
+                return;
             try {
                 const { data: partners } = await supabase
                     .from('partners')
@@ -564,6 +568,9 @@ function setupTelegramHandlers() {
 
         // --- Зворотний дзвінок ---
         if (text === '📞 Зворотний дзвінок') {
+            if (!await requireLinked(chatId,
+                '📞 Щоб ми могли вам передзвонити — будь ласка, підв\'яжіть ваш номер телефону.'))
+                return;
             if (aiSettings?.tg_bot_token && aiSettings?.tg_chat_id) {
                 const alertBot = new TelegramBot(aiSettings.tg_bot_token);
                 const name = [msg.from.first_name, msg.from.last_name].filter(Boolean).join(' ');
