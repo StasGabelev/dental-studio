@@ -306,6 +306,9 @@ async function handleAITools(toolCalls, previousMessages) {
 
 // --- 3. Platform Handlers ---
 
+// In-memory: chatId -> true (waiting for phone input)
+const waitingForPhone = new Map();
+
 const MAIN_MENU = {
     reply_markup: {
         keyboard: [
@@ -319,56 +322,75 @@ const MAIN_MENU = {
     }
 };
 
-function setupTelegramHandlers() {
-    // Handle shared phone number (for "Моя історія")
-    tgBot.on('contact', async (msg) => {
-        const chatId = msg.chat.id;
-        const rawPhone = msg.contact.phone_number.replace(/\D/g, '');
-        const phoneLast9 = rawPhone.slice(-9);
+async function showPatientHistory(chatId, phoneLast9) {
+    const { data: patients } = await supabase
+        .from('cc_patients')
+        .select('cc_id, full_name')
+        .ilike('phone', `%${phoneLast9}%`)
+        .limit(1);
 
-        const { data: patients } = await supabase
-            .from('cc_patients')
-            .select('cc_id, full_name')
-            .ilike('phone', `%${phoneLast9}%`)
-            .limit(1);
-
-        if (!patients || patients.length === 0) {
-            await tgBot.sendMessage(chatId,
-                'На жаль, ми не знайшли вас у нашій базі.\nМожливо, ви реєструвались під іншим номером.\n\nЗателефонуйте нам: (077) 600 7 800',
-                MAIN_MENU);
-            return;
-        }
-
-        const patient = patients[0];
-        const { data: visits } = await supabase
-            .from('cc_visits')
-            .select('visit_date, service_name, doctor_name')
-            .eq('patient_id', patient.cc_id)
-            .order('visit_date', { ascending: false })
-            .limit(5);
-
-        if (!visits || visits.length === 0) {
-            await tgBot.sendMessage(chatId,
-                `Привіт, ${patient.full_name}!\n\nІсторія ваших візитів поки що порожня.`,
-                MAIN_MENU);
-            return;
-        }
-
-        const lines = visits.map(v => {
-            const date = v.visit_date ? v.visit_date.slice(0, 10) : '—';
-            const doc  = v.doctor_name   || 'Лікар';
-            const svc  = v.service_name  || 'Послуга';
-            return `📅 ${date}\n👨‍⚕️ ${doc}\n🦷 ${svc}`;
-        });
+    if (!patients || patients.length === 0) {
         await tgBot.sendMessage(chatId,
-            `📋 Ваша історія візитів, ${patient.full_name}:\n\n${lines.join('\n\n')}`,
+            'На жаль, ми не знайшли вас у нашій базі.\n' +
+            'Можливо, ви реєструвались під іншим номером.\n\n' +
+            'Зателефонуйте нам: (077) 600 7 800',
             MAIN_MENU);
-    });
+        return false;
+    }
 
+    const patient = patients[0];
+
+    // Save link for future use
+    await supabase.from('messenger_users')
+        .update({ patient_phone: phoneLast9, patient_cc_id: String(patient.cc_id) })
+        .eq('platform', 'telegram')
+        .eq('platform_user_id', String(chatId));
+
+    const { data: visits } = await supabase
+        .from('cc_visits')
+        .select('visit_date, service_name, doctor_name')
+        .eq('patient_id', patient.cc_id)
+        .order('visit_date', { ascending: false })
+        .limit(5);
+
+    if (!visits || visits.length === 0) {
+        await tgBot.sendMessage(chatId,
+            `Привіт, ${patient.full_name}!\n\nІсторія ваших візитів поки що порожня.`,
+            MAIN_MENU);
+        return true;
+    }
+
+    const lines = visits.map(v => {
+        const date = v.visit_date ? v.visit_date.slice(0, 10) : '—';
+        const doc  = v.doctor_name  || 'Лікар';
+        const svc  = v.service_name || 'Послуга';
+        return `📅 ${date}\n👨‍⚕️ ${doc}\n🦷 ${svc}`;
+    });
+    await tgBot.sendMessage(chatId,
+        `📋 Ваша історія візитів, ${patient.full_name}:\n\n${lines.join('\n\n')}`,
+        MAIN_MENU);
+    return true;
+}
+
+function setupTelegramHandlers() {
     tgBot.on('message', async (msg) => {
         const chatId = msg.chat.id;
         const text = msg.text;
         if (!text) return;
+
+        // --- Очікуємо номер телефону ---
+        if (waitingForPhone.get(chatId)) {
+            const digits = text.replace(/\D/g, '');
+            if (digits.length < 9) {
+                await tgBot.sendMessage(chatId,
+                    'Будь ласка, введіть номер телефону цифрами.\nНаприклад: 0771234567',
+                    MAIN_MENU);
+                return;
+            }
+            waitingForPhone.delete(chatId);
+            await showPatientHistory(chatId, digits.slice(-9));
+            return;
+        }
 
         // --- /start ---
         if (text === '/start') {
@@ -395,15 +417,25 @@ function setupTelegramHandlers() {
 
         // --- Моя історія ---
         if (text === '📋 Моя історія') {
+            // Check if already linked
+            const { data: mu } = await supabase
+                .from('messenger_users')
+                .select('patient_phone, patient_cc_id')
+                .eq('platform', 'telegram')
+                .eq('platform_user_id', String(chatId))
+                .single();
+
+            if (mu?.patient_cc_id) {
+                await showPatientHistory(chatId, mu.patient_phone);
+                return;
+            }
+
+            // Not linked yet — ask for phone as text
+            waitingForPhone.set(chatId, true);
             await tgBot.sendMessage(chatId,
-                'Для перегляду вашої історії візитів поділіться, будь ласка, номером телефону:',
-                {
-                    reply_markup: {
-                        keyboard: [[{ text: '📱 Поділитися номером телефону', request_contact: true }]],
-                        resize_keyboard: true,
-                        one_time_keyboard: true
-                    }
-                });
+                'Введіть ваш номер телефону, і ми покажемо історію ваших візитів.\n\n' +
+                'Приклад: 0771234567',
+                MAIN_MENU);
             return;
         }
 
