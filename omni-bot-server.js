@@ -594,6 +594,9 @@ function setupTelegramHandlers() {
 
         // --- Залишити відгук ---
         if (text === '⭐ Залишити відгук') {
+            if (!await requireLinked(chatId,
+                '⭐ Щоб залишити відгук, будь ласка, підв\'яжіть ваш номер телефону.'))
+                return;
             await tgBot.sendMessage(chatId,
                 'Будемо дуже вдячні за ваш відгук! Це займе лише хвилину 🙏',
                 {
