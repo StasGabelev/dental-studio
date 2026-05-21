@@ -1103,7 +1103,7 @@ async function syncVisitsAndRevenue() {
     if (!aiSettings?.cc_api_token) return;
     console.log('🔄 CRON: Syncing visits from Cliniccards...');
     try {
-        const dateFrom = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().split('T')[0];
+        const dateFrom = new Date(Date.now() - 730 * 24 * 3600 * 1000).toISOString().split('T')[0]; // 2 years
         const dateTo = new Date().toISOString().split('T')[0];
         const url = `https://cliniccards.com/api/visits?from=${dateFrom}&to=${dateTo}`;
         const response = await fetch(url, { headers: ccHeaders() });
