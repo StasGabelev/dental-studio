@@ -401,12 +401,19 @@ async function showVisits(chatId, patient) {
         if (family?.length > 1) patientIds = family.map(p => p.id);
     }
 
-    const { data: visits } = await supabase
-        .from('cc_visits')
-        .select('visit_date, service_name, doctor_name')
-        .in('patient_id', patientIds)
-        .order('visit_date', { ascending: false })
-        .limit(10);
+    const [{ data: visits }, { data: invoices }] = await Promise.all([
+        supabase.from('cc_visits')
+            .select('visit_date, doctor_name')
+            .in('patient_id', patientIds)
+            .eq('status', 'VISITED')
+            .order('visit_date', { ascending: false })
+            .limit(10),
+        supabase.from('cc_invoices')
+            .select('date, items')
+            .in('patient_id', patientIds)
+            .order('date', { ascending: false })
+            .limit(30)
+    ]);
 
     if (!visits || visits.length === 0) {
         await tgBot.sendMessage(chatId,
@@ -415,11 +422,19 @@ async function showVisits(chatId, patient) {
         return;
     }
 
+    // Build invoice map by date for service name lookup
+    const invoiceByDate = {};
+    for (const inv of (invoices || [])) {
+        const d = inv.date ? inv.date.slice(0, 10) : null;
+        if (d && !invoiceByDate[d] && inv.items?.length) invoiceByDate[d] = inv.items;
+    }
+
     const lines = visits.map(v => {
         const date = v.visit_date ? v.visit_date.slice(0, 10) : '—';
-        const doc  = v.doctor_name  || 'Лікар';
-        const svc  = v.service_name || 'Послуга';
-        return `📅 ${date}\n👨‍⚕️ ${doc}\n🦷 ${svc}`;
+        const doc  = v.doctor_name || 'Лікар';
+        const items = invoiceByDate[date];
+        const svc  = items ? items.map(i => i.plan_item_name).filter(Boolean).join(', ') : null;
+        return `📅 ${date}\n👨‍⚕️ ${doc}${svc ? `\n🦷 ${svc}` : ''}`;
     });
     await tgBot.sendMessage(chatId,
         `📋 Ваша історія візитів, ${patient.full_name}:\n\n${lines.join('\n\n')}`,
@@ -1130,6 +1145,7 @@ async function syncVisitsAndRevenue() {
                     cc_id: String(v.visit_id),
                     doctor_cc_id: String(v.doctor_id || ''),
                     doctor_id: String(v.doctor_id || ''),
+                    doctor_name: v.doctor || null,
                     visit_date: visitStart ? visitStart.toISOString().split('T')[0] : null,
                     time_start: visitStart ? visitStart.toTimeString().slice(0, 5) : null,
                     time_end: visitEnd ? visitEnd.toTimeString().slice(0, 5) : null,
