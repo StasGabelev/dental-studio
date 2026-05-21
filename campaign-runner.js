@@ -102,17 +102,18 @@ async function runPendingCampaigns() {
             // Mark as running
             await _supabase.from('campaigns').update({ status: 'running' }).eq('id', campaign.id);
 
-            // Get target patients
-            const patients = await getPatientsByFilter(campaign.audience_filter || {});
+            const subscribers = await getSubscribers(campaign.audience_filter || {});
             let sent = 0, failed = 0;
 
-            for (const patient of patients) {
-                // Check if already sent to this patient in this campaign
-                const { data: existing } = await _supabase.from('campaign_deliveries')
-                    .select('id').eq('campaign_id', campaign.id).eq('patient_id', patient.id).single();
-                if (existing) continue;
+            for (const sub of subscribers) {
+                // Dedup: skip if already sent (only when patient UUID is known)
+                if (sub.id) {
+                    const { data: existing } = await _supabase.from('campaign_deliveries')
+                        .select('id').eq('campaign_id', campaign.id).eq('patient_id', sub.id).single();
+                    if (existing) continue;
+                }
 
-                const vars = getPatientVars(patient);
+                const vars = getPatientVars(sub);
                 const text = renderTemplate(campaign.message_template, vars);
 
                 const bookingBtn = campaign.add_booking_button !== false
@@ -121,29 +122,29 @@ async function runPendingCampaigns() {
 
                 let delivery;
                 try {
-                    delivery = await sendToPatient(patient, text, bookingBtn);
+                    delivery = await sendToPatient(sub, text, bookingBtn);
                 } catch (e) {
                     delivery = { channel: null, success: false, error: e.message };
                 }
 
-                await _supabase.from('campaign_deliveries').insert({
-                    campaign_id: campaign.id,
-                    patient_id: patient.id,
-                    channel: delivery.channel,
-                    status: delivery.success ? 'sent' : 'failed',
-                    sent_at: delivery.success ? new Date().toISOString() : null,
-                    error: delivery.error || null
-                });
+                if (sub.id) {
+                    await _supabase.from('campaign_deliveries').insert({
+                        campaign_id: campaign.id,
+                        patient_id: sub.id,
+                        channel: delivery.channel,
+                        status: delivery.success ? 'sent' : 'failed',
+                        sent_at: delivery.success ? new Date().toISOString() : null,
+                        error: delivery.error || null
+                    });
+                }
 
                 if (delivery.success) sent++; else failed++;
-                // Small delay between messages to avoid rate limits
                 await sleep(300);
             }
 
-            // Mark campaign as done, update stats
             await _supabase.from('campaigns').update({
                 status: 'done',
-                stats: { sent, failed, total: patients.length }
+                stats: { sent, failed, total: subscribers.length }
             }).eq('id', campaign.id);
 
             console.log(`✅ Campaign "${campaign.name}" done: ${sent} sent, ${failed} failed.`);
@@ -151,6 +152,54 @@ async function runPendingCampaigns() {
     } catch (e) {
         console.error('Campaign runner error:', e.message);
     }
+}
+
+// Returns subscriber objects compatible with sendToPatient (have telegram_id/viber_id fields).
+// audience_filter.audience === 'all_subscribers' → query messenger_users directly (all bot subscribers with linked phone)
+// otherwise → query cc_patients with filters
+async function getSubscribers(filter = {}) {
+    if (filter.audience === 'all_subscribers') {
+        const { data: muData } = await _supabase
+            .from('messenger_users')
+            .select('platform, platform_user_id, patient_cc_id, patient_phone')
+            .not('patient_phone', 'is', null);
+
+        const cascaded = cascadeSubscribers(muData || []);
+
+        // Batch-load patient info for template vars and dedup
+        const ccIds = [...new Set(cascaded.map(s => s.patient_cc_id).filter(Boolean))];
+        const patientMap = {};
+        if (ccIds.length) {
+            const { data: patients } = await _supabase
+                .from('cc_patients')
+                .select('id, cc_id, full_name, phone')
+                .in('cc_id', ccIds);
+            (patients || []).forEach(p => { patientMap[p.cc_id] = p; });
+        }
+
+        return cascaded.map(s => {
+            const pt = patientMap[s.patient_cc_id] || {};
+            return {
+                id: pt.id || null,
+                full_name: pt.full_name || 'Підписник',
+                phone: pt.phone || s.patient_phone || '',
+                telegram_id: s.platform === 'telegram' ? s.platform_user_id : null,
+                viber_id: s.platform === 'viber' ? s.platform_user_id : null
+            };
+        });
+    }
+
+    return getPatientsByFilter(filter);
+}
+
+// Cascade: Telegram has priority over Viber for the same patient
+function cascadeSubscribers(messengerUsers) {
+    const map = {};
+    for (const mu of messengerUsers) {
+        const key = mu.patient_cc_id || mu.platform_user_id;
+        if (!map[key] || mu.platform === 'telegram') map[key] = mu;
+    }
+    return Object.values(map);
 }
 
 async function getPatientsByFilter(filter) {

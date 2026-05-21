@@ -443,7 +443,10 @@ const LUSYA_TOOLS = [
                 properties: {
                     name: { type: 'string', description: 'Название кампании' },
                     message_template: { type: 'string', description: 'Текст сообщения. Поддерживает {first_name}, {full_name}, {doctor_name}' },
-                    audience_filter: { type: 'object', description: 'Фильтр аудитории: {gender, age_min, age_max, has_children, tag}' },
+                    audience_filter: {
+                        type: 'object',
+                        description: 'Фильтр аудитории. audience: "all_subscribers" — все подписчики бота с привязанным телефоном (Telegram→Viber каскад); "patients" или не указано — пациенты ЦРМ. Дополнительные фильтры (только для patients): gender (F/M), has_children (true/false), tag, age_min, age_max, has_telegram (true).'
+                    },
                     scheduled_at: { type: 'string', description: 'ISO дата и время отправки (null = черновик)' }
                 },
                 required: ['name', 'message_template']
@@ -564,10 +567,11 @@ const LUSYA_TOOLS = [
         type: 'function',
         function: {
             name: 'get_audience_reach',
-            description: 'Узнать охват аудитории перед рассылкой: сколько человек, у скольких есть Telegram/Viber. Поддерживает те же фильтры что и search_patients.',
+            description: 'Узнать охват аудитории перед рассылкой: сколько человек, у скольких есть Telegram/Viber. Если audience="all_subscribers" — считает всех подписчиков бота с привязанным телефоном (не только пациентов ЦРМ). Для пациентов ЦРМ поддерживает те же фильтры что и search_patients.',
             parameters: {
                 type: 'object',
                 properties: {
+                    audience: { type: 'string', description: 'all_subscribers — все подписчики бота; не указывать или patients — только пациенты ЦРМ' },
                     gender: { type: 'string' },
                     age_min: { type: 'number' },
                     age_max: { type: 'number' },
@@ -1121,7 +1125,37 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
         }
 
         case 'get_audience_reach': {
-            // Same filter logic as search_patients, but only counts
+            // all_subscribers: count directly from messenger_users (all bot users with linked phone)
+            if (args.audience === 'all_subscribers') {
+                const [{ count: tg }, { count: vb }] = await Promise.all([
+                    supabase.from('messenger_users').select('*', { count: 'exact', head: true })
+                        .eq('platform', 'telegram').not('patient_phone', 'is', null),
+                    supabase.from('messenger_users').select('*', { count: 'exact', head: true })
+                        .eq('platform', 'viber').not('patient_phone', 'is', null)
+                ]);
+                // Unique patients: deduplicated by patient_cc_id (telegram wins cascade)
+                const { data: muData } = await supabase.from('messenger_users')
+                    .select('platform, patient_cc_id, platform_user_id')
+                    .not('patient_phone', 'is', null);
+                const unique = new Set();
+                // telegram first pass
+                for (const mu of (muData || [])) {
+                    if (mu.platform === 'telegram') unique.add(mu.patient_cc_id || mu.platform_user_id);
+                }
+                // viber only if no telegram
+                for (const mu of (muData || [])) {
+                    if (mu.platform === 'viber') unique.add(mu.patient_cc_id || mu.platform_user_id);
+                }
+                return {
+                    audience: 'all_subscribers',
+                    total_unique: unique.size,
+                    with_telegram: tg || 0,
+                    with_viber: vb || 0,
+                    note: 'Підписники бота з підв\'язаним телефоном. При розсилці: Telegram → Viber (каскад).'
+                };
+            }
+
+            // patients: same filter logic as search_patients, but only counts
             let servicePatientIds = null;
             if (args.service_name) {
                 const { data: invs } = await supabase.from('cc_invoices')
@@ -1234,17 +1268,18 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
         }
 
         case 'get_patient_stats': {
-            const [{ count: total }, { count: female }, { count: male }, { count: with_dob }, { count: with_phone }, { count: with_email }] = await Promise.all([
+            const [{ count: total }, { count: female }, { count: male }, { count: with_dob }, { count: with_phone }, { count: with_email }, { count: telegram_subscribers }] = await Promise.all([
                 supabase.from('cc_patients').select('*', { count: 'exact', head: true }),
                 supabase.from('cc_patients').select('*', { count: 'exact', head: true }).eq('gender', 'F'),
                 supabase.from('cc_patients').select('*', { count: 'exact', head: true }).eq('gender', 'M'),
                 supabase.from('cc_patients').select('*', { count: 'exact', head: true }).not('dob', 'is', null),
                 supabase.from('cc_patients').select('*', { count: 'exact', head: true }).neq('phone', ''),
                 supabase.from('cc_patients').select('*', { count: 'exact', head: true }).neq('email', ''),
+                supabase.from('cc_patients').select('*', { count: 'exact', head: true }).not('telegram_id', 'is', null),
             ]);
             const unknown_gender = total - female - male;
             const without_dob = total - with_dob;
-            return { total, female, male, unknown_gender, with_dob, without_dob, with_phone, with_email };
+            return { total, female, male, unknown_gender, with_dob, without_dob, with_phone, with_email, telegram_subscribers };
         }
 
         case 'get_top_patients': {
@@ -1589,12 +1624,26 @@ const DEFAULT_SYSTEM_PROMPT = `Ты — Люся, внутренний ИИ-ас
 - НИКОГДА не говори "у меня доступ только к 1000 записей" — это ложь. Инструменты возвращают точные данные по всей базе.
 - Для ANY вопроса о данных — ОБЯЗАТЕЛЬНО вызывай соответствующий инструмент. Не отвечай из головы.
 - Для статистики по полу (сколько женщин/мужчин/всего пациентов) → ВСЕГДА вызывай get_patient_stats.
+- Для вопроса "сколько подписчиков в Telegram-боте" → вызывай get_patient_stats, поле telegram_subscribers.
 - Для поиска пациентов → search_patients.
 - Для финансов/визитов → get_revenue, get_visits_stats.
 - Если не знаешь ответа без инструмента — скажи "дай мне секунду" и вызови инструмент.
 - НИКОГДА не спрашивай у администратора ID пациента — ты сама находишь его через search_patients или get_patient_history по имени. ID нужен только для внутренних вызовов между инструментами.
 - Когда нашла пациента через search_patients и спрашивают "что лечили / история / когда были" — сразу вызывай get_patient_history с patient_id из предыдущего результата. Если найдено несколько пациентов — получи историю для КАЖДОГО и покажи все без лишних вопросов.
 - Никогда не спрашивай "показать историю лечения?" — просто показывай. Администратор уже спросил — делай.
+
+РАССЫЛКИ — ДВА ТИПА АУДИТОРИИ:
+1. **Все подписчики бота** (audience: "all_subscribers") — все кто подписался на бота и привязал телефон. Не обязательно клиенты ЦРМ. Доставка: Telegram → Viber (каскад, Telegram приоритетнее).
+   - Команды: "отправь всем подписчикам", "разошли всем в боте", "все кто есть в боте"
+2. **Пациенты ЦРМ** (без audience или audience: "patients") — только пациенты из базы ЦРМ. Можно фильтровать: женщины, мамы, по возрасту и т.д.
+   - Команды: "отправь клиенткам-женщинам", "мамам", "пациентам которые давно не приходили"
+
+АЛГОРИТМ РАССЫЛКИ:
+- Если не указан текст → спроси текст сообщения
+- Сначала узнай охват: вызови get_audience_reach с нужным audience и фильтрами
+- Покажи черновик: "Отправляю X людей. Текст: [...]"
+- Жди подтверждения ("да", "ок", "давай")
+- После подтверждения: create_campaign + send_campaign_now
 
 ПРАВИЛА:
 1. Перед выполнением важных действий (отправить рассылку, изменить данные пациентов) — кратко опиши что именно будешь делать и жди подтверждения.
