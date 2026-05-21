@@ -747,8 +747,16 @@ function setupTelegramHandlers() {
 
         // --- Default: fixed response for free text ---
         await tgBot.sendMessage(chatId,
-            'Якщо у вас є запитання, на які немає відповіді в меню цього сервісу — натисніть кнопку нижче або зателефонуйте нам:\n\n📞 (077) 600 7 800\n📞 (073) 600 7 800',
-            MAIN_MENU);
+            'Якщо у вас є запитання, на які немає відповіді в меню цього сервісу — натисніть кнопку «Зворотний зв\'язок» або зателефонуйте нам:',
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: '📞 (077) 600 7 800', url: 'tel:+380776007800' }],
+                        [{ text: '📞 (073) 600 7 800', url: 'tel:+380736007800' }]
+                    ]
+                }
+            }
+        );
 
         if (reply.includes('[[CALLBACK:TRUE]]')) {
             triggerAdminAlert('Telegram', msg.from.first_name, text, session.id);
