@@ -339,7 +339,7 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
 
     const { data: patients } = await supabase
         .from('cc_patients')
-        .select('cc_id, full_name')
+        .select('id, cc_id, full_name')
         .ilike('phone', `%${phoneLast9}%`)
         .limit(1);
 
@@ -386,7 +386,7 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
     const { data: visits } = await supabase
         .from('cc_visits')
         .select('visit_date, service_name, doctor_name')
-        .eq('patient_id', patient.cc_id)
+        .eq('patient_id', patient.id)
         .order('visit_date', { ascending: false })
         .limit(5);
 
