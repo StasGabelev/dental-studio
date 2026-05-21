@@ -339,7 +339,7 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
 
     const { data: patients } = await supabase
         .from('cc_patients')
-        .select('id, cc_id, full_name')
+        .select('id, cc_id, full_name, phone')
         .ilike('phone', `%${phoneLast9}%`)
         .not('cc_id', 'like', 'bot_%')
         .limit(1);
@@ -389,12 +389,24 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
 }
 
 async function showVisits(chatId, patient) {
+    // Find all family members with the same phone to show full household history
+    let patientIds = [patient.id];
+    const phoneLast9 = (patient.phone || '').replace(/\D/g, '').slice(-9);
+    if (phoneLast9) {
+        const { data: family } = await supabase
+            .from('cc_patients')
+            .select('id')
+            .ilike('phone', `%${phoneLast9}%`)
+            .not('cc_id', 'like', 'bot_%');
+        if (family?.length > 1) patientIds = family.map(p => p.id);
+    }
+
     const { data: visits } = await supabase
         .from('cc_visits')
         .select('visit_date, service_name, doctor_name')
-        .eq('patient_id', patient.id)
+        .in('patient_id', patientIds)
         .order('visit_date', { ascending: false })
-        .limit(5);
+        .limit(10);
 
     if (!visits || visits.length === 0) {
         await tgBot.sendMessage(chatId,
@@ -610,7 +622,7 @@ function setupTelegramHandlers() {
                 // Fetch patient directly by cc_id to avoid duplicate phone matches
                 const { data: pt } = await supabase
                     .from('cc_patients')
-                    .select('id, cc_id, full_name')
+                    .select('id, cc_id, full_name, phone')
                     .eq('cc_id', mu.patient_cc_id)
                     .single();
                 if (pt) {
