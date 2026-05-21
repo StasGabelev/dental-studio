@@ -202,7 +202,6 @@ window.toggleMobileMenu = function() {
             ${links.map(l => `<a href="${l.href}">${l.label}</a>`).join('')}
         </nav>
         <div class="mobile-overlay__footer">
-            <a href="tel:+380776007800" style="font-family:var(--font-serif); font-size:24px; color:#B8924A;">(077) 600 7 800</a>
         </div>
     `;
     document.body.appendChild(overlay);
