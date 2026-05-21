@@ -341,6 +341,7 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
         .from('cc_patients')
         .select('id, cc_id, full_name')
         .ilike('phone', `%${phoneLast9}%`)
+        .not('cc_id', 'like', 'bot_%')
         .limit(1);
 
     if (!patients || patients.length === 0) {
@@ -383,6 +384,11 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
         .update({ telegram_id: String(chatId) })
         .eq('cc_id', String(patient.cc_id));
 
+    await showVisits(chatId, patient);
+    return true;
+}
+
+async function showVisits(chatId, patient) {
     const { data: visits } = await supabase
         .from('cc_visits')
         .select('visit_date, service_name, doctor_name')
@@ -394,7 +400,7 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
         await tgBot.sendMessage(chatId,
             `Привіт, ${patient.full_name}!\n\nІсторія ваших візитів поки що порожня.`,
             MAIN_MENU);
-        return true;
+        return;
     }
 
     const lines = visits.map(v => {
@@ -406,7 +412,6 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
     await tgBot.sendMessage(chatId,
         `📋 Ваша історія візитів, ${patient.full_name}:\n\n${lines.join('\n\n')}`,
         MAIN_MENU);
-    return true;
 }
 
 async function requireLinked(chatId, message) {
@@ -602,7 +607,17 @@ function setupTelegramHandlers() {
                 .single();
 
             if (mu?.patient_cc_id) {
-                await showPatientHistory(chatId, mu.patient_phone);
+                // Fetch patient directly by cc_id to avoid duplicate phone matches
+                const { data: pt } = await supabase
+                    .from('cc_patients')
+                    .select('id, cc_id, full_name')
+                    .eq('cc_id', mu.patient_cc_id)
+                    .single();
+                if (pt) {
+                    await showVisits(chatId, pt);
+                } else {
+                    await tgBot.sendMessage(chatId, 'Не вдалося знайти ваші дані. Спробуйте ще раз.', MAIN_MENU);
+                }
                 return;
             }
 
