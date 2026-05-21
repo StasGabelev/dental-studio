@@ -745,15 +745,10 @@ function setupTelegramHandlers() {
             return;
         }
 
-        // --- Default: AI ---
-        let session = await getOrCreateSession('telegram', chatId, msg.from.first_name);
-        const history = await getChatHistory(session.id);
-        const reply = await getAIResponse(text, history);
-
-        await saveMessage(session.id, 'user', text);
-        await saveMessage(session.id, 'bot', reply);
-
-        await tgBot.sendMessage(chatId, reply.replace(/\[\[.*?\]\]/g, ''), MAIN_MENU);
+        // --- Default: fixed response for free text ---
+        await tgBot.sendMessage(chatId,
+            'Якщо у вас є запитання, на які немає відповіді в меню цього сервісу — натисніть кнопку нижче або зателефонуйте нам:\n\n📞 (077) 600 7 800\n📞 (073) 600 7 800',
+            MAIN_MENU);
 
         if (reply.includes('[[CALLBACK:TRUE]]')) {
             triggerAdminAlert('Telegram', msg.from.first_name, text, session.id);
