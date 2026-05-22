@@ -735,8 +735,14 @@ function setupTelegramHandlers() {
                 const alertBot = new TelegramBot(aiSettings.tg_bot_token);
                 const name = [msg.from.first_name, msg.from.last_name].filter(Boolean).join(' ');
                 const uname = msg.from.username ? ` (@${msg.from.username})` : '';
+                const { data: patient } = await supabase
+                    .from('cc_patients')
+                    .select('phone')
+                    .eq('telegram_id', String(chatId))
+                    .single();
+                const phoneStr = patient?.phone ? `\n📱 Телефон: ${patient.phone}` : '';
                 alertBot.sendMessage(aiSettings.tg_chat_id,
-                    `☎️ *Зворотний дзвінок*\n\nКлієнт ${name}${uname} просить передзвонити.`,
+                    `☎️ *Зворотний дзвінок*\n\nКлієнт ${name}${uname} просить передзвонити.${phoneStr}`,
                     { parse_mode: 'Markdown' });
             }
             await tgBot.sendMessage(chatId,
