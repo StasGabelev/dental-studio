@@ -267,7 +267,7 @@ function selectModel(text, aiSettings) {
     const keywords = keywordsRaw.split(',').map(k => k.trim().toLowerCase());
 
     // These always need complex model (reliable tool calling)
-    const complexKeywords = ['статистик', 'аналіз', 'анализ', 'звіт', 'отчёт', 'ltv', 'топ', 'порівня', 'сравни', 'ризик', 'риск'];
+    const complexKeywords = ['статистик', 'аналіз', 'анализ', 'звіт', 'отчёт', 'ltv', 'топ', 'порівня', 'сравни', 'ризик', 'риск', 'зубов', 'зубів', 'зуби', 'зубы', 'лікують', 'лечат', 'лікуванн', 'лечени'];
 
     const lower = text.toLowerCase();
     const needsComplex = complexKeywords.some(kw => lower.includes(kw));
