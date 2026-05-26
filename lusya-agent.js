@@ -745,12 +745,10 @@ const LUSYA_TOOLS = [
         type: 'function',
         function: {
             name: 'get_monday_therapy_stats',
-            description: 'Статистика по понеділках для терапевтів: скільки зубів пролікували (реставрація / лікування / ендолікування), скільки терапевтів працювало, топ-послуги. Відповідь на питання "скільки зубів лікують по понеділках / скільки терапевтів".',
+            description: 'Статистика по понеділках: скільки зубів пролікували (реставрація / лікування / ендолікування), скільки лікарів, топ-послуги. Завжди аналізує останні 90 днів. Параметрів не потрібно.',
             parameters: {
                 type: 'object',
-                properties: {
-                    period: { type: 'string', description: 'Період: last_90_days | this_month | last_month | this_year | last_year. ЗАВЖДИ використовуй last_90_days якщо не вказано інше — це охоплює останні 3 місяці включно з поточним.' }
-                },
+                properties: {},
                 required: []
             }
         }
@@ -1629,8 +1627,9 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
         }
 
         case 'get_monday_therapy_stats': {
-            const period = args.period || 'last_90_days';
-            const { from, to } = getPeriodDates(period);
+            const now = new Date();
+            const from = toLocalDateStr(new Date(now.getTime() - 90 * 86400000));
+            const to = toLocalDateStr(now);
 
             // Load doctor name map (all doctors)
             const { data: allDoctors } = await supabase.from('cc_doctors').select('cc_id, full_name');
@@ -1643,7 +1642,7 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
                 .order('date', { ascending: false })
                 .limit(3000);
 
-            console.log(`[monday_stats] invoices fetched: ${invoices?.length}, error: ${invError?.message}, from: ${from}, to: ${to}`);
+            console.log(`[monday_stats] fetched: ${invoices?.length}, err: ${invError?.message}, from: ${from}, to: ${to}`);
             if (invoices?.length) console.log(`[monday_stats] sample date: ${invoices[0]?.date}`);
 
             const fromTs = new Date(from).getTime();
