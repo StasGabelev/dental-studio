@@ -740,6 +740,20 @@ const LUSYA_TOOLS = [
                 required: []
             }
         }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'get_monday_therapy_stats',
+            description: 'Статистика по понеділках для терапевтів: скільки зубів пролікували (реставрація / лікування / ендолікування), скільки терапевтів працювало, топ-послуги. Відповідь на питання "скільки зубів лікують по понеділках / скільки терапевтів".',
+            parameters: {
+                type: 'object',
+                properties: {
+                    period: { type: 'string', description: 'Період: this_month | last_month | last_90_days | this_year | last_year (за замовчуванням last_90_days)' }
+                },
+                required: []
+            }
+        }
     }
 ];
 
@@ -1607,6 +1621,108 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             return { period, working_days: workingDays, capacity_per_doctor: capacity, doctors: result };
         }
 
+        case 'get_monday_therapy_stats': {
+            const period = args.period || 'last_90_days';
+            const { from, to } = getPeriodDates(period);
+
+            // Find therapist doctors
+            const { data: doctors } = await supabase.from('cc_doctors')
+                .select('cc_id, full_name, specialization')
+                .ilike('specialization', '%терапевт%');
+
+            if (!doctors?.length) {
+                return { error: 'Не знайдено лікарів з спеціалізацією "терапевт" у базі. Перевірте поле specialization у cc_doctors.' };
+            }
+
+            const therapistIds = doctors.map(d => d.cc_id);
+            const therapistMap = {};
+            doctors.forEach(d => { therapistMap[d.cc_id] = d.full_name; });
+
+            // Fetch invoices for therapists in period
+            const { data: invoices } = await supabase.from('cc_invoices')
+                .select('date, doctor_cc_id, items, amount')
+                .gte('date', from)
+                .lte('date', to + 'T23:59:59')
+                .in('doctor_cc_id', therapistIds);
+
+            if (!invoices?.length) {
+                return {
+                    period, therapists_in_db: doctors.length,
+                    therapists: doctors.map(d => d.full_name),
+                    monday_invoices: 0, total_teeth: 0,
+                    note: 'Рахунків терапевтів за вказаний період не знайдено'
+                };
+            }
+
+            // Filter invoices on Mondays (parse date portion to avoid TZ shifts)
+            const mondayInvoices = invoices.filter(inv => {
+                const ds = String(inv.date).substring(0, 10);
+                const [y, m, d] = ds.split('-').map(Number);
+                return new Date(y, m - 1, d).getDay() === 1;
+            });
+
+            if (!mondayInvoices.length) {
+                return {
+                    period, therapists_in_db: doctors.length,
+                    monday_invoices: 0, total_teeth: 0,
+                    note: 'Рахунків терапевтів саме по понеділках не знайдено'
+                };
+            }
+
+            // Count Mondays in period
+            let mondayCount = 0;
+            const cur = new Date(from);
+            const endDate = new Date(to);
+            while (cur <= endDate) { if (cur.getDay() === 1) mondayCount++; cur.setDate(cur.getDate() + 1); }
+
+            // Aggregate teeth (quantity) and services per doctor
+            const perDoctor = {};
+            const serviceBreakdown = {};
+            let totalTeeth = 0;
+            const workingDoctorIds = new Set();
+
+            for (const inv of mondayInvoices) {
+                const docId = inv.doctor_cc_id;
+                workingDoctorIds.add(docId);
+                if (!perDoctor[docId]) perDoctor[docId] = { teeth: 0, invoices: 0 };
+                perDoctor[docId].invoices++;
+
+                for (const item of (inv.items || [])) {
+                    const name = (item.plan_item_name || '').toLowerCase();
+                    const isToothTreatment = /реставрац|лікуванн|ендолікуванн/.test(name);
+                    if (!isToothTreatment) continue;
+                    const qty = parseFloat(item.quantity) || 1;
+                    totalTeeth += qty;
+                    perDoctor[docId].teeth += qty;
+                    const svcKey = item.plan_item_name || 'Невідомо';
+                    serviceBreakdown[svcKey] = (serviceBreakdown[svcKey] || 0) + qty;
+                }
+            }
+
+            const doctorStats = Object.entries(perDoctor).map(([id, s]) => ({
+                doctor: therapistMap[id] || id,
+                teeth_treated: Math.round(s.teeth),
+                invoices_on_mondays: s.invoices,
+                avg_teeth_per_monday: mondayCount > 0 ? Math.round(s.teeth / mondayCount * 10) / 10 : 0
+            })).sort((a, b) => b.teeth_treated - a.teeth_treated);
+
+            const topServices = Object.entries(serviceBreakdown)
+                .map(([name, qty]) => ({ service: name, quantity: Math.round(qty) }))
+                .sort((a, b) => b.quantity - a.quantity)
+                .slice(0, 10);
+
+            return {
+                period,
+                mondays_in_period: mondayCount,
+                therapists_in_db: doctors.length,
+                therapists_working_on_mondays: workingDoctorIds.size,
+                total_teeth_on_mondays: Math.round(totalTeeth),
+                avg_teeth_per_monday: mondayCount > 0 ? Math.round(totalTeeth / mondayCount * 10) / 10 : 0,
+                per_doctor: doctorStats,
+                top_services: topServices
+            };
+        }
+
         default:
             return { error: `Unknown tool: ${toolName}` };
     }
@@ -1650,7 +1766,8 @@ const DEFAULT_SYSTEM_PROMPT = `Ты — Люся, внутренний ИИ-ас
 2. При создании кампаний — всегда показывай черновик текста сообщения перед сохранением.
 3. Используй Markdown для форматирования ответов: **жирный**, _курсив_, таблицы.
 4. Если данных нет — честно скажи об этом, не выдумывай.
-5. Финансовые данные показывай в гривнах (₴).`;
+5. Финансовые данные показывай в гривнах (₴).
+- Для вопросов "скільки зубів лікують по понеділках", "скільки терапевтів по понеділках", "терапевт по понеділках" → вызывай get_monday_therapy_stats. Ключові послуги терапевта: "Фотополімерна реставрація", "Лікування С молочного зуба", "Лікування С постійного зуба", "Первинне ендолікування", "Первинне ендолікування під мікроскопом".`;
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
