@@ -764,9 +764,6 @@ function setupTelegramHandlers() {
             }
         );
 
-        if (reply.includes('[[CALLBACK:TRUE]]')) {
-            triggerAdminAlert('Telegram', msg.from.first_name, text, session.id);
-        }
     });
 }
 
