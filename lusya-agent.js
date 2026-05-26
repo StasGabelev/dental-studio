@@ -1654,7 +1654,7 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             });
 
             if (!filteredInvoices.length) {
-                return { period, monday_invoices: 0, total_teeth: 0, note: `Рахунків за вказаний період не знайдено (всього в БД: ${invoices?.length || 0})` };
+                return { from, to, monday_invoices: 0, total_teeth: 0, note: `Рахунків за вказаний період не знайдено (всього в БД: ${invoices?.length || 0})` };
             }
 
             // Filter invoices on Mondays (parse date portion to avoid TZ shifts)
@@ -1665,7 +1665,7 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             });
 
             if (!mondayInvoices.length) {
-                return { period, monday_invoices: 0, total_teeth: 0, note: 'Рахунків по понеділках не знайдено' };
+                return { from, to, monday_invoices: 0, total_teeth: 0, note: 'Рахунків по понеділках не знайдено' };
             }
 
             // Count Mondays in period
@@ -1714,7 +1714,7 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
                 .slice(0, 10);
 
             return {
-                period,
+                period: `${from} — ${to}`,
                 mondays_in_period: mondayCount,
                 therapists_working_on_mondays: workingDoctorIds.size,
                 total_teeth_on_mondays: Math.round(totalTeeth),
