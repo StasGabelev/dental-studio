@@ -1670,7 +1670,8 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
 
                 for (const item of (inv.items || [])) {
                     const name = (item.plan_item_name || '').toLowerCase();
-                    const isToothTreatment = /реставрац|лікуванн|ендолікуванн/.test(name);
+                    const isToothTreatment = /реставрац|ендолікуванн/.test(name) ||
+                        (/лікуванн/.test(name) && !/планування/.test(name));
                     if (!isToothTreatment) continue;
                     const qty = parseFloat(item.quantity) || 1;
                     totalTeeth += qty;
