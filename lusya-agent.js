@@ -1625,33 +1625,19 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             const period = args.period || 'last_90_days';
             const { from, to } = getPeriodDates(period);
 
-            // Find therapist doctors
-            const { data: doctors } = await supabase.from('cc_doctors')
-                .select('cc_id, full_name, specialization')
-                .ilike('specialization', '%терапевт%');
+            // Load doctor name map (all doctors)
+            const { data: allDoctors } = await supabase.from('cc_doctors').select('cc_id, full_name');
+            const doctorNameMap = {};
+            (allDoctors || []).forEach(d => { doctorNameMap[d.cc_id] = d.full_name; });
 
-            if (!doctors?.length) {
-                return { error: 'Не знайдено лікарів з спеціалізацією "терапевт" у базі. Перевірте поле specialization у cc_doctors.' };
-            }
-
-            const therapistIds = doctors.map(d => d.cc_id);
-            const therapistMap = {};
-            doctors.forEach(d => { therapistMap[d.cc_id] = d.full_name; });
-
-            // Fetch invoices for therapists in period
+            // Fetch all invoices in period (therapists are identified by their procedures, not specialization)
             const { data: invoices } = await supabase.from('cc_invoices')
                 .select('date, doctor_cc_id, items, amount')
                 .gte('date', from)
-                .lte('date', to + 'T23:59:59')
-                .in('doctor_cc_id', therapistIds);
+                .lte('date', to + 'T23:59:59');
 
             if (!invoices?.length) {
-                return {
-                    period, therapists_in_db: doctors.length,
-                    therapists: doctors.map(d => d.full_name),
-                    monday_invoices: 0, total_teeth: 0,
-                    note: 'Рахунків терапевтів за вказаний період не знайдено'
-                };
+                return { period, monday_invoices: 0, total_teeth: 0, note: 'Рахунків за вказаний період не знайдено' };
             }
 
             // Filter invoices on Mondays (parse date portion to avoid TZ shifts)
@@ -1662,11 +1648,7 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             });
 
             if (!mondayInvoices.length) {
-                return {
-                    period, therapists_in_db: doctors.length,
-                    monday_invoices: 0, total_teeth: 0,
-                    note: 'Рахунків терапевтів саме по понеділках не знайдено'
-                };
+                return { period, monday_invoices: 0, total_teeth: 0, note: 'Рахунків по понеділках не знайдено' };
             }
 
             // Count Mondays in period
@@ -1683,7 +1665,6 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
 
             for (const inv of mondayInvoices) {
                 const docId = inv.doctor_cc_id;
-                workingDoctorIds.add(docId);
                 if (!perDoctor[docId]) perDoctor[docId] = { teeth: 0, invoices: 0 };
                 perDoctor[docId].invoices++;
 
@@ -1694,13 +1675,16 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
                     const qty = parseFloat(item.quantity) || 1;
                     totalTeeth += qty;
                     perDoctor[docId].teeth += qty;
+                    workingDoctorIds.add(docId);
                     const svcKey = item.plan_item_name || 'Невідомо';
                     serviceBreakdown[svcKey] = (serviceBreakdown[svcKey] || 0) + qty;
                 }
             }
 
-            const doctorStats = Object.entries(perDoctor).map(([id, s]) => ({
-                doctor: therapistMap[id] || id,
+            const doctorStats = Object.entries(perDoctor)
+                .filter(([, s]) => s.teeth > 0)
+                .map(([id, s]) => ({
+                doctor: doctorNameMap[id] || id,
                 teeth_treated: Math.round(s.teeth),
                 invoices_on_mondays: s.invoices,
                 avg_teeth_per_monday: mondayCount > 0 ? Math.round(s.teeth / mondayCount * 10) / 10 : 0
@@ -1714,7 +1698,6 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             return {
                 period,
                 mondays_in_period: mondayCount,
-                therapists_in_db: doctors.length,
                 therapists_working_on_mondays: workingDoctorIds.size,
                 total_teeth_on_mondays: Math.round(totalTeeth),
                 avg_teeth_per_monday: mondayCount > 0 ? Math.round(totalTeeth / mondayCount * 10) / 10 : 0,
