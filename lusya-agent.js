@@ -749,7 +749,7 @@ const LUSYA_TOOLS = [
             parameters: {
                 type: 'object',
                 properties: {
-                    period: { type: 'string', description: 'Період: this_month | last_month | last_90_days | this_year | last_year (за замовчуванням last_90_days)' }
+                    period: { type: 'string', description: 'Період: last_90_days | this_month | last_month | this_year | last_year. ЗАВЖДИ використовуй last_90_days якщо не вказано інше — це охоплює останні 3 місяці включно з поточним.' }
                 },
                 required: []
             }
@@ -761,6 +761,13 @@ const LUSYA_TOOLS = [
 
 async function executeLusyaTool(toolName, args, supabase, aiSettings) {
     const today = new Date();
+
+    function toLocalDateStr(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
 
     function getPeriodDates(period) {
         const now = new Date();
@@ -825,7 +832,7 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             default:
                 from = new Date(Date.now() - 30 * 86400000);
         }
-        return { from: from.toISOString().split('T')[0], to: to.toISOString().split('T')[0] };
+        return { from: toLocalDateStr(from), to: toLocalDateStr(to) };
     }
 
     switch (toolName) {
