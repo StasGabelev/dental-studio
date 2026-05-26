@@ -745,10 +745,16 @@ const LUSYA_TOOLS = [
         type: 'function',
         function: {
             name: 'get_monday_therapy_stats',
-            description: 'Статистика по понеділках: скільки зубів пролікували (реставрація / лікування / ендолікування), скільки лікарів, топ-послуги. Завжди аналізує останні 90 днів. Параметрів не потрібно.',
+            description: 'Статистика лікування зубів: скільки зубів пролікували (реставрація / лікування / ендолікування), скільки лікарів, топ-послуги. Підтримує будь-який період: цей понеділок, минулий понеділок, цей тиждень, минулий тиждень, цей місяць, минулий місяць, цей рік, минулий рік або останні 90 днів.',
             parameters: {
                 type: 'object',
-                properties: {},
+                properties: {
+                    period: {
+                        type: 'string',
+                        enum: ['this_monday', 'last_monday', 'this_week', 'last_week', 'this_month', 'last_month', 'this_year', 'last_year', 'last_90_days'],
+                        description: 'Період: this_monday=цей понеділок, last_monday=минулий понеділок, this_week=цей тиждень, last_week=минулий тиждень, this_month=цей місяць, last_month=минулий місяць, this_year=цей рік, last_year=минулий рік, last_90_days=останні 90 днів (за замовчуванням)'
+                    }
+                },
                 required: []
             }
         }
@@ -1628,98 +1634,121 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
 
         case 'get_monday_therapy_stats': {
             const now = new Date();
-            const from = toLocalDateStr(new Date(now.getTime() - 90 * 86400000));
-            const to = toLocalDateStr(now);
 
-            // Load doctor name map (all doctors)
+            // Calculate date range based on period
+            let from, to;
+            const dow = now.getDay() || 7; // 1=Mon ... 7=Sun
+            switch (args.period) {
+                case 'this_monday': {
+                    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow + 1);
+                    from = to = toLocalDateStr(d);
+                    break;
+                }
+                case 'last_monday': {
+                    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow - 6);
+                    from = to = toLocalDateStr(d);
+                    break;
+                }
+                case 'this_week':
+                    from = toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow + 1));
+                    to = toLocalDateStr(now);
+                    break;
+                case 'last_week':
+                    from = toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow - 6));
+                    to = toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow));
+                    break;
+                case 'this_month':
+                    from = toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+                    to = toLocalDateStr(now);
+                    break;
+                case 'last_month':
+                    from = toLocalDateStr(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+                    to = toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 0));
+                    break;
+                case 'this_year':
+                    from = toLocalDateStr(new Date(now.getFullYear(), 0, 1));
+                    to = toLocalDateStr(now);
+                    break;
+                case 'last_year':
+                    from = toLocalDateStr(new Date(now.getFullYear() - 1, 0, 1));
+                    to = toLocalDateStr(new Date(now.getFullYear() - 1, 11, 31));
+                    break;
+                default:
+                    from = toLocalDateStr(new Date(now.getTime() - 90 * 86400000));
+                    to = toLocalDateStr(now);
+            }
+
+            // Load doctor name map
             const { data: allDoctors } = await supabase.from('cc_doctors').select('cc_id, full_name');
             const doctorNameMap = {};
             (allDoctors || []).forEach(d => { doctorNameMap[d.cc_id] = d.full_name; });
 
-            // Fetch invoices — filter by date range in JS to avoid column type issues
-            const { data: invoices, error: invError } = await supabase.from('cc_invoices')
-                .select('date, doctor_cc_id, items, amount')
+            // Fetch invoices and filter by date in JS (avoids column type issues)
+            const { data: invoices } = await supabase.from('cc_invoices')
+                .select('date, doctor_cc_id, items')
                 .order('date', { ascending: false })
-                .limit(3000);
-
-            console.log(`[monday_stats] fetched: ${invoices?.length}, err: ${invError?.message}, from: ${from}, to: ${to}`);
-            if (invoices?.length) console.log(`[monday_stats] sample date: ${invoices[0]?.date}`);
+                .limit(5000);
 
             const fromTs = new Date(from).getTime();
             const toTs = new Date(to).getTime() + 86400000;
-            const filteredInvoices = (invoices || []).filter(inv => {
-                const ds = String(inv.date).substring(0, 10);
-                const t = new Date(ds).getTime();
+            const filtered = (invoices || []).filter(inv => {
+                const t = new Date(String(inv.date).substring(0, 10)).getTime();
                 return t >= fromTs && t <= toTs;
             });
 
-            if (!filteredInvoices.length) {
-                return { from, to, monday_invoices: 0, total_teeth: 0, note: `Рахунків за вказаний період не знайдено (всього в БД: ${invoices?.length || 0})` };
+            if (!filtered.length) {
+                return { period: `${from} — ${to}`, total_teeth: 0, note: 'Рахунків за вказаний період не знайдено' };
             }
 
-            // Filter invoices on Mondays (parse date portion to avoid TZ shifts)
-            const mondayInvoices = filteredInvoices.filter(inv => {
-                const ds = String(inv.date).substring(0, 10);
-                const [y, m, d] = ds.split('-').map(Number);
-                return new Date(y, m - 1, d).getDay() === 1;
-            });
-
-            if (!mondayInvoices.length) {
-                return { from, to, monday_invoices: 0, total_teeth: 0, note: 'Рахунків по понеділках не знайдено' };
-            }
-
-            // Count Mondays in period
-            let mondayCount = 0;
-            const cur = new Date(from);
-            const endDate = new Date(to);
-            while (cur <= endDate) { if (cur.getDay() === 1) mondayCount++; cur.setDate(cur.getDate() + 1); }
-
-            // Aggregate teeth (quantity) and services per doctor
+            // Aggregate teeth by date and doctor
             const perDoctor = {};
+            const perDate = {};
             const serviceBreakdown = {};
             let totalTeeth = 0;
             const workingDoctorIds = new Set();
 
-            for (const inv of mondayInvoices) {
+            for (const inv of filtered) {
+                const dateKey = String(inv.date).substring(0, 10);
                 const docId = inv.doctor_cc_id;
-                if (!perDoctor[docId]) perDoctor[docId] = { teeth: 0, invoices: 0 };
-                perDoctor[docId].invoices++;
+                if (!perDoctor[docId]) perDoctor[docId] = { teeth: 0 };
+                if (!perDate[dateKey]) perDate[dateKey] = 0;
 
                 for (const item of (inv.items || [])) {
                     const name = (item.plan_item_name || '').toLowerCase();
-                    const isToothTreatment = /реставрац|ендолікуванн/.test(name) ||
+                    const isTreatment = /реставрац|ендолікуванн/.test(name) ||
                         (/лікуванн/.test(name) && !/планування/.test(name));
-                    if (!isToothTreatment) continue;
+                    if (!isTreatment) continue;
                     const qty = parseFloat(item.quantity) || 1;
                     totalTeeth += qty;
                     perDoctor[docId].teeth += qty;
+                    perDate[dateKey] += qty;
                     workingDoctorIds.add(docId);
-                    const svcKey = item.plan_item_name || 'Невідомо';
-                    serviceBreakdown[svcKey] = (serviceBreakdown[svcKey] || 0) + qty;
+                    const svc = item.plan_item_name || 'Невідомо';
+                    serviceBreakdown[svc] = (serviceBreakdown[svc] || 0) + qty;
                 }
             }
 
-            const doctorStats = Object.entries(perDoctor)
+            const DAY_NAMES = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+            const byDate = Object.entries(perDate)
+                .filter(([, v]) => v > 0)
+                .map(([date, teeth]) => ({ date, day: DAY_NAMES[new Date(date).getDay()], teeth: Math.round(teeth) }))
+                .sort((a, b) => a.date.localeCompare(b.date));
+
+            const byDoctor = Object.entries(perDoctor)
                 .filter(([, s]) => s.teeth > 0)
-                .map(([id, s]) => ({
-                doctor: doctorNameMap[id] || id,
-                teeth_treated: Math.round(s.teeth),
-                invoices_on_mondays: s.invoices,
-                avg_teeth_per_monday: mondayCount > 0 ? Math.round(s.teeth / mondayCount * 10) / 10 : 0
-            })).sort((a, b) => b.teeth_treated - a.teeth_treated);
+                .map(([id, s]) => ({ doctor: doctorNameMap[id] || id, teeth: Math.round(s.teeth) }))
+                .sort((a, b) => b.teeth - a.teeth);
 
             const topServices = Object.entries(serviceBreakdown)
                 .map(([name, qty]) => ({ service: name, quantity: Math.round(qty) }))
-                .sort((a, b) => b.quantity - a.quantity)
-                .slice(0, 10);
+                .sort((a, b) => b.quantity - a.quantity).slice(0, 8);
 
             return {
                 period: `${from} — ${to}`,
-                mondays_in_period: mondayCount,
-                therapists_working_on_mondays: workingDoctorIds.size,
-                total_teeth_on_mondays: Math.round(totalTeeth),
-                avg_teeth_per_monday: mondayCount > 0 ? Math.round(totalTeeth / mondayCount * 10) / 10 : 0,
-                per_doctor: doctorStats,
+                total_teeth: Math.round(totalTeeth),
+                doctors_count: workingDoctorIds.size,
+                by_date: byDate,
+                by_doctor: byDoctor,
                 top_services: topServices
             };
         }
