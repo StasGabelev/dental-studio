@@ -1630,18 +1630,29 @@ async function executeLusyaTool(toolName, args, supabase, aiSettings) {
             const doctorNameMap = {};
             (allDoctors || []).forEach(d => { doctorNameMap[d.cc_id] = d.full_name; });
 
-            // Fetch all invoices in period (therapists are identified by their procedures, not specialization)
-            const { data: invoices } = await supabase.from('cc_invoices')
+            // Fetch invoices — filter by date range in JS to avoid column type issues
+            const { data: invoices, error: invError } = await supabase.from('cc_invoices')
                 .select('date, doctor_cc_id, items, amount')
-                .gte('date', from)
-                .lte('date', to + 'T23:59:59');
+                .order('date', { ascending: false })
+                .limit(3000);
 
-            if (!invoices?.length) {
-                return { period, monday_invoices: 0, total_teeth: 0, note: 'Рахунків за вказаний період не знайдено' };
+            console.log(`[monday_stats] invoices fetched: ${invoices?.length}, error: ${invError?.message}, from: ${from}, to: ${to}`);
+            if (invoices?.length) console.log(`[monday_stats] sample date: ${invoices[0]?.date}`);
+
+            const fromTs = new Date(from).getTime();
+            const toTs = new Date(to).getTime() + 86400000;
+            const filteredInvoices = (invoices || []).filter(inv => {
+                const ds = String(inv.date).substring(0, 10);
+                const t = new Date(ds).getTime();
+                return t >= fromTs && t <= toTs;
+            });
+
+            if (!filteredInvoices.length) {
+                return { period, monday_invoices: 0, total_teeth: 0, note: `Рахунків за вказаний період не знайдено (всього в БД: ${invoices?.length || 0})` };
             }
 
             // Filter invoices on Mondays (parse date portion to avoid TZ shifts)
-            const mondayInvoices = invoices.filter(inv => {
+            const mondayInvoices = filteredInvoices.filter(inv => {
                 const ds = String(inv.date).substring(0, 10);
                 const [y, m, d] = ds.split('-').map(Number);
                 return new Date(y, m - 1, d).getDay() === 1;
