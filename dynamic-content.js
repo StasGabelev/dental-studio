@@ -5,8 +5,8 @@
 // ============================================================
 
 (async function initDynamicContent() {
-    const PUBLIC_SB_URL = 'https://ladeofbnhqcxjaomlvbx.supabase.co';
-    const PUBLIC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhZGVvZmJuaHFjeGphb21sdmJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NDMzNDksImV4cCI6MjA5NDMxOTM0OX0.pr3COkOr2h1V986c4-2tluSttWhQuiMD4H4OZaXmdW4';
+    const PUBLIC_SB_URL = 'https://ipuksuzlvyoosmlqzvkb.supabase.co';
+    const PUBLIC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwdWtzdXpsdnlvb3NtbHF6dmtiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDM4NTMyMSwiZXhwIjoyMDk1OTYxMzIxfQ.OJ0m8SceL19g5RfYm9-SPo44nOhg3Nxvye7LsWDyfmE';
     let sbClient = null;
 
     // Helper to wait for global supabase to be ready (CDN load)
