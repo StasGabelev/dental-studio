@@ -6,7 +6,7 @@ const ViberBot = require('viber-bot').Bot;
 const TextMessage = require('viber-bot').Message.Text;
 const fetch = require('node-fetch');
 const { initLusya } = require('./lusya-agent');
-const { initCampaignRunner, updateSettings: updateCampaignSettings } = require('./campaign-runner');
+const { initCampaignRunner, updateSettings: updateCampaignSettings, handleComplaintMessage } = require('./campaign-runner');
 
 // --- Configuration & Initialization ---
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ckldvntrsiacbjpiydmn.supabase.co';
@@ -555,6 +555,9 @@ function setupTelegramHandlers() {
 
         const text = msg.text;
         if (!text) return;
+
+        // --- Complaint message (if patient is in awaiting complaint state) ---
+        if (await handleComplaintMessage(chatId, text)) return;
 
         // --- /start (завжди має пріоритет, скидає будь-який стан) ---
         if (text === '/start') {

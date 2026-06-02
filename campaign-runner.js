@@ -283,15 +283,18 @@ async function runPostVisitFlow(flow) {
         const vars = getPatientVars(patient, { doctor_name: doctorName, service_name: visit.service_name || '' });
 
         // Build post-visit survey message with inline keyboard
+        const firstName = vars.first_name || '';
         let text = flow.message_template
             ? renderTemplate(flow.message_template, vars)
-            : `${vars.first_name ? vars.first_name + ', как' : 'Как'} прошёл ваш визит к нам${doctorName ? ` (доктор ${doctorName})` : ''}? Мы ценим ваше мнение! 🦷`;
+            : `${firstName ? firstName + ', дя' : 'Дя'}куємо за ваш вибір — Dental Studio! 🦷✨\n\n`
+            + `${doctorName ? `Сподіваємось, що візит до ${doctorName} пройшов чудово.\n\n` : ''}`
+            + `Будь ласка, оцініть ваш візит — це займе лише секунду:`;
 
         const inlineKeyboard = [
             [
-                { text: '😊 Отлично!', callback_data: `survey_postvisiit_great_${patient.id}` },
-                { text: '😐 Нормально', callback_data: `survey_postvisit_ok_${patient.id}` },
-                { text: '😞 Плохо', callback_data: `survey_postvisit_bad_${patient.id}` }
+                { text: '💚 Відмінно', callback_data: `survey_postvisit_great_${patient.id}` },
+                { text: '💛 Добре', callback_data: `survey_postvisit_ok_${patient.id}` },
+                { text: '🔴 Погано', callback_data: `survey_postvisit_bad_${patient.id}` }
             ]
         ];
 
@@ -419,29 +422,70 @@ async function handleCallbackQuery(query) {
         const rating = parts[parts.length - 2]; // great | ok | bad
         const patientId = parts[parts.length - 1];
 
-        if (rating === 'great') {
+        if (rating === 'great' || rating === 'ok') {
             const reviewUrl = 'https://g.page/r/CRieZR5gW2LwEAE/review';
-            await _patientBot.sendMessage(chatId,
-                `Отлично! Мы рады, что вам понравилось! 😊\n\nБудем очень благодарны, если вы оставите отзыв — это очень помогает нам! ⭐\n${reviewUrl}`
-            );
-            // Update patient's last survey response
-            await _supabase.from('cc_patients').update({ notes_lusya: 'post_visit: отлично' }).eq('id', patientId);
-        } else if (rating === 'ok') {
-            await _patientBot.sendMessage(chatId, 'Спасибо за ответ! Если у вас есть пожелания — мы всегда открыты к обратной связи. 🦷');
-        } else if (rating === 'bad') {
-            await _patientBot.sendMessage(chatId, 'Нам жаль, что что-то пошло не так. Администратор свяжется с вами в ближайшее время, чтобы разобраться. 🙏');
-            // Create admin task
-            const { data: patient } = await _supabase.from('cc_patients').select('full_name, phone').eq('id', patientId).single();
-            await _supabase.from('admin_tasks').insert({
-                type: 'negative_review',
-                client_name: patient?.full_name || 'Пациент',
-                description: `Пациент ${patient?.full_name} (${patient?.phone}) оставил негативный отзыв после визита. Нужно связаться!`,
-                status: 'new',
-                priority: 'high',
-                payload: { patient_id: patientId, telegram_id: chatId }
+            const msg = rating === 'great'
+                ? `🌟 Дуже раді, що все пройшло чудово!\n\nВаша довіра — це найбільша нагорода для нас. Ми постійно працюємо над тим, щоб кожен візит був ще кращим.\n\nБудемо дуже вдячні за ваш відгук у Google — навіть найкоротший коментар дуже допомагає нам! 🙏`
+                : `💛 Дякуємо за вашу оцінку!\n\nМи завжди прагнемо ставати кращими. Якщо у вас є побажання — ми готові слухати.\n\nБудемо вдячні, якщо залишите відгук у Google — це допомагає іншим людям знайти нас! 😊`;
+            await _patientBot.sendMessage(chatId, msg, {
+                reply_markup: {
+                    inline_keyboard: [[
+                        { text: '⭐ Залишити відгук на Google Maps', url: reviewUrl }
+                    ]]
+                }
             });
+            await _supabase.from('cc_patients').update({ notes_lusya: `post_visit: ${rating}` }).eq('id', patientId);
+        } else if (rating === 'bad') {
+            await _patientBot.sendMessage(chatId,
+                `😔 Нам дуже прикро це чути.\n\nМи хочемо розібратись у ситуації та зробити все можливе, щоб такого більше не повторилось.\n\nНатисніть кнопку нижче — ваше повідомлення отримає особисто власник клініки.`,
+                {
+                    reply_markup: {
+                        inline_keyboard: [[
+                            { text: '✉️ Написати власнику клініки', callback_data: `complaint_write_${patientId}` }
+                        ]]
+                    }
+                }
+            );
         }
     }
+
+    // Complaint: patient pressed "Написати власнику"
+    if (data.startsWith('complaint_write_')) {
+        const patientId = data.replace('complaint_write_', '');
+        awaitingComplaint.set(chatId, patientId);
+        await _patientBot.sendMessage(chatId,
+            `✍️ Опишіть, будь ласка, що сталось. Ваше повідомлення буде передано особисто власнику клініки.`,
+            { reply_markup: { force_reply: true, selective: true } }
+        );
+    }
+}
+
+// In-memory state for patients awaiting complaint input
+const awaitingComplaint = new Map();
+
+async function handleComplaintMessage(chatId, text) {
+    const patientId = awaitingComplaint.get(String(chatId));
+    if (!patientId) return false;
+    awaitingComplaint.delete(String(chatId));
+
+    const { data: patient } = await _supabase.from('cc_patients')
+        .select('full_name, phone').eq('id', patientId).single();
+
+    // Send complaint to admin
+    if (_aiSettings?.tg_bot_token && _aiSettings?.tg_chat_id) {
+        const TelegramBot = require('node-telegram-bot-api');
+        const alertBot = new TelegramBot(_aiSettings.tg_bot_token);
+        const uname = `tg://user?id=${chatId}`;
+        await alertBot.sendMessage(_aiSettings.tg_chat_id,
+            `📩 *Скарга від пацієнта*\n\n👤 ${patient?.full_name || 'Невідомо'}\n📱 ${patient?.phone || '—'}\n🔗 ${uname}\n\n💬 ${text}`,
+            { parse_mode: 'Markdown' }
+        );
+    }
+
+    await _patientBot.sendMessage(String(chatId),
+        `✅ Дякуємо. Власник клініки отримав ваше повідомлення і зв'яжеться з вами найближчим часом.`
+    );
+    return true;
 }
 
 // ─── AI extraction for survey text responses ──────────────────────────────────
@@ -522,4 +566,4 @@ ${questions.map(q => `- "${q.text}" → поле: ${q.extract_field} (тип: ${
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-module.exports = { initCampaignRunner, updateSettings };
+module.exports = { initCampaignRunner, updateSettings, handleComplaintMessage };
