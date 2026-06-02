@@ -23,6 +23,10 @@ function initCampaignRunner(supabase, aiSettings, patientBot, viberBot) {
     setInterval(runAutomatedFlows, 15 * 60 * 1000);
     setTimeout(runAutomatedFlows, 15000);
 
+    // Appointment reminders: check every 15 min, fires at 09:00 and 17:00 Kyiv time
+    setInterval(runAppointmentReminders, 15 * 60 * 1000);
+    setTimeout(runAppointmentReminders, 30000);
+
     // Process unprocessed survey responses: every 10 minutes
     setInterval(processSurveyResponses, 10 * 60 * 1000);
 
@@ -406,6 +410,81 @@ async function runReactivationFlow(flow) {
     }
 }
 
+// ─── Appointment reminder flow ────────────────────────────────────────────────
+
+async function runAppointmentReminders() {
+    if (!_supabase || !_patientBot || !_aiSettings) return;
+
+    // Only run at 09:00 and 17:00 Kyiv time (UTC+3)
+    const now = new Date();
+    const kyivHour = (now.getUTCHours() + 3) % 24;
+    const kyivMin = now.getUTCMinutes();
+    if (!((kyivHour === 9 && kyivMin < 15) || (kyivHour === 17 && kyivMin < 15))) return;
+
+    // Get tomorrow's date in Kyiv time
+    const kyivNow = new Date(now.getTime() + 3 * 3600000);
+    const tomorrow = new Date(kyivNow);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+    const { data: visits } = await _supabase.from('cc_visits')
+        .select('cc_id, patient_id, time_start, doctor_name')
+        .eq('visit_date', tomorrowStr)
+        .eq('status', 'PLANNED')
+        .not('patient_id', 'is', null);
+
+    for (const visit of (visits || [])) {
+        // Check not already sent today for this visit
+        const todayStr = kyivNow.toISOString().split('T')[0];
+        const { data: existing } = await _supabase.from('flow_executions')
+            .select('id')
+            .eq('visit_cc_id', visit.cc_id)
+            .eq('status', 'sent')
+            .ilike('result->>type', 'appointment_reminder')
+            .gte('triggered_at', todayStr)
+            .maybeSingle();
+        if (existing) continue;
+
+        const { data: patient } = await _supabase.from('cc_patients')
+            .select('id, full_name, phone, telegram_id').eq('id', visit.patient_id).single();
+        if (!patient?.telegram_id) continue;
+
+        const firstName = (patient.full_name || '').split(' ')[1] || patient.full_name || '';
+        const time = visit.time_start || '';
+        const doctor = visit.doctor_name ? `\n👨‍⚕️ Лікар: ${visit.doctor_name}` : '';
+
+        const text = `👋 Добрий день${firstName ? ', ' + firstName : ''}!\n\n`
+            + `Нагадуємо, що завтра о ${time} у вас запланований візит до Dental Studio. 🦷\n`
+            + `${doctor}\n📍 вул. Незалежності, 21\n\n`
+            + `Будемо раді вас бачити! 😊`;
+
+        const inlineKeyboard = [
+            [
+                { text: '✅ Підтверджую візит', callback_data: `appt_confirm_${visit.cc_id}_${patient.id}` },
+                { text: '📞 Потрібна допомога', callback_data: `appt_reschedule_${visit.cc_id}_${patient.id}` }
+            ]
+        ];
+
+        let sent = false;
+        try {
+            await _patientBot.sendMessage(patient.telegram_id, text, {
+                reply_markup: { inline_keyboard: inlineKeyboard }
+            });
+            sent = true;
+        } catch(e) { console.error('Reminder send error:', e.message); }
+
+        await _supabase.from('flow_executions').insert({
+            patient_id: patient.id,
+            visit_cc_id: visit.cc_id,
+            triggered_at: new Date().toISOString(),
+            status: sent ? 'sent' : 'failed',
+            result: { type: 'appointment_reminder' }
+        });
+
+        await sleep(500);
+    }
+}
+
 // ─── Inline keyboard callback handler (survey answers) ────────────────────────
 
 async function handleCallbackQuery(query) {
@@ -447,6 +526,53 @@ async function handleCallbackQuery(query) {
                 }
             );
         }
+    }
+
+    // Appointment reminder callbacks
+    if (data.startsWith('appt_confirm_') || data.startsWith('appt_reschedule_')) {
+        const parts = data.split('_');
+        const action = parts[1]; // confirm | reschedule
+        const visitCcId = parts[2];
+        const patientId = parts[parts.length - 1];
+
+        const { data: patient } = await _supabase.from('cc_patients')
+            .select('full_name, phone').eq('id', patientId).single();
+
+        const { data: visit } = await _supabase.from('cc_visits')
+            .select('visit_date, time_start, doctor_name').eq('cc_id', visitCcId).single();
+
+        const name = patient?.full_name || 'Пацієнт';
+        const phone = patient?.phone || '—';
+        const date = visit?.visit_date || '—';
+        const time = visit?.time_start || '—';
+        const tgLink = `tg://user?id=${chatId}`;
+
+        if (action === 'confirm') {
+            await _patientBot.sendMessage(chatId,
+                `✅ Чудово! Ваш візит підтверджено.\n\nЧекаємо вас ${date} о ${time}. До зустрічі! 😊`
+            );
+            if (_aiSettings?.tg_bot_token && _aiSettings?.tg_chat_id) {
+                const TelegramBot = require('node-telegram-bot-api');
+                const alertBot = new TelegramBot(_aiSettings.tg_bot_token);
+                await alertBot.sendMessage(_aiSettings.tg_chat_id,
+                    `✅ *Підтвердження запису*\n\n👤 ${name}\n📱 ${phone}\n🔗 ${tgLink}\n📅 ${date} о ${time}`,
+                    { parse_mode: 'Markdown' }
+                );
+            }
+        } else {
+            await _patientBot.sendMessage(chatId,
+                `📞 Дякуємо! Наш адміністратор зв'яжеться з вами найближчим часом для уточнення деталей.`
+            );
+            if (_aiSettings?.tg_bot_token && _aiSettings?.tg_chat_id) {
+                const TelegramBot = require('node-telegram-bot-api');
+                const alertBot = new TelegramBot(_aiSettings.tg_bot_token);
+                await alertBot.sendMessage(_aiSettings.tg_chat_id,
+                    `⚠️ *Потрібна допомога із записом*\n\n👤 ${name}\n📱 ${phone}\n🔗 ${tgLink}\n📅 Запис: ${date} о ${time}\n\nКлієнт хоче змінити або скасувати візит.`,
+                    { parse_mode: 'Markdown' }
+                );
+            }
+        }
+        return;
     }
 
     // Complaint: patient pressed "Написати власнику"
