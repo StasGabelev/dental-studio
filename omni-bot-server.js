@@ -319,8 +319,9 @@ const MAIN_MENU = {
     reply_markup: {
         keyboard: [
             [{ text: '📅 Записатися онлайн' }, { text: '📋 Моя історія' }],
-            [{ text: '🤝 Наші партнери' },      { text: '📍 Як нас знайти' }],
-            [{ text: '⭐ Залишити відгук' },     { text: '📞 Зворотний дзвінок' }]
+            [{ text: '👨‍⚕️ Мої лікарі' },        { text: '🤝 Наші партнери' }],
+            [{ text: '📍 Як нас знайти' },       { text: '⭐ Залишити відгук' }],
+            [{ text: '📞 Зворотний дзвінок' }]
         ],
         resize_keyboard: true,
         one_time_keyboard: false
@@ -402,13 +403,13 @@ async function showVisits(chatId, patient) {
 
     const [{ data: visits }, { data: invoices }] = await Promise.all([
         supabase.from('cc_visits')
-            .select('visit_date, doctor_name')
+            .select('visit_date, doctor_name, patient_id')
             .in('patient_id', patientIds)
             .eq('status', 'VISITED')
             .order('visit_date', { ascending: false })
             .limit(10),
         supabase.from('cc_invoices')
-            .select('date, items')
+            .select('date, items, amount, patient_id')
             .in('patient_id', patientIds)
             .order('date', { ascending: false })
             .limit(30)
@@ -421,22 +422,38 @@ async function showVisits(chatId, patient) {
         return;
     }
 
-    // Build invoice map by date for service name lookup
-    const invoiceByDate = {};
+    // Batch-load patient names for all unique patient_ids
+    const allPatientIds = [...new Set([
+        ...visits.map(v => v.patient_id),
+        ...(invoices || []).map(i => i.patient_id)
+    ].filter(Boolean))];
+    const { data: familyMembers } = await supabase
+        .from('cc_patients')
+        .select('id, full_name')
+        .in('id', allPatientIds);
+    const patientNameMap = Object.fromEntries((familyMembers || []).map(p => [p.id, p.full_name]));
+
+    // Build invoice map by date — store amount and items, keyed by date+patient_id
+    const invoiceMap = {};
     for (const inv of (invoices || [])) {
         const d = inv.date ? inv.date.slice(0, 10) : null;
-        if (d && !invoiceByDate[d] && inv.items?.length) invoiceByDate[d] = inv.items;
+        if (!d) continue;
+        const key = `${d}_${inv.patient_id}`;
+        if (!invoiceMap[key]) invoiceMap[key] = { items: inv.items || [], amount: inv.amount };
     }
 
     const lines = visits.map(v => {
         const date = v.visit_date ? v.visit_date.slice(0, 10) : '—';
         const doc  = v.doctor_name || 'Лікар';
-        const items = invoiceByDate[date];
-        const svc  = items ? items.map(i => i.plan_item_name).filter(Boolean).join(', ') : null;
-        return `📅 ${date}\n👨‍⚕️ ${doc}${svc ? `\n🦷 ${svc}` : ''}`;
+        const name = patientNameMap[v.patient_id] || patient.full_name;
+        const firstName = name.split(' ')[1] || name.split(' ')[0] || name;
+        const inv = invoiceMap[`${date}_${v.patient_id}`];
+        const svc = inv?.items?.length ? inv.items.map(i => i.plan_item_name).filter(Boolean).join(', ') : null;
+        const amount = inv?.amount ? `\n💰 ${Number(inv.amount).toLocaleString('uk-UA')} ₴` : '';
+        return `👤 ${firstName}\n📅 ${date}\n👨‍⚕️ ${doc}${svc ? `\n🦷 ${svc}` : ''}${amount}`;
     });
     await tgBot.sendMessage(chatId,
-        `📋 Ваша історія візитів, ${patient.full_name}:\n\n${lines.join('\n\n')}`,
+        `📋 Історія візитів:\n\n${lines.join('\n\n')}`,
         MAIN_MENU);
 }
 
@@ -648,6 +665,82 @@ function setupTelegramHandlers() {
             }
 
             if (!await requireLinked(chatId)) return;
+        }
+
+        // --- Мої лікарі ---
+        if (text === '👨‍⚕️ Мої лікарі') {
+            const { data: mu } = await supabase
+                .from('messenger_users')
+                .select('patient_cc_id')
+                .eq('platform', 'telegram')
+                .eq('platform_user_id', String(chatId))
+                .single();
+            if (!mu?.patient_cc_id) { if (!await requireLinked(chatId)) return; return; }
+
+            const { data: pt } = await supabase
+                .from('cc_patients')
+                .select('id, phone')
+                .eq('cc_id', mu.patient_cc_id)
+                .single();
+            if (!pt) { await tgBot.sendMessage(chatId, 'Не вдалося знайти ваші дані.', MAIN_MENU); return; }
+
+            // Find all family members by phone
+            let patientIds = [pt.id];
+            const phoneLast9 = (pt.phone || '').replace(/\D/g, '').slice(-9);
+            if (phoneLast9) {
+                const { data: family } = await supabase
+                    .from('cc_patients')
+                    .select('id, full_name')
+                    .ilike('phone', `%${phoneLast9}%`)
+                    .not('cc_id', 'like', 'bot_%');
+                if (family?.length > 1) {
+                    patientIds = family.map(p => p.id);
+                    var familyNameMap = Object.fromEntries(family.map(p => [p.id, p.full_name]));
+                }
+            }
+
+            const { data: visits } = await supabase
+                .from('cc_visits')
+                .select('visit_date, doctor_name, patient_id')
+                .in('patient_id', patientIds)
+                .eq('status', 'VISITED')
+                .order('visit_date', { ascending: false })
+                .limit(50);
+
+            if (!visits?.length) {
+                await tgBot.sendMessage(chatId, 'Записів про візити поки що немає.', MAIN_MENU);
+                return;
+            }
+
+            // Load patient names if not loaded yet
+            if (!familyNameMap) {
+                const { data: pts } = await supabase.from('cc_patients').select('id, full_name').in('id', patientIds);
+                familyNameMap = Object.fromEntries((pts || []).map(p => [p.id, p.full_name]));
+            }
+
+            // Group by doctor
+            const byDoctor = {};
+            for (const v of visits) {
+                const doc = v.doctor_name || 'Невідомий лікар';
+                if (!byDoctor[doc]) byDoctor[doc] = {};
+                const pid = v.patient_id;
+                if (!byDoctor[doc][pid]) byDoctor[doc][pid] = { dates: [] };
+                byDoctor[doc][pid].dates.push(v.visit_date);
+            }
+
+            const lines = Object.entries(byDoctor).map(([doc, patients]) => {
+                const patLines = Object.entries(patients).map(([pid, info]) => {
+                    const name = familyNameMap[pid] || 'Пацієнт';
+                    const firstName = name.split(' ')[1] || name.split(' ')[0] || name;
+                    const last = info.dates[0]?.slice(0, 10) || '—';
+                    const count = info.dates.length;
+                    return `  └ ${firstName} — ${count} візит${count > 1 ? 'ів' : ''} (останній: ${last})`;
+                });
+                return `👨‍⚕️ ${doc}\n${patLines.join('\n')}`;
+            });
+
+            await tgBot.sendMessage(chatId, `🩺 Ваші лікарі:\n\n${lines.join('\n\n')}`, MAIN_MENU);
+            return;
         }
 
         // --- Моя знижка ---
