@@ -1136,13 +1136,20 @@ async function syncVisitsAndRevenue() {
     if (!aiSettings?.cc_api_token) return;
     console.log('🔄 CRON: Syncing visits from Cliniccards...');
     try {
-        const dateFrom = new Date(Date.now() - 730 * 24 * 3600 * 1000).toISOString().split('T')[0]; // 2 years
+        const dateFrom = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().split('T')[0]; // 30 days
         const dateTo = new Date().toISOString().split('T')[0];
         const url = `https://cliniccards.com/api/visits?from=${dateFrom}&to=${dateTo}`;
         const response = await fetch(url, { headers: ccHeaders() });
         const res = await response.json();
         if (res.result === 'success' && res.data) {
             console.log(`📥 CRON: Syncing ${res.data.length} recent visits...`);
+
+            // Batch-load patient UUIDs to avoid N+1 queries
+            const patientCcIds = [...new Set(res.data.map(v => String(v.patient_id)).filter(Boolean))];
+            const { data: patientRows } = await supabase.from('cc_patients')
+                .select('id, cc_id').in('cc_id', patientCcIds);
+            const patientMap = Object.fromEntries((patientRows || []).map(p => [p.cc_id, p.id]));
+
             for (const v of res.data) {
                 const visitStart = v.visit_start ? new Date(v.visit_start) : null;
                 const visitEnd = v.visit_end ? new Date(v.visit_end) : null;
@@ -1161,14 +1168,13 @@ async function syncVisitsAndRevenue() {
                 };
 
                 if (v.patient_id) {
-                    const { data: pt } = await supabase.from('cc_patients')
-                        .select('id').eq('cc_id', String(v.patient_id)).single();
-                    if (pt) {
-                        visitRow.patient_id = pt.id;
+                    const ptId = patientMap[String(v.patient_id)];
+                    if (ptId) {
+                        visitRow.patient_id = ptId;
                         if (v.status === 'VISITED' && visitEnd) {
                             await supabase.from('cc_patients').update({
                                 last_visit_at: visitEnd.toISOString()
-                            }).eq('id', pt.id).or(`last_visit_at.is.null,last_visit_at.lt.${visitEnd.toISOString()}`);
+                            }).eq('id', ptId).or(`last_visit_at.is.null,last_visit_at.lt.${visitEnd.toISOString()}`);
                         }
                     }
                 }
@@ -1193,6 +1199,13 @@ async function syncInvoices() {
         const res = await response.json();
         if (res.result === 'success' && res.data) {
             console.log(`📥 CRON: Syncing ${res.data.length} invoices...`);
+
+            // Batch-load patient UUIDs to avoid N+1 queries
+            const invPatientCcIds = [...new Set(res.data.map(inv => String(inv.patient_id)).filter(Boolean))];
+            const { data: invPatientRows } = await supabase.from('cc_patients')
+                .select('id, cc_id').in('cc_id', invPatientCcIds);
+            const invPatientMap = Object.fromEntries((invPatientRows || []).map(p => [p.cc_id, p.id]));
+
             for (const inv of res.data) {
                 const row = {
                     cc_id: String(inv.id),
@@ -1206,11 +1219,9 @@ async function syncInvoices() {
                     last_sync_at: new Date().toISOString()
                 };
 
-                // Link to patient UUID
                 if (inv.patient_id) {
-                    const { data: pt } = await supabase.from('cc_patients')
-                        .select('id').eq('cc_id', String(inv.patient_id)).single();
-                    if (pt) row.patient_id = pt.id;
+                    const ptId = invPatientMap[String(inv.patient_id)];
+                    if (ptId) row.patient_id = ptId;
                 }
 
                 await supabase.from('cc_invoices').upsert(row, { onConflict: 'cc_id' });
@@ -1231,10 +1242,10 @@ app.listen(PORT, async () => {
     setInterval(syncCliniccardsDatabase, 1800000);  // patients: every 30 min
     setTimeout(syncCliniccardsDatabase, 10000);
 
-    setInterval(syncVisitsAndRevenue, 600000);      // visits: every 10 min
+    setInterval(syncVisitsAndRevenue, 3600000);     // visits: every 60 min
     setTimeout(syncVisitsAndRevenue, 30000);
 
-    setInterval(syncInvoices, 600000);              // invoices/finance: every 10 min
+    setInterval(syncInvoices, 3600000);             // invoices/finance: every 60 min
     setTimeout(syncInvoices, 45000);
 
     setInterval(syncDoctors, 86400000);             // doctors: once per day
