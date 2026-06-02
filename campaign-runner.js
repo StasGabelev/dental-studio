@@ -4,6 +4,27 @@ const fetch = require('node-fetch');
 let _supabase, _aiSettings, _patientBot, _viberBot;
 let _initialized = false;
 
+// ─── Procedure follow-up rules ────────────────────────────────────────────────
+
+const PROCEDURE_FLOWS = [
+    {
+        keywords: ['видалення зуба', 'видалення', 'удаление зуба', 'удалення'],
+        followups: [
+            { delay_hours: 2,  message: '🦷 Дякуємо за візит!\n\nПісля видалення зуба рекомендуємо:\n• Не їжте та не пийте 2 години\n• Уникайте гарячого та твердого\n• При сильному болі — знеболювальне\n\nЯкщо є питання — пишіть нам! 💙' },
+            { delay_hours: 20, message: '👋 Доброго ранку!\n\nЯк ваше самопочуття після вчорашньої процедури? Сподіваємось, все добре. Якщо турбує набряк або біль — не зволікайте, зателефонуйте нам. 🌟' },
+            { delay_hours: 72, message: '💙 3 дні після видалення зуба — лунка поступово загоюється.\n\nЯкщо відчуваєте дискомфорт — будемо раді прийняти вас на контрольний огляд. Здоров\'я вашої посмішки — наша турбота! 🦷' }
+        ]
+    },
+    {
+        keywords: ['імплантація', 'імплант', 'имплант', 'имплантация'],
+        followups: [
+            { delay_hours: 3,  message: '🦷 Після імплантації важливо:\n• Уникайте фізичних навантажень 24 год\n• Не куріть\n• Холодний компрес допоможе зменшити набряк\n\nМи поруч — пишіть якщо є питання! 💙' },
+            { delay_hours: 24, message: '👋 Добрий день!\n\nЯк ваше самопочуття після імплантації? Невеликий набряк — це нормально. Якщо є сильний біль або температура — зателефонуйте нам одразу. 🌟' },
+            { delay_hours: 168, message: '💙 Тиждень після імплантації!\n\nСподіваємось, загоєння проходить добре. Через 3-6 місяців ми запросимо вас на контрольний огляд для встановлення коронки.\n\nДякуємо за довіру! 🦷' }
+        ]
+    }
+];
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
 function initCampaignRunner(supabase, aiSettings, patientBot, viberBot) {
@@ -26,6 +47,10 @@ function initCampaignRunner(supabase, aiSettings, patientBot, viberBot) {
     // Appointment reminders: check every 15 min, fires at 09:00 and 17:00 Kyiv time
     setInterval(runAppointmentReminders, 15 * 60 * 1000);
     setTimeout(runAppointmentReminders, 30000);
+
+    // Scheduled procedure follow-ups: every 15 min
+    setInterval(runScheduledFollowUps, 15 * 60 * 1000);
+    setTimeout(runScheduledFollowUps, 60000);
 
     // Process unprocessed survey responses: every 10 minutes
     setInterval(processSurveyResponses, 10 * 60 * 1000);
@@ -440,7 +465,6 @@ async function runAppointmentReminders() {
             .select('id')
             .eq('visit_cc_id', visit.cc_id)
             .eq('status', 'sent')
-            .ilike('result->>type', 'appointment_reminder')
             .gte('triggered_at', todayStr)
             .maybeSingle();
         if (existing) continue;
@@ -473,13 +497,15 @@ async function runAppointmentReminders() {
             sent = true;
         } catch(e) { console.error('Reminder send error:', e.message); }
 
-        await _supabase.from('flow_executions').insert({
-            patient_id: patient.id,
-            visit_cc_id: visit.cc_id,
-            triggered_at: new Date().toISOString(),
-            status: sent ? 'sent' : 'failed',
-            result: { type: 'appointment_reminder' }
-        });
+        try {
+            await _supabase.from('flow_executions').insert({
+                patient_id: patient.id,
+                visit_cc_id: visit.cc_id,
+                triggered_at: new Date().toISOString(),
+                status: sent ? 'sent' : 'failed',
+                result: { type: 'appointment_reminder' }
+            });
+        } catch(_) {}
 
         await sleep(500);
     }
@@ -690,6 +716,85 @@ ${questions.map(q => `- "${q.text}" → поле: ${q.extract_field} (тип: ${
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
+// ─── Procedure follow-up scheduling ──────────────────────────────────────────
+
+async function scheduleProceduralFollowUps(invoice, patientMap) {
+    if (!_supabase) return;
+    const patientId = patientMap ? patientMap[String(invoice.patient_id)] : null;
+    if (!patientId) return;
+
+    const items = invoice.invoice_items || invoice.items || [];
+    const itemNames = items.map(i => (i.plan_item_name || '').toLowerCase()).join(' ');
+    const invoiceTime = new Date(invoice.date_created || invoice.date || Date.now()).getTime();
+
+    for (const rule of PROCEDURE_FLOWS) {
+        const matched = rule.keywords.some(kw => itemNames.includes(kw.toLowerCase()));
+        if (!matched) continue;
+
+        // Check not already scheduled for this invoice
+        const { data: existing } = await _supabase.from('flow_executions')
+            .select('id')
+            .eq('patient_id', patientId)
+            .filter('result->>invoice_cc_id', 'eq', String(invoice.id || invoice.cc_id))
+            .maybeSingle();
+        if (existing) continue;
+
+        // Schedule each follow-up message
+        for (const followup of rule.followups) {
+            const scheduledAt = new Date(invoiceTime + followup.delay_hours * 3600000).toISOString();
+            try {
+                await _supabase.from('flow_executions').insert({
+                    patient_id: patientId,
+                    triggered_at: new Date().toISOString(),
+                    scheduled_at: scheduledAt,
+                    status: 'pending',
+                    result: {
+                        type: 'procedure_followup',
+                        message: followup.message,
+                        invoice_cc_id: String(invoice.id || invoice.cc_id)
+                    }
+                });
+            } catch(_) {}
+        }
+        break; // only first matched rule per invoice
+    }
+}
+
+async function runScheduledFollowUps() {
+    if (!_supabase || !_patientBot) return;
+    try {
+        const { data: pending } = await _supabase.from('flow_executions')
+            .select('*')
+            .eq('status', 'pending')
+            .not('scheduled_at', 'is', null)
+            .lte('scheduled_at', new Date().toISOString())
+            .limit(20);
+
+        for (const exec of (pending || [])) {
+            const message = exec.result?.message;
+            if (!message) continue;
+
+            const { data: patient } = await _supabase.from('cc_patients')
+                .select('*').eq('id', exec.patient_id).single();
+            if (!patient) {
+                await _supabase.from('flow_executions').update({ status: 'skipped' }).eq('id', exec.id);
+                continue;
+            }
+
+            let delivery = { success: false };
+            try { delivery = await sendToPatient(patient, message); } catch(e) { delivery.error = e.message; }
+
+            await _supabase.from('flow_executions').update({
+                executed_at: new Date().toISOString(),
+                status: delivery.success ? 'sent' : 'failed',
+                channel: delivery.channel
+            }).eq('id', exec.id);
+
+            await sleep(500);
+        }
+    } catch(e) { console.error('runScheduledFollowUps error:', e.message); }
+}
+
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-module.exports = { initCampaignRunner, updateSettings, handleComplaintMessage };
+module.exports = { initCampaignRunner, updateSettings, handleComplaintMessage, scheduleProceduralFollowUps };

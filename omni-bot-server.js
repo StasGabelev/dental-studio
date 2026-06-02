@@ -6,7 +6,7 @@ const ViberBot = require('viber-bot').Bot;
 const TextMessage = require('viber-bot').Message.Text;
 const fetch = require('node-fetch');
 const { initLusya } = require('./lusya-agent');
-const { initCampaignRunner, updateSettings: updateCampaignSettings, handleComplaintMessage } = require('./campaign-runner');
+const { initCampaignRunner, updateSettings: updateCampaignSettings, handleComplaintMessage, scheduleProceduralFollowUps } = require('./campaign-runner');
 
 // --- Configuration & Initialization ---
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ckldvntrsiacbjpiydmn.supabase.co';
@@ -1320,6 +1320,12 @@ async function syncInvoices() {
                 }
 
                 await supabase.from('cc_invoices').upsert(row, { onConflict: 'cc_id' });
+
+                // Schedule procedure follow-ups for recent invoices
+                const invoiceAge = Date.now() - new Date(inv.date_created || 0).getTime();
+                if (invoiceAge < 2 * 3600 * 1000 && inv.invoice_items?.length) {
+                    scheduleProceduralFollowUps(inv, invPatientMap).catch(() => {});
+                }
             }
             console.log('✅ CRON: Invoices sync done.');
         }
