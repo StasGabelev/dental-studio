@@ -4,6 +4,19 @@ const fetch = require('node-fetch');
 let _supabase, _aiSettings, _patientBot, _viberBot;
 let _initialized = false;
 
+const PATIENT_MENU = {
+    reply_markup: {
+        keyboard: [
+            [{ text: '📅 Записатися онлайн' }, { text: '📋 Моя історія' }],
+            [{ text: '👨‍⚕️ Мої лікарі' },        { text: '🤝 Наші партнери' }],
+            [{ text: '📍 Як нас знайти' },       { text: '⭐ Залишити відгук' }],
+            [{ text: '📞 Зворотний дзвінок' }]
+        ],
+        resize_keyboard: true,
+        one_time_keyboard: false
+    }
+};
+
 // ─── Procedure follow-up rules ────────────────────────────────────────────────
 
 const PROCEDURE_FLOWS = [
@@ -546,6 +559,7 @@ async function handleCallbackQuery(query) {
                     ]]
                 }
             });
+            await _patientBot.sendMessage(chatId, '🏠 Повертайтесь до нас будь-коли!', PATIENT_MENU);
             await _supabase.from('cc_patients').update({ notes_lusya: `post_visit: ${rating}` }).eq('id', patientId);
         } else if (rating === 'bad') {
             await _patientBot.sendMessage(chatId,
@@ -642,7 +656,8 @@ async function handleComplaintMessage(chatId, text) {
     }
 
     await _patientBot.sendMessage(String(chatId),
-        `✅ Дякуємо. Власник клініки отримав ваше повідомлення і зв'яжеться з вами найближчим часом.`
+        `✅ Дякуємо. Власник клініки отримав ваше повідомлення і зв'яжеться з вами найближчим часом.`,
+        PATIENT_MENU
     );
     return true;
 }
