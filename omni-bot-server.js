@@ -78,9 +78,9 @@ async function refreshSettings() {
 async function rebuildKnowledgeBase() {
     let kb = `ОСНОВНАЯ ИНФОРМАЦИЯ О КЛИНИКЕ DENTAL STUDIO:
 - Город: Чернигов, Украина
-- Адрес: просп. Независимости, 21
-- График: Пн-Пт, 10:00-18:00
-- Телефон: (077) 600 7 800\n`;
+- Адрес: вул. Незалежності, 21
+- График: Пн-Пт 09:00-19:00, Сб-Нд 09:00-16:00
+- Телефон: (073) 600 7 800, (077) 600 7 800\n`;
 
     if (aiSettings?.knowledge_base_manual) {
         kb += `\nИНСТРУКЦИИ КЛИНИКИ:\n${aiSettings.knowledge_base_manual}\n`;
@@ -449,8 +449,7 @@ async function showVisits(chatId, patient) {
         const firstName = name.split(' ')[1] || name.split(' ')[0] || name;
         const inv = invoiceMap[`${date}_${v.patient_id}`];
         const svc = inv?.items?.length ? inv.items.map(i => i.plan_item_name).filter(Boolean).join(', ') : null;
-        const amount = inv?.amount ? `\n💰 ${Number(inv.amount).toLocaleString('uk-UA')} ₴` : '';
-        return `👤 ${firstName}\n📅 ${date}\n👨‍⚕️ ${doc}${svc ? `\n🦷 ${svc}` : ''}${amount}`;
+        return `👤 ${firstName}\n📅 ${date}\n👨‍⚕️ ${doc}${svc ? `\n🦷 ${svc}` : ''}`;
     });
     await tgBot.sendMessage(chatId,
         `📋 Історія візитів:\n\n${lines.join('\n\n')}`,
@@ -518,7 +517,7 @@ function setupTelegramHandlers() {
             }
 
             await tgBot.sendMessage(chatId,
-                '✅ Дякуємо! Наш адміністратор зателефонує вам найближчим часом для уточнення зручного часу.\n\n🕐 Графік роботи: Пн–Пт 10:00–18:00',
+                '✅ Дякуємо! Наш адміністратор зателефонує вам найближчим часом для уточнення зручного часу.\n\n🕐 Графік роботи: Пн–Пт 09:00–19:00, Сб–Нд 09:00–16:00',
                 MAIN_MENU
             );
             return;
@@ -793,7 +792,7 @@ function setupTelegramHandlers() {
         // --- Як нас знайти ---
         if (text === '📍 Як нас знайти') {
             await tgBot.sendMessage(chatId,
-                '📍 Dental Studio\nЧернігів, просп. Незалежності, 21\n📞 (077) 600 7 800\n🕐 Пн-Пт: 10:00 - 18:00',
+                '📍 Dental Studio\nЧернігів, вулиця Незалежності, 21\n📞 (073) 600 7 800\n      (077) 600 7 800\n🕐 Пн-Пт: 09:00 - 19:00\n      Сб-Нд: 09:00 - 16:00',
                 {
                     reply_markup: {
                         inline_keyboard: [[
@@ -841,7 +840,7 @@ function setupTelegramHandlers() {
                     { parse_mode: 'Markdown' });
             }
             await tgBot.sendMessage(chatId,
-                '☎️ Ваш запит передано адміністратору.\nМи зателефонуємо вам найближчим часом!\n\n🕐 Графік роботи: Пн-Пт 10:00-18:00',
+                '☎️ Ваш запит передано адміністратору.\nМи зателефонуємо вам найближчим часом!\n\n🕐 Графік роботи: Пн-Пт 09:00-19:00, Сб-Нд 09:00-16:00',
                 MAIN_MENU);
             return;
         }
@@ -953,9 +952,11 @@ function setupViberHandlers() {
         if (text === '📞 Контакти') {
             const contactsText =
                 `📍 Dental Studio\n` +
-                `Чернігів, просп. Незалежності, 21\n` +
-                `📞 (077) 600 7 800\n` +
-                `🕐 Пн-Пт: 10:00 - 18:00`;
+                `Чернігів, вулиця Незалежності, 21\n` +
+                `📞 (073) 600 7 800\n` +
+                `      (077) 600 7 800\n` +
+                `🕐 Пн-Пт: 09:00 - 19:00\n` +
+                `      Сб-Нд: 09:00 - 16:00`;
             response.send(new TextMessage(contactsText, undefined, undefined, undefined, undefined, keyboard));
             return;
         }
