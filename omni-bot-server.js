@@ -9,7 +9,7 @@ const { initLusya } = require('./lusya-agent');
 const { initCampaignRunner, updateSettings: updateCampaignSettings, handleComplaintMessage, scheduleProceduralFollowUps } = require('./campaign-runner');
 
 // --- Configuration & Initialization ---
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ckldvntrsiacbjpiydmn.supabase.co';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ipuksuzlvyoosmlqzvkb.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_KEY; // Service role key for admin access
 const PORT = process.env.PORT || 3000;
 
