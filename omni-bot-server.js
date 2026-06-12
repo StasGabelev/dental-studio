@@ -1337,7 +1337,13 @@ async function syncInvoices() {
 // Start Server
 app.listen(PORT, async () => {
     console.log(`🚀 AI Omni-Server running on port ${PORT}`);
-    await refreshSettings();
+    // Retry initial settings load until tgBot is initialized
+    for (let i = 0; i < 10; i++) {
+        await refreshSettings();
+        if (tgBot) break;
+        console.warn(`⚠️ Bot not initialized yet, retrying in 5s... (${i + 1}/10)`);
+        await new Promise(r => setTimeout(r, 5000));
+    }
     setInterval(refreshSettings, 60000 * 5); // every 5 min
 
     setInterval(syncCliniccardsDatabase, 1800000);  // patients: every 30 min
