@@ -95,6 +95,49 @@ async function rebuildKnowledgeBase() {
 }
 
 // --- 2. Core AI Logic ---
+async function getMedicalQAResponse(userMessage, patientName) {
+    if (!aiSettings || !aiSettings.api_key) return null;
+
+    const systemPrompt = `Ти — асистент стоматології Dental Studio (Чернігів). Відповідаєш на питання пацієнта після процедур або загальні стоматологічні питання.
+
+ПРАВИЛА:
+1. Відповідай ТІЛЬКИ українською мовою, коротко і зрозуміло (2-4 речення).
+2. Якщо питання просте (догляд після процедури, терміни загоєння, що можна їсти тощо) — відповідай сам.
+3. Якщо питання СКЛАДНЕ або потребує огляду лікаря — відповідай доброзичливо і додай [[ESCALATE]] в кінці.
+4. Завжди додавай [[ESCALATE]] якщо: сильний біль, кровотеча, температура, ускладнення, підозра на алергію, питання про діагноз або лікування конкретної ситуації.
+5. НЕ давай медичних діагнозів. НЕ призначай ліки.
+6. Підпис: "З повагою, команда Dental Studio 🦷"
+
+Ім'я пацієнта: ${patientName || 'Пацієнт'}`;
+
+    try {
+        let apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+        const provider = aiSettings.provider || 'openrouter';
+        const headers = { 'Authorization': `Bearer ${aiSettings.api_key}`, 'Content-Type': 'application/json' };
+        if (provider === 'openai') apiUrl = 'https://api.openai.com/v1/chat/completions';
+        else if (provider === 'deepseek') apiUrl = 'https://api.deepseek.com/v1/chat/completions';
+        else if (provider === 'openrouter') { headers['HTTP-Referer'] = 'https://dentstudio.in.ua'; headers['X-Title'] = 'Dental Studio AI'; }
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                model: aiSettings.model || 'gpt-4o-mini',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userMessage }
+                ]
+            })
+        });
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content || null;
+    } catch (e) {
+        console.error('Medical QA Error:', e);
+        return null;
+    }
+}
+
 async function getAIResponse(userMessage, history = []) {
     if (!aiSettings || !aiSettings.api_key) return "Перепрошую, мій інтелект зараз на техобслуговуванні. Зверніться, будь ласка, за телефоном (077) 600 7 800.";
 
@@ -321,12 +364,14 @@ const MAIN_MENU = {
             [{ text: '📅 Записатися онлайн' }, { text: '📋 Моя історія' }],
             [{ text: '👨‍⚕️ Мої лікарі' },        { text: '🤝 Наші партнери' }],
             [{ text: '📍 Як нас знайти' },       { text: '⭐ Залишити відгук' }],
-            [{ text: '📞 Зворотний дзвінок' }]
+            [{ text: '💬 Задати питання' },       { text: '📞 Зворотний дзвінок' }]
         ],
         resize_keyboard: true,
         one_time_keyboard: false
     }
 };
+
+const waitingForQuestion = new Map();
 
 async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
     const savedPhone = fullPhone || phoneLast9;
@@ -558,9 +603,40 @@ function setupTelegramHandlers() {
         // --- Complaint message (if patient is in awaiting complaint state) ---
         if (await handleComplaintMessage(chatId, text)) return;
 
+        // --- Question from patient (if in waitingForQuestion state) ---
+        if (waitingForQuestion.has(chatId)) {
+            const patientData = waitingForQuestion.get(chatId);
+            waitingForQuestion.delete(chatId);
+
+            await tgBot.sendMessage(chatId, '🔄 Одну мить, опрацьовую ваше питання...');
+
+            const aiReply = await getMedicalQAResponse(text, patientData.name);
+
+            if (!aiReply) {
+                await tgBot.sendMessage(chatId,
+                    '😔 Вибачте, зараз не можу відповісти автоматично. Ваше питання передано адміністратору — ми зв\'яжемося з вами найближчим часом.',
+                    MAIN_MENU);
+                await triggerQuestionAlert(chatId, patientData, text, '(AI недоступний)');
+                return;
+            }
+
+            const needsEscalation = aiReply.includes('[[ESCALATE]]');
+            const cleanReply = aiReply.replace('[[ESCALATE]]', '').trim();
+
+            await tgBot.sendMessage(chatId, cleanReply, MAIN_MENU);
+
+            if (needsEscalation) {
+                await tgBot.sendMessage(chatId,
+                    '📬 Ваше питання також передано нашому лікарю — він зв\'яжеться з вами найближчим часом.');
+                await triggerQuestionAlert(chatId, patientData, text, cleanReply);
+            }
+            return;
+        }
+
         // --- /start (завжди має пріоритет, скидає будь-який стан) ---
         if (text === '/start') {
             waitingForPhone.delete(chatId);
+            waitingForQuestion.delete(chatId);
 
             // Ensure row exists in messenger_users (creates on first /start)
             await supabase.from('messenger_users').upsert({
@@ -820,6 +896,48 @@ function setupTelegramHandlers() {
             return;
         }
 
+        // --- Задати питання ---
+        if (text === '💬 Задати питання') {
+            const tgName = [msg.from.first_name, msg.from.last_name].filter(Boolean).join(' ') || 'Пацієнт';
+            let patientName = tgName;
+
+            const { data: mu } = await supabase
+                .from('messenger_users')
+                .select('patient_cc_id')
+                .eq('platform', 'telegram')
+                .eq('platform_user_id', String(chatId))
+                .single();
+
+            if (mu?.patient_cc_id) {
+                const { data: pt } = await supabase
+                    .from('cc_patients')
+                    .select('full_name')
+                    .eq('cc_id', mu.patient_cc_id)
+                    .single();
+                if (pt?.full_name) patientName = pt.full_name;
+            }
+
+            waitingForQuestion.set(chatId, { name: patientName, tgName });
+            await tgBot.sendMessage(chatId,
+                '💬 Напишіть ваше запитання — Люся відповість одразу.\n\nЯкщо питання потребує уваги лікаря, ми передамо його особисто.',
+                {
+                    reply_markup: {
+                        keyboard: [[{ text: '❌ Скасувати' }]],
+                        resize_keyboard: true,
+                        one_time_keyboard: true
+                    }
+                }
+            );
+            return;
+        }
+
+        // --- Скасувати питання ---
+        if (text === '❌ Скасувати' && waitingForQuestion.has(chatId)) {
+            waitingForQuestion.delete(chatId);
+            await tgBot.sendMessage(chatId, 'Скасовано.', MAIN_MENU);
+            return;
+        }
+
         // --- Зворотний дзвінок ---
         if (text === '📞 Зворотний дзвінок') {
             if (!await requireLinked(chatId,
@@ -1043,6 +1161,41 @@ async function triggerAdminAlert(platform, userName, lastMsg, sessionId) {
     } catch(e) { console.error('Failed to save fallback task:', e); }
 }
 
+async function triggerQuestionAlert(patientChatId, patientData, question, aiAnswer) {
+    if (aiSettings?.tg_bot_token && aiSettings?.tg_chat_id) {
+        const alertBot = new TelegramBot(aiSettings.tg_bot_token);
+        const aiAnswerBlock = aiAnswer && aiAnswer !== '(AI недоступний)'
+            ? `\n\n🤖 *AI відповів:*\n_${aiAnswer.replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&').substring(0, 300)}_`
+            : '';
+        alertBot.sendMessage(
+            aiSettings.tg_chat_id,
+            `❓ *Питання від пацієнта*\n\n👤 ${patientData.name}${patientData.tgName !== patientData.name ? ` (${patientData.tgName})` : ''}\n💬 *Питання:* ${question}${aiAnswerBlock}\n\n_Потребує відповіді лікаря. Chat ID: ${patientChatId}_`,
+            { parse_mode: 'Markdown' }
+        );
+    }
+
+    try {
+        const { data: mu } = await supabase
+            .from('messenger_users')
+            .select('session_id')
+            .eq('platform', 'telegram')
+            .eq('platform_user_id', String(patientChatId))
+            .single();
+
+        await supabase.from('admin_tasks').insert({
+            task_type: 'Питання пацієнта',
+            description: `${patientData.name} запитує: "${question}"`,
+            status: 'pending',
+            metadata: {
+                session_id: mu?.session_id || null,
+                platform: 'telegram',
+                patient_chat_id: String(patientChatId),
+                ai_answer: aiAnswer
+            }
+        });
+    } catch(e) { console.error('Failed to save question task:', e); }
+}
+
 // --- 5. Web API for Widget ---
 app.get('/health_check_unique', (req, res) => {
     res.json({ status: 'ok', message: 'Unique endpoint reached!' });
@@ -1116,20 +1269,25 @@ app.post('/api/admin/task-action', async (req, res) => {
         const { data: task, error: tErr } = await supabase.from('admin_tasks').select('*').eq('id', taskId).single();
         if (tErr || !task) throw new Error('Task not found');
 
-        // 2. Find associated messenger user
-        const { data: mUser } = await supabase.from('messenger_users')
-            .select('*')
-            .eq('session_id', task.metadata?.session_id)
-            .single();
-        
-        if (mUser && mUser.platform_user_id) {
-            const replyMsg = message || (action === 'approve' ? '✅ Ваш запит схвалено! Ми зв\'яжемося з вами найближчим часом.' : '❌ На жаль, ваш запит було відхилено. Оберіть інший час.');
+        // 2. Find associated messenger user (by session_id or direct patient_chat_id)
+        let platformUserId = task.metadata?.patient_chat_id || null;
+        let platform = task.metadata?.platform || 'telegram';
 
-            if (mUser.platform === 'telegram' && tgBot) {
-                await tgBot.sendMessage(mUser.platform_user_id, replyMsg);
-            } else if (mUser.platform === 'viber' && viberBot) {
+        if (!platformUserId && task.metadata?.session_id) {
+            const { data: mUser } = await supabase.from('messenger_users')
+                .select('*')
+                .eq('session_id', task.metadata.session_id)
+                .single();
+            if (mUser) { platformUserId = mUser.platform_user_id; platform = mUser.platform; }
+        }
+
+        if (platformUserId) {
+            const replyMsg = message || '👨‍⚕️ Лікар Dental Studio відповів на ваше питання. Зв\'яжіться з нами для уточнення деталей.';
+            if (platform === 'telegram' && tgBot) {
+                await tgBot.sendMessage(platformUserId, replyMsg, MAIN_MENU);
+            } else if (platform === 'viber' && viberBot) {
                 const TextMessage = require('viber-bot').Message.Text;
-                await viberBot.sendMessage({ id: mUser.platform_user_id }, [new TextMessage(replyMsg)]);
+                await viberBot.sendMessage({ id: platformUserId }, [new TextMessage(replyMsg)]);
             }
         }
 
