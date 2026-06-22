@@ -12,9 +12,25 @@ const BALANCE_WARN_USD  = 3;       // ⚠️ warn below $3
 const BALANCE_CRIT_USD  = 1;       // 🔴 critical below $1
 const BALANCE_WARN_EVERY_MS = 6 * 3600 * 1000;  // at most once per 6 hours
 
+// ─── Admin menu state ─────────────────────────────────────────────────────────
+const adminBroadcastState = new Map(); // chatId → { step, audience, segmentFilter, messageText, taskId, patientChatId }
+let _patientBot = null;
+let _viberBot   = null;
+
+const LUSYA_MENU = {
+    reply_markup: {
+        keyboard: [
+            [{ text: '📊 Статистика' }, { text: '🕐 Активність' }],
+            [{ text: '📢 Розсилка' },   { text: '🎯 Сегменти'  }],
+            [{ text: '📋 Завдання' }]
+        ],
+        resize_keyboard: true
+    }
+};
+
 // ─── Init ────────────────────────────────────────────────────────────────────
 
-function initLusya(supabase, aiSettings) {
+function initLusya(supabase, aiSettings, patientBot, viberBot) {
     const token = aiSettings?.lusya_bot_token;
     if (!token) {
         console.log('ℹ️  Lusya: no lusya_bot_token set, skipping init.');
@@ -25,6 +41,8 @@ function initLusya(supabase, aiSettings) {
     if (lusyaBot) { try { lusyaBot.stopPolling(); } catch(_) {} }
     lusyaBotToken = token;
     lusyaBot = new TelegramBot(token, { polling: true });
+    _patientBot = patientBot || null;
+    _viberBot   = viberBot   || null;
 
     // Start hourly balance check
     const apiKey = aiSettings?.lusya_openrouter_key || aiSettings?.api_key;
@@ -41,12 +59,25 @@ function initLusya(supabase, aiSettings) {
         // Track who writes to Lusya — last sender becomes the alert recipient
         _adminChatId = chatId;
 
-        // Only respond to text messages, ignore commands except /start
         if (text === '/start') {
-            lusyaBot.sendMessage(chatId, '👋 Привет! Я Люся — ваш внутренний AI-ассистент клиники. Спрашивайте всё что угодно о пациентах, докторах, записях, финансах. Могу создавать рассылки, опросы и отчёты.');
+            await lusyaBot.sendMessage(chatId, '👋 Привіт! Я Люся — AI-асистент клініки.\nОберіть дію або напишіть питання:', LUSYA_MENU);
             return;
         }
 
+        // State machine for broadcast / task-reply flows
+        if (adminBroadcastState.has(chatId)) {
+            const handled = await handleBroadcastState(chatId, text, supabase);
+            if (handled) return;
+        }
+
+        // Menu buttons
+        if (text === '📊 Статистика') { await handleStats(chatId, supabase);    return; }
+        if (text === '🕐 Активність') { await handleActivity(chatId, supabase); return; }
+        if (text === '📢 Розсилка')   { await handleBroadcast(chatId);           return; }
+        if (text === '🎯 Сегменти')   { await handleSegments(chatId);            return; }
+        if (text === '📋 Завдання')   { await handleTasks(chatId, supabase);     return; }
+
+        // AI fallback — free text
         try {
             lusyaBot.sendChatAction(chatId, 'typing');
             const reply = await handleLusyaMessage(chatId, text, supabase, aiSettings);
@@ -78,6 +109,52 @@ function initLusya(supabase, aiSettings) {
     });
 
     lusyaBot.on('polling_error', (e) => console.error('Lusya polling error:', e.message));
+
+    lusyaBot.on('callback_query', async (query) => {
+        const chatId = String(query.message.chat.id);
+        const cbData = query.data;
+        _adminChatId = chatId;
+        try { await lusyaBot.answerCallbackQuery(query.id); } catch (_) {}
+
+        if (cbData.startsWith('segment_')) {
+            await handleSegmentCallback(chatId, cbData, supabase);
+            return;
+        }
+        if (cbData.startsWith('segbroad_')) {
+            const filter = cbData.slice(9);
+            adminBroadcastState.set(chatId, { step: 'text', audience: 'segment', segmentFilter: filter });
+            await lusyaBot.sendMessage(chatId, '✏️ Введіть текст розсилки:');
+            return;
+        }
+        if (cbData === 'bcast_all' || cbData === 'bcast_tg' || cbData === 'bcast_viber') {
+            adminBroadcastState.set(chatId, { step: 'text', audience: cbData });
+            await lusyaBot.sendMessage(chatId, '✏️ Введіть текст розсилки:');
+            return;
+        }
+        if (cbData === 'bcast_confirm') {
+            await executeBroadcast(chatId, supabase);
+            return;
+        }
+        if (cbData === 'bcast_cancel') {
+            adminBroadcastState.delete(chatId);
+            await lusyaBot.sendMessage(chatId, '❌ Розсилку скасовано.', LUSYA_MENU);
+            return;
+        }
+        if (cbData === 'segments_back') {
+            await handleSegments(chatId);
+            return;
+        }
+        if (cbData.startsWith('task_reply_')) {
+            const parts = cbData.split('_');
+            // task_reply_<taskId>_<patientChatId>
+            const taskId = parts[2];
+            const patientChatId = parts[3];
+            adminBroadcastState.set(chatId, { step: 'reply', taskId, patientChatId });
+            await lusyaBot.sendMessage(chatId, '✏️ Введіть відповідь пацієнту:');
+            return;
+        }
+    });
+
     console.log('🌸 Lusya agent initialized.');
     return lusyaBot;
 }
@@ -145,6 +222,278 @@ async function runBalanceCheck(apiKey) {
         console.log(`💰 Balance warning sent: $${remaining.toFixed(2)} remaining`);
     } catch (e) {
         console.error('Balance warning send error:', e.message);
+    }
+}
+
+// ─── Admin menu handlers ──────────────────────────────────────────────────────
+
+async function handleStats(chatId, supabase) {
+    try {
+        await lusyaBot.sendChatAction(chatId, 'typing');
+
+        const [totalRes, muRes, active30Res, active90Res] = await Promise.all([
+            supabase.from('cc_patients').select('id', { count: 'exact', head: true }),
+            supabase.from('messenger_users').select('platform'),
+            supabase.from('cc_patients').select('id', { count: 'exact', head: true })
+                .gte('last_visit_at', new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString()),
+            supabase.from('cc_patients').select('id', { count: 'exact', head: true })
+                .gte('last_visit_at', new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString())
+        ]);
+
+        const total   = totalRes.count || 0;
+        const active30 = active30Res.count || 0;
+        const active90 = active90Res.count || 0;
+
+        const platforms = {};
+        (muRes.data || []).forEach(u => { platforms[u.platform] = (platforms[u.platform] || 0) + 1; });
+        const tgCount = platforms.telegram || 0;
+        const vbCount = platforms.viber    || 0;
+
+        const msg = `📊 *Статистика Dental Studio*\n\n👥 Всього пацієнтів: *${total}*\n📱 Telegram підписники: *${tgCount}*\n💬 Viber підписники: *${vbCount}*\n✅ Активні (30 днів): *${active30}*\n🔄 Активні (90 днів): *${active90}*`;
+        await lusyaBot.sendMessage(chatId, msg, { parse_mode: 'Markdown' });
+    } catch (e) {
+        console.error('handleStats error:', e.message);
+        await lusyaBot.sendMessage(chatId, '❌ Помилка отримання статистики.');
+    }
+}
+
+async function handleActivity(chatId, supabase) {
+    try {
+        await lusyaBot.sendChatAction(chatId, 'typing');
+
+        const { data: sessions, error } = await supabase
+            .from('chat_sessions')
+            .select('patient_name, platform, last_message_at')
+            .order('last_message_at', { ascending: false })
+            .limit(10);
+
+        if (error || !sessions || sessions.length === 0) {
+            await lusyaBot.sendMessage(chatId, '🕐 Немає нещодавньої активності.');
+            return;
+        }
+
+        const lines = sessions.map(s => {
+            const name = s.patient_name || 'Невідомий';
+            const pl   = s.platform === 'telegram' ? '📱' : '💬';
+            const when = s.last_message_at
+                ? new Date(s.last_message_at).toLocaleString('uk-UA', { timeZone: 'Europe/Kiev', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                : '—';
+            return `• ${name} ${pl} — ${when}`;
+        });
+
+        await lusyaBot.sendMessage(chatId, `🕐 *Остання активність*\n\n${lines.join('\n')}`, { parse_mode: 'Markdown' });
+    } catch (e) {
+        console.error('handleActivity error:', e.message);
+        await lusyaBot.sendMessage(chatId, '❌ Помилка отримання активності.');
+    }
+}
+
+async function handleBroadcast(chatId) {
+    adminBroadcastState.set(chatId, { step: 'audience' });
+    await lusyaBot.sendMessage(chatId, '📢 *Розсилка*\n\nОберіть аудиторію:', {
+        parse_mode: 'Markdown',
+        reply_markup: {
+            inline_keyboard: [[
+                { text: '👥 Всім',      callback_data: 'bcast_all'   },
+                { text: '📱 Telegram',  callback_data: 'bcast_tg'    },
+                { text: '💬 Viber',     callback_data: 'bcast_viber' }
+            ]]
+        }
+    });
+}
+
+async function handleSegments(chatId) {
+    await lusyaBot.sendMessage(chatId, '🎯 *Сегменти*\n\nОберіть сегмент:', {
+        parse_mode: 'Markdown',
+        reply_markup: {
+            inline_keyboard: [
+                [{ text: '👩 Жінки', callback_data: 'segment_women' }, { text: '👨 Чоловіки', callback_data: 'segment_men' }],
+                [{ text: '👨‍👩‍👧 З дітьми', callback_data: 'segment_children' }],
+                [{ text: '😴 Без візитів 90+ днів', callback_data: 'segment_inactive' }]
+            ]
+        }
+    });
+}
+
+async function handleTasks(chatId, supabase) {
+    try {
+        await lusyaBot.sendChatAction(chatId, 'typing');
+
+        const { data: tasks, error } = await supabase
+            .from('admin_tasks')
+            .select('*')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+        if (error || !tasks || tasks.length === 0) {
+            await lusyaBot.sendMessage(chatId, '📋 Немає нових завдань.');
+            return;
+        }
+
+        for (const task of tasks) {
+            const created = new Date(task.created_at).toLocaleString('uk-UA', {
+                timeZone: 'Europe/Kiev', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+            });
+            const taskText = `📋 *${task.task_type || 'Завдання'}*\n${task.description || ''}\n🕐 ${created}`;
+            const opts = { parse_mode: 'Markdown' };
+            const patientChatId = task.metadata?.patient_chat_id || task.metadata?.telegram_chat_id;
+            if (patientChatId) {
+                opts.reply_markup = {
+                    inline_keyboard: [[
+                        { text: '↩️ Відповісти', callback_data: `task_reply_${task.id}_${patientChatId}` }
+                    ]]
+                };
+            }
+            await lusyaBot.sendMessage(chatId, taskText, opts);
+        }
+    } catch (e) {
+        console.error('handleTasks error:', e.message);
+        await lusyaBot.sendMessage(chatId, '❌ Помилка отримання завдань.');
+    }
+}
+
+async function handleSegmentCallback(chatId, segmentKey, supabase) {
+    try {
+        let countQuery = supabase.from('cc_patients').select('id', { count: 'exact', head: true });
+        let label = '';
+
+        if (segmentKey === 'segment_women') {
+            countQuery = countQuery.eq('gender', 'F');
+            label = 'Жінки';
+        } else if (segmentKey === 'segment_men') {
+            countQuery = countQuery.eq('gender', 'M');
+            label = 'Чоловіки';
+        } else if (segmentKey === 'segment_children') {
+            countQuery = countQuery.eq('has_children', true);
+            label = 'З дітьми';
+        } else if (segmentKey === 'segment_inactive') {
+            const cutoff = new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString();
+            countQuery = supabase.from('cc_patients').select('id', { count: 'exact', head: true })
+                .or(`last_visit_at.is.null,last_visit_at.lt.${cutoff}`);
+            label = 'Без візитів 90+ днів';
+        }
+
+        const { count, error } = await countQuery;
+        if (error) { await lusyaBot.sendMessage(chatId, '❌ Помилка запиту.'); return; }
+
+        await lusyaBot.sendMessage(chatId,
+            `🎯 *${label}*: ${count || 0} пацієнтів\n\nЗробити розсилку цьому сегменту?`,
+            {
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [[
+                        { text: '📢 Розсилка', callback_data: `segbroad_${segmentKey}` },
+                        { text: '↩️ Назад',    callback_data: 'segments_back' }
+                    ]]
+                }
+            }
+        );
+    } catch (e) {
+        console.error('handleSegmentCallback error:', e.message);
+        await lusyaBot.sendMessage(chatId, '❌ Помилка.');
+    }
+}
+
+async function handleBroadcastState(chatId, text, supabase) {
+    const state = adminBroadcastState.get(chatId);
+    if (!state) return false;
+
+    if (state.step === 'audience') return false; // waiting for inline button, not text
+
+    if (state.step === 'text') {
+        state.messageText = text;
+        state.step = 'confirm';
+        adminBroadcastState.set(chatId, state);
+
+        const audienceLabel = state.audience === 'bcast_all'   ? 'Всім' :
+                              state.audience === 'bcast_tg'    ? 'Telegram' :
+                              state.audience === 'bcast_viber' ? 'Viber' :
+                              state.segmentFilter ? `Сегмент: ${state.segmentFilter}` : '—';
+
+        await lusyaBot.sendMessage(chatId,
+            `📢 *Перегляд розсилки*\n\nАудиторія: ${audienceLabel}\n\nТекст:\n${text}`,
+            {
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [[
+                        { text: '✅ Надіслати', callback_data: 'bcast_confirm' },
+                        { text: '❌ Скасувати', callback_data: 'bcast_cancel'  }
+                    ]]
+                }
+            }
+        );
+        return true;
+    }
+
+    if (state.step === 'reply') {
+        const { taskId, patientChatId } = state;
+        adminBroadcastState.delete(chatId);
+
+        if (_patientBot && patientChatId) {
+            try {
+                await _patientBot.sendMessage(patientChatId, `👨‍⚕️ Відповідь лікаря на ваше питання:\n\n${text}`);
+                if (taskId) {
+                    await supabase.from('admin_tasks')
+                        .update({ status: 'completed', resolved_at: new Date().toISOString() })
+                        .eq('id', taskId);
+                }
+                await lusyaBot.sendMessage(chatId, '✅ Відповідь надіслано пацієнту.', LUSYA_MENU);
+            } catch (e) {
+                console.error('Reply to patient error:', e.message);
+                await lusyaBot.sendMessage(chatId, '❌ Не вдалося надіслати відповідь.', LUSYA_MENU);
+            }
+        } else {
+            await lusyaBot.sendMessage(chatId, '❌ Пацієнтський бот не ініціалізований.', LUSYA_MENU);
+        }
+        return true;
+    }
+
+    return false;
+}
+
+async function executeBroadcast(chatId, supabase) {
+    const state = adminBroadcastState.get(chatId);
+    if (!state || !state.messageText) { adminBroadcastState.delete(chatId); return; }
+    adminBroadcastState.delete(chatId);
+
+    try {
+        await lusyaBot.sendMessage(chatId, '⏳ Виконую розсилку...');
+
+        let query = supabase.from('messenger_users').select('platform, platform_user_id');
+        if (state.audience === 'bcast_tg' || state.audience === 'segment') {
+            query = query.eq('platform', 'telegram');
+        } else if (state.audience === 'bcast_viber') {
+            query = query.eq('platform', 'viber');
+        }
+        // bcast_all — no filter
+
+        const { data: users, error } = await query;
+        if (error || !users || users.length === 0) {
+            await lusyaBot.sendMessage(chatId, '❌ Не знайдено підписників.', LUSYA_MENU);
+            return;
+        }
+
+        let sent = 0, failed = 0;
+        for (const user of users) {
+            try {
+                if (user.platform === 'telegram' && _patientBot) {
+                    await _patientBot.sendMessage(user.platform_user_id, state.messageText);
+                    sent++;
+                } else if (user.platform === 'viber' && _viberBot) {
+                    sent++;
+                }
+                await new Promise(r => setTimeout(r, 50));
+            } catch (_) { failed++; }
+        }
+
+        await lusyaBot.sendMessage(chatId,
+            `✅ Розсилку завершено!\n📨 Відправлено: ${sent}\n❌ Помилок: ${failed}`,
+            LUSYA_MENU
+        );
+    } catch (e) {
+        console.error('executeBroadcast error:', e.message);
+        await lusyaBot.sendMessage(chatId, '❌ Помилка під час розсилки.', LUSYA_MENU);
     }
 }
 

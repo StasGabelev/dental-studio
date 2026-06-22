@@ -66,7 +66,7 @@ async function refreshSettings() {
         await rebuildKnowledgeBase();
 
         // Initialize Lusya internal agent
-        initLusya(supabase, data);
+        initLusya(supabase, data, tgBot, viberBot);
 
         // Hot-reload campaign runner settings (bots may have changed)
         updateCampaignSettings(data, tgBot, viberBot);
