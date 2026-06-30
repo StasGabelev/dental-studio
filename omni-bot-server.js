@@ -1508,15 +1508,15 @@ app.listen(PORT, async () => {
         console.warn(`⚠️ Bot not initialized yet, retrying in 5s... (${i + 1}/10)`);
         await new Promise(r => setTimeout(r, 5000));
     }
-    setInterval(refreshSettings, 60000 * 5); // every 5 min
+    setInterval(refreshSettings, 60000 * 15); // every 15 min
 
-    setInterval(syncCliniccardsDatabase, 1800000);  // patients: every 30 min
+    setInterval(syncCliniccardsDatabase, 6 * 3600000);  // patients: every 6 hours
     setTimeout(syncCliniccardsDatabase, 10000);
 
-    setInterval(syncVisitsAndRevenue, 3600000);     // visits: every 60 min
+    setInterval(syncVisitsAndRevenue, 2 * 3600000);     // visits: every 2 hours
     setTimeout(syncVisitsAndRevenue, 30000);
 
-    setInterval(syncInvoices, 3600000);             // invoices/finance: every 60 min
+    setInterval(syncInvoices, 3 * 3600000);             // invoices/finance: every 3 hours
     setTimeout(syncInvoices, 45000);
 
     setInterval(syncDoctors, 86400000);             // doctors: once per day
