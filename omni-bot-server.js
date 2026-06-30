@@ -376,11 +376,12 @@ const waitingForQuestion = new Map();
 async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
     const savedPhone = fullPhone || phoneLast9;
 
-    // Save phone — user is "linked" regardless of CRM match
-    await supabase.from('messenger_users')
-        .update({ patient_phone: savedPhone })
-        .eq('platform', 'telegram')
-        .eq('platform_user_id', String(chatId));
+    // Upsert to ensure the row always exists, then save phone
+    await supabase.from('messenger_users').upsert({
+        platform: 'telegram',
+        platform_user_id: String(chatId),
+        patient_phone: savedPhone
+    }, { onConflict: 'platform,platform_user_id' });
 
     const { data: patients } = await supabase
         .from('cc_patients')
@@ -402,10 +403,12 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
             gender,
             note: 'Зареєстрований через Telegram-бот'
         }, { onConflict: 'cc_id' });
-        await supabase.from('messenger_users')
-            .update({ patient_cc_id: botCcId })
-            .eq('platform', 'telegram')
-            .eq('platform_user_id', String(chatId));
+        await supabase.from('messenger_users').upsert({
+            platform: 'telegram',
+            platform_user_id: String(chatId),
+            patient_phone: savedPhone,
+            patient_cc_id: botCcId
+        }, { onConflict: 'platform,platform_user_id' });
 
         const greeting = firstName ? `, ${firstName}` : '';
         await tgBot.sendMessage(chatId,
@@ -418,11 +421,13 @@ async function showPatientHistory(chatId, phoneLast9, fullPhone, tgName) {
 
     const patient = patients[0];
 
-    // Save CRM link
-    await supabase.from('messenger_users')
-        .update({ patient_cc_id: String(patient.cc_id) })
-        .eq('platform', 'telegram')
-        .eq('platform_user_id', String(chatId));
+    // Save CRM link (upsert to guarantee row exists)
+    await supabase.from('messenger_users').upsert({
+        platform: 'telegram',
+        platform_user_id: String(chatId),
+        patient_phone: savedPhone,
+        patient_cc_id: String(patient.cc_id)
+    }, { onConflict: 'platform,platform_user_id' });
 
     // Sync telegram_id to cc_patients so Lusya and campaign-runner can find this subscriber
     await supabase.from('cc_patients')
