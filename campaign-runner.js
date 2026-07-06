@@ -294,20 +294,16 @@ async function runAutomatedFlows() {
 
 async function runPostVisitFlow(flow) {
     const delayHours = flow.delay_hours || 3;
-    const windowEnd = new Date(Date.now() - delayHours * 3600000);
-    const windowStart = new Date(windowEnd.getTime() - 15 * 60000); // 15 min window
-
-    // Find visits that ended in this window
-    const endTimeStr = windowEnd.toTimeString().slice(0, 5); // HH:MM
-    const startTimeStr = windowStart.toTimeString().slice(0, 5);
-    const dateStr = windowEnd.toISOString().split('T')[0];
+    // Look back 7 days to catch visits missed due to daily sync delays.
+    // Cutoff ensures we don't send to visits that haven't aged delay_hours yet.
+    const cutoffDate = new Date(Date.now() - delayHours * 3600000).toISOString().split('T')[0];
+    const windowStartDate = new Date(Date.now() - 7 * 24 * 3600000).toISOString().split('T')[0];
 
     const { data: visits } = await _supabase.from('cc_visits')
         .select('cc_id, patient_id, doctor_cc_id, service_name')
-        .eq('visit_date', dateStr)
         .eq('status', 'VISITED')
-        .gte('time_end', startTimeStr)
-        .lte('time_end', endTimeStr);
+        .gte('visit_date', windowStartDate)
+        .lte('visit_date', cutoffDate);
 
     for (const visit of (visits || [])) {
         if (!visit.patient_id) continue;

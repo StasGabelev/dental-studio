@@ -1416,7 +1416,8 @@ async function syncVisitsAndRevenue() {
                 const visitEnd = v.visit_end ? new Date(v.visit_end) : null;
 
                 const visitRow = {
-                    cc_id: String(v.visit_id),
+                    cc_id: String(v.id),
+                    patient_cc_id: String(v.patient_id || ''),
                     doctor_cc_id: String(v.doctor_id || ''),
                     doctor_id: String(v.doctor_id || ''),
                     doctor_name: v.doctor || null,
@@ -1424,6 +1425,7 @@ async function syncVisitsAndRevenue() {
                     time_start: visitStart ? visitStart.toTimeString().slice(0, 5) : null,
                     time_end: visitEnd ? visitEnd.toTimeString().slice(0, 5) : null,
                     status: v.status || 'PLANNED',
+                    service_name: v.service_name || v.service || null,
                     note: v.note || null,
                     last_sync_at: new Date().toISOString()
                 };
