@@ -1510,13 +1510,13 @@ app.listen(PORT, async () => {
     }
     setInterval(refreshSettings, 60000 * 15); // every 15 min
 
-    setInterval(syncCliniccardsDatabase, 6 * 3600000);  // patients: every 6 hours
+    setInterval(syncCliniccardsDatabase, 24 * 3600000);  // patients: every 24 hours
     setTimeout(syncCliniccardsDatabase, 10000);
 
-    setInterval(syncVisitsAndRevenue, 2 * 3600000);     // visits: every 2 hours
+    setInterval(syncVisitsAndRevenue, 24 * 3600000);     // visits: every 24 hours
     setTimeout(syncVisitsAndRevenue, 30000);
 
-    setInterval(syncInvoices, 3 * 3600000);             // invoices/finance: every 3 hours
+    setInterval(syncInvoices, 24 * 3600000);             // invoices/finance: every 24 hours
     setTimeout(syncInvoices, 45000);
 
     setInterval(syncDoctors, 86400000);             // doctors: once per day
