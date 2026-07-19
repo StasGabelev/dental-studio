@@ -314,7 +314,8 @@ async function runPostVisitFlow(flow) {
         if (existing) continue;
 
         const { data: patient } = await _supabase.from('cc_patients')
-            .select('*').eq('id', visit.patient_id).single();
+            .select('id, full_name, phone, telegram_id, viber_id, gender')
+            .eq('id', visit.patient_id).single();
         if (!patient) continue;
 
         // Get doctor name
@@ -373,16 +374,11 @@ async function runBirthdayFlow(flow) {
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
 
-    // Find patients with birthday today (compare month-day portion of dob)
-    const { data: patients } = await _supabase.from('cc_patients')
-        .select('*')
-        .not('dob', 'is', null);
-
-    const birthdayPatients = (patients || []).filter(p => {
-        if (!p.dob) return false;
-        const dob = p.dob.slice(5, 10); // MM-DD
-        return dob === `${month}-${day}`;
-    });
+    // Filter by birthday in DB — avoid loading all patients into memory
+    const mmdd = `${month}-${day}`;
+    const { data: birthdayPatients } = await _supabase.from('cc_patients')
+        .select('id, full_name, phone, telegram_id, viber_id, dob, gender')
+        .like('dob', `%-${mmdd}`);
 
     for (const patient of birthdayPatients) {
         // Check not already sent today
@@ -415,10 +411,12 @@ async function runBirthdayFlow(flow) {
 
 async function runReactivationFlow(flow) {
     const cutoff = new Date(Date.now() - 90 * 86400000).toISOString();
+    // Select only needed fields — avoid pulling full patient records (10k rows × 700 bytes = 7MB per call)
     const { data: patients } = await _supabase.from('cc_patients')
-        .select('*')
+        .select('id, full_name, phone, telegram_id, viber_id, gender, last_visit_at')
         .or(`last_visit_at.lt.${cutoff},last_visit_at.is.null`)
-        .not('telegram_id', 'is', null); // Only patients we can reach
+        .not('telegram_id', 'is', null)
+        .limit(50); // Process max 50 per run to avoid spikes
 
     for (const patient of patients) {
         // Check not already sent in last 90 days
