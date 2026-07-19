@@ -270,7 +270,7 @@ async function getPatientsByFilter(filter) {
         }
     }
 
-    const { data } = await query;
+    const { data } = await query.limit(5000);
     return data || [];
 }
 
@@ -305,13 +305,17 @@ async function runPostVisitFlow(flow) {
         .gte('visit_date', windowStartDate)
         .lte('visit_date', cutoffDate);
 
-    for (const visit of (visits || [])) {
-        if (!visit.patient_id) continue;
+    if (!visits || visits.length === 0) return;
 
-        // Check not already executed for this visit
-        const { data: existing } = await _supabase.from('flow_executions')
-            .select('id').eq('flow_id', flow.id).eq('visit_cc_id', visit.cc_id).single();
-        if (existing) continue;
+    // Batch dedup: one query instead of N individual checks
+    const visitCcIds = visits.map(v => v.cc_id).filter(Boolean);
+    const { data: alreadySent } = await _supabase.from('flow_executions')
+        .select('visit_cc_id').eq('flow_id', flow.id).in('visit_cc_id', visitCcIds);
+    const sentSet = new Set((alreadySent || []).map(e => e.visit_cc_id));
+
+    for (const visit of visits) {
+        if (!visit.patient_id) continue;
+        if (sentSet.has(visit.cc_id)) continue;
 
         const { data: patient } = await _supabase.from('cc_patients')
             .select('id, full_name, phone, telegram_id, viber_id, gender')
@@ -370,6 +374,12 @@ async function runPostVisitFlow(flow) {
 }
 
 async function runBirthdayFlow(flow) {
+    // Only run once per day at 09:00 Kyiv time (UTC+3) — was running 96x/day = 15 MB/month wasted
+    const now = new Date();
+    const kyivHour = (now.getUTCHours() + 3) % 24;
+    const kyivMin = now.getUTCMinutes();
+    if (!(kyivHour === 9 && kyivMin < 15)) return;
+
     const today = new Date();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
@@ -410,6 +420,12 @@ async function runBirthdayFlow(flow) {
 }
 
 async function runReactivationFlow(flow) {
+    // Only run once per day at 10:00 Kyiv time (UTC+3) — was running 96x/day = 28 MB/month wasted
+    const now = new Date();
+    const kyivHour = (now.getUTCHours() + 3) % 24;
+    const kyivMin = now.getUTCMinutes();
+    if (!(kyivHour === 10 && kyivMin < 15)) return;
+
     const cutoff = new Date(Date.now() - 90 * 86400000).toISOString();
     // Select only needed fields — avoid pulling full patient records (10k rows × 700 bytes = 7MB per call)
     const { data: patients } = await _supabase.from('cc_patients')
