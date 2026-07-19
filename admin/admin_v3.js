@@ -2572,7 +2572,7 @@ async function loadAIHub() {
     
     // Start polling for new tasks if not already running
     if (!aiHubTaskInterval) {
-        aiHubTaskInterval = setInterval(loadAIHubTasks, 10000); // Check every 10s
+        aiHubTaskInterval = setInterval(loadAIHubTasks, 60000); // Check every 60s
     }
 }
 

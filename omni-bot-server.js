@@ -62,8 +62,12 @@ async function refreshSettings() {
             setupViberHandlers();
         }
 
-        // Build Knowledge Base String
-        await rebuildKnowledgeBase();
+        // Rebuild knowledge base only if settings content changed
+        const newKbHash = (data.knowledge_base_manual || '') + (data.updated_at || '');
+        if (!refreshSettings._lastKbHash || refreshSettings._lastKbHash !== newKbHash) {
+            refreshSettings._lastKbHash = newKbHash;
+            await rebuildKnowledgeBase();
+        }
 
         // Initialize Lusya internal agent
         initLusya(supabase, data, tgBot, viberBot);
@@ -447,7 +451,8 @@ async function showVisits(chatId, patient) {
             .from('cc_patients')
             .select('id')
             .ilike('phone', `%${phoneLast9}%`)
-            .not('cc_id', 'like', 'bot_%');
+            .not('cc_id', 'like', 'bot_%')
+            .limit(20);
         if (family?.length > 1) patientIds = family.map(p => p.id);
     }
 
@@ -777,7 +782,8 @@ function setupTelegramHandlers() {
                     .from('cc_patients')
                     .select('id, full_name')
                     .ilike('phone', `%${phoneLast9}%`)
-                    .not('cc_id', 'like', 'bot_%');
+                    .not('cc_id', 'like', 'bot_%')
+                    .limit(20);
                 if (family?.length > 1) {
                     patientIds = family.map(p => p.id);
                     var familyNameMap = Object.fromEntries(family.map(p => [p.id, p.full_name]));
@@ -1521,6 +1527,7 @@ app.listen(PORT, async () => {
         await new Promise(r => setTimeout(r, 5000));
     }
     setInterval(refreshSettings, 60000 * 15); // every 15 min
+    setInterval(rebuildKnowledgeBase, 2 * 3600000); // prices: refresh every 2h regardless of settings
 
     setInterval(syncCliniccardsDatabase, 24 * 3600000);  // patients: every 24 hours
     setTimeout(syncCliniccardsDatabase, 10000);
