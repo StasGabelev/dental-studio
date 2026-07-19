@@ -391,7 +391,7 @@ async function runBirthdayFlow(flow) {
         const vars = getPatientVars(patient);
         const text = flow.message_template
             ? renderTemplate(flow.message_template, vars)
-            : `🎂 ${vars.first_name ? vars.first_name + ', с' : 'С'} днём рождения! Команда Dental Studio поздравляет вас и желает крепкого здоровья и голголивудской улыбки! 😁`;
+            : `🎂 ${vars.first_name ? vars.first_name + ', з' : 'З'} днем народження! Команда Dental Studio вітає вас і бажає міцного здоров'я та голлівудської посмішки! 😁`;
 
         const { data: exec } = await _supabase.from('flow_executions').insert({
             flow_id: flow.id, patient_id: patient.id,
@@ -414,9 +414,10 @@ async function runReactivationFlow(flow) {
     // Select only needed fields — avoid pulling full patient records (10k rows × 700 bytes = 7MB per call)
     const { data: patients } = await _supabase.from('cc_patients')
         .select('id, full_name, phone, telegram_id, viber_id, gender, last_visit_at')
-        .or(`last_visit_at.lt.${cutoff},last_visit_at.is.null`)
+        .lt('last_visit_at', cutoff)
         .not('telegram_id', 'is', null)
-        .limit(50); // Process max 50 per run to avoid spikes
+        .order('last_visit_at', { ascending: true })
+        .limit(50);
 
     for (const patient of patients) {
         // Check not already sent in last 90 days
@@ -429,7 +430,7 @@ async function runReactivationFlow(flow) {
         const vars = getPatientVars(patient);
         const text = flow.message_template
             ? renderTemplate(flow.message_template, vars)
-            : `Привет, ${vars.first_name || 'дорогой пациент'}! 😊 Мы соскучились! Прошло уже несколько месяцев с вашего последнего визита. Запишитесь на профилактический осмотр — здоровая улыбка важна! 🦷`;
+            : `${vars.first_name ? vars.first_name + ', д' : 'Д'}обрий день! 😊 Ми сумуємо за вами! Минуло вже кілька місяців з вашого останнього візиту. Запишіться на профілактичний огляд — здорова посмішка важлива! 🦷`;
 
         const { data: exec } = await _supabase.from('flow_executions').insert({
             flow_id: flow.id, patient_id: patient.id,

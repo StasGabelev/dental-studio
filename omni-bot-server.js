@@ -1448,6 +1448,14 @@ async function syncVisitsAndRevenue() {
         }
     } catch (e) {
         console.error('❌ CRON syncVisitsAndRevenue error:', e.message);
+        if (aiSettings?.tg_bot_token && aiSettings?.tg_chat_id) {
+            try {
+                const alertBot = new TelegramBot(aiSettings.tg_bot_token);
+                alertBot.sendMessage(aiSettings.tg_chat_id,
+                    `⚠️ *Помилка синхронізації візитів CRM*\n\n\`${e.message}\``,
+                    { parse_mode: 'Markdown' });
+            } catch {}
+        }
     }
 }
 
@@ -1517,7 +1525,7 @@ app.listen(PORT, async () => {
     setInterval(syncCliniccardsDatabase, 24 * 3600000);  // patients: every 24 hours
     setTimeout(syncCliniccardsDatabase, 10000);
 
-    setInterval(syncVisitsAndRevenue, 24 * 3600000);     // visits: every 24 hours
+    setInterval(syncVisitsAndRevenue, 4 * 3600000);      // visits: every 4 hours
     setTimeout(syncVisitsAndRevenue, 30000);
 
     setInterval(syncInvoices, 24 * 3600000);             // invoices/finance: every 24 hours
