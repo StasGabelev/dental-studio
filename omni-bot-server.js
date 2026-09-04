@@ -1537,3 +1537,12 @@ app.listen(PORT, async () => {
     // Campaign runner: campaigns, surveys, automated flows
     initCampaignRunner(supabase, aiSettings, tgBot, viberBot);
 });
+
+// Graceful shutdown: stop Telegram polling before process exits
+// Without this, pm2 restart causes 502 loop — Telegram keeps old connection open
+process.on('SIGTERM', async () => {
+    console.log('🛑 Graceful shutdown: stopping Telegram polling...');
+    try { if (tgBot) await tgBot.stopPolling(); } catch (_) {}
+    console.log('✅ Polling stopped. Exiting.');
+    process.exit(0);
+});
