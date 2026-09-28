@@ -30,7 +30,7 @@ const LUSYA_MENU = {
 
 // ─── Init ────────────────────────────────────────────────────────────────────
 
-function initLusya(supabase, aiSettings, patientBot, viberBot) {
+function initLusya(supabase, aiSettings, patientBot, viberBot, onPollingError) {
     const token = aiSettings?.lusya_bot_token;
     if (!token) {
         console.log('ℹ️  Lusya: no lusya_bot_token set, skipping init.');
@@ -108,7 +108,10 @@ function initLusya(supabase, aiSettings, patientBot, viberBot) {
         }
     });
 
-    lusyaBot.on('polling_error', (e) => console.error('Lusya polling error:', e.message));
+    lusyaBot.on('polling_error', (e) => {
+        console.error('Lusya polling error:', e.message);
+        if (typeof onPollingError === 'function') onPollingError(e, 'lusya');
+    });
 
     lusyaBot.on('callback_query', async (query) => {
         const chatId = String(query.message.chat.id);
@@ -2151,4 +2154,11 @@ const DEFAULT_SYSTEM_PROMPT = `Ты — Люся, внутренний ИИ-ас
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
-module.exports = { initLusya };
+async function stopLusyaPolling() {
+    if (!lusyaBot) return;
+    await lusyaBot.stopPolling();
+    lusyaBot = null;
+    lusyaBotToken = null;
+}
+
+module.exports = { initLusya, stopLusyaPolling };

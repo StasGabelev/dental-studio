@@ -5,7 +5,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const ViberBot = require('viber-bot').Bot;
 const TextMessage = require('viber-bot').Message.Text;
 const fetch = require('node-fetch');
-const { initLusya } = require('./lusya-agent');
+const { initLusya, stopLusyaPolling } = require('./lusya-agent');
 const { initCampaignRunner, updateSettings: updateCampaignSettings, handleComplaintMessage, scheduleProceduralFollowUps } = require('./campaign-runner');
 
 // --- Configuration & Initialization ---
@@ -37,6 +37,50 @@ let knowledgeBase = "";
 let tgBot = null;
 let viberBot = null;
 
+// PM2 can only see whether the Node.js process is alive. Telegram long polling can
+// become unusable while the process remains "online", so track sustained polling
+// failures and let PM2 restart the whole process when retries do not recover.
+const telegramPollingHealth = {
+    errorCount: 0,
+    firstErrorAt: 0,
+    lastErrorAt: 0,
+    lastError: null,
+    source: null,
+    restartScheduled: false,
+    resetTimer: null
+};
+
+function handleTelegramPollingError(error, source = 'patient') {
+    const now = Date.now();
+    const message = error?.message || String(error);
+
+    // A new incident starts after five quiet minutes.
+    if (!telegramPollingHealth.firstErrorAt || now - telegramPollingHealth.lastErrorAt > 5 * 60 * 1000) {
+        telegramPollingHealth.errorCount = 0;
+        telegramPollingHealth.firstErrorAt = now;
+    }
+
+    telegramPollingHealth.errorCount += 1;
+    telegramPollingHealth.lastErrorAt = now;
+    telegramPollingHealth.lastError = message;
+    telegramPollingHealth.source = source;
+
+    clearTimeout(telegramPollingHealth.resetTimer);
+    telegramPollingHealth.resetTimer = setTimeout(() => {
+        telegramPollingHealth.errorCount = 0;
+        telegramPollingHealth.firstErrorAt = 0;
+        telegramPollingHealth.lastError = null;
+        telegramPollingHealth.source = null;
+    }, 3 * 60 * 1000);
+
+    const persistedFor = now - telegramPollingHealth.firstErrorAt;
+    if (telegramPollingHealth.errorCount >= 8 && persistedFor >= 60 * 1000 && !telegramPollingHealth.restartScheduled) {
+        telegramPollingHealth.restartScheduled = true;
+        console.error(`🚨 Telegram polling stuck (${source}, ${telegramPollingHealth.errorCount} errors). Restarting via PM2...`);
+        setTimeout(() => gracefulShutdown('WATCHDOG', 1), 1500);
+    }
+}
+
 // --- 1. Dynamic Settings Refresher ---
 async function refreshSettings() {
     try {
@@ -48,6 +92,7 @@ async function refreshSettings() {
         if (data.tg_patient_bot_token && (!tgBot || tgBot.token !== data.tg_patient_bot_token)) {
             console.log('🤖 Initializing Patient Telegram Bot...');
             tgBot = new TelegramBot(data.tg_patient_bot_token, { polling: true });
+            tgBot.on('polling_error', (error) => handleTelegramPollingError(error, 'patient'));
             setupTelegramHandlers();
         }
 
@@ -70,7 +115,7 @@ async function refreshSettings() {
         }
 
         // Initialize Lusya internal agent
-        initLusya(supabase, data, tgBot, viberBot);
+        initLusya(supabase, data, tgBot, viberBot, handleTelegramPollingError);
 
         // Hot-reload campaign runner settings (bots may have changed)
         updateCampaignSettings(data, tgBot, viberBot);
@@ -1208,7 +1253,24 @@ app.get('/health_check_unique', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', time: new Date().toISOString(), provider: aiSettings?.provider || 'not set' });
+    const pollingDegraded = telegramPollingHealth.restartScheduled
+        || (telegramPollingHealth.errorCount >= 3
+            && Date.now() - telegramPollingHealth.lastErrorAt < 3 * 60 * 1000);
+
+    res.status(pollingDegraded ? 503 : 200).json({
+        status: pollingDegraded ? 'degraded' : 'ok',
+        time: new Date().toISOString(),
+        provider: aiSettings?.provider || 'not set',
+        telegram: {
+            initialized: Boolean(tgBot),
+            status: pollingDegraded ? 'polling_errors' : 'ok',
+            recent_errors: telegramPollingHealth.errorCount,
+            source: telegramPollingHealth.source,
+            last_error_at: telegramPollingHealth.lastErrorAt
+                ? new Date(telegramPollingHealth.lastErrorAt).toISOString()
+                : null
+        }
+    });
 });
 
 app.post('/api/chat', async (req, res) => {
@@ -1540,9 +1602,13 @@ app.listen(PORT, async () => {
 
 // Graceful shutdown: stop Telegram polling before process exits
 // Without this, pm2 restart causes 502 loop — Telegram keeps old connection open
-process.on('SIGTERM', async () => {
-    console.log('🛑 Graceful shutdown: stopping Telegram polling...');
+async function gracefulShutdown(signal, exitCode = 0) {
+    console.log(`🛑 Graceful shutdown (${signal}): stopping Telegram polling...`);
     try { if (tgBot) await tgBot.stopPolling(); } catch (_) {}
+    try { await stopLusyaPolling(); } catch (_) {}
     console.log('✅ Polling stopped. Exiting.');
-    process.exit(0);
-});
+    process.exit(exitCode);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
