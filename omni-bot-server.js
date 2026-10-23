@@ -5,7 +5,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const ViberBot = require('viber-bot').Bot;
 const TextMessage = require('viber-bot').Message.Text;
 const fetch = require('node-fetch');
-const { initLusya, stopLusyaPolling } = require('./lusya-agent');
+const { initLusya, stopLusyaPolling, getLusyaPollingHealth } = require('./lusya-agent');
 const { initCampaignRunner, updateSettings: updateCampaignSettings, handleComplaintMessage, scheduleProceduralFollowUps } = require('./campaign-runner');
 
 // --- Configuration & Initialization ---
@@ -36,6 +36,8 @@ let aiSettings = null;
 let knowledgeBase = "";
 let tgBot = null;
 let viberBot = null;
+let patientPollingStartedAt = 0;
+const POLLING_STALE_AFTER_MS = 90 * 1000;
 
 // PM2 can only see whether the Node.js process is alive. Telegram long polling can
 // become unusable while the process remains "online", so track sustained polling
@@ -81,6 +83,32 @@ function handleTelegramPollingError(error, source = 'patient') {
     }
 }
 
+function getPatientPollingHealth() {
+    if (!tgBot) return { initialized: false, isPolling: false, lastSuccessAt: 0, stale: true };
+    const lastSuccessAt = tgBot._polling?._lastUpdate || 0;
+    const referenceTime = lastSuccessAt || patientPollingStartedAt;
+    return {
+        initialized: true,
+        isPolling: tgBot.isPolling(),
+        lastSuccessAt,
+        stale: !tgBot.isPolling() || !referenceTime || Date.now() - referenceTime > POLLING_STALE_AFTER_MS
+    };
+}
+
+function checkTelegramPollingLiveness() {
+    const patient = getPatientPollingHealth();
+    const lusya = getLusyaPollingHealth(POLLING_STALE_AFTER_MS);
+    const failedSource = patient.initialized && patient.stale
+        ? 'patient'
+        : (lusya.initialized && lusya.stale ? 'lusya' : null);
+
+    if (failedSource && !telegramPollingHealth.restartScheduled) {
+        telegramPollingHealth.restartScheduled = true;
+        console.error(`🚨 Telegram polling heartbeat stale (${failedSource}). Restarting via PM2...`);
+        gracefulShutdown('POLLING_HEARTBEAT_STALE', 1);
+    }
+}
+
 // --- 1. Dynamic Settings Refresher ---
 async function refreshSettings() {
     try {
@@ -92,6 +120,7 @@ async function refreshSettings() {
         if (data.tg_patient_bot_token && (!tgBot || tgBot.token !== data.tg_patient_bot_token)) {
             console.log('🤖 Initializing Patient Telegram Bot...');
             tgBot = new TelegramBot(data.tg_patient_bot_token, { polling: true });
+            patientPollingStartedAt = Date.now();
             tgBot.on('polling_error', (error) => handleTelegramPollingError(error, 'patient'));
             setupTelegramHandlers();
         }
@@ -1253,7 +1282,11 @@ app.get('/health_check_unique', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
+    const patientPolling = getPatientPollingHealth();
+    const lusyaPolling = getLusyaPollingHealth(POLLING_STALE_AFTER_MS);
     const pollingDegraded = telegramPollingHealth.restartScheduled
+        || patientPolling.stale
+        || (lusyaPolling.initialized && lusyaPolling.stale)
         || (telegramPollingHealth.errorCount >= 3
             && Date.now() - telegramPollingHealth.lastErrorAt < 3 * 60 * 1000);
 
@@ -1262,8 +1295,12 @@ app.get('/api/health', (req, res) => {
         time: new Date().toISOString(),
         provider: aiSettings?.provider || 'not set',
         telegram: {
-            initialized: Boolean(tgBot),
+            initialized: patientPolling.initialized,
             status: pollingDegraded ? 'polling_errors' : 'ok',
+            is_polling: patientPolling.isPolling,
+            last_success_at: patientPolling.lastSuccessAt
+                ? new Date(patientPolling.lastSuccessAt).toISOString()
+                : null,
             recent_errors: telegramPollingHealth.errorCount,
             source: telegramPollingHealth.source,
             last_error_at: telegramPollingHealth.lastErrorAt
@@ -1598,6 +1635,11 @@ app.listen(PORT, async () => {
 
     // Campaign runner: campaigns, surveys, automated flows
     initCampaignRunner(supabase, aiSettings, tgBot, viberBot);
+
+    // Detect a silent long-polling hang. Telegram long polling normally completes
+    // every ~10 seconds even when there are no messages, so 90 seconds is a safe
+    // failure threshold with plenty of room for brief network interruptions.
+    setInterval(checkTelegramPollingLiveness, 30 * 1000);
 });
 
 // Graceful shutdown: stop Telegram polling before process exits

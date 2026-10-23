@@ -4,6 +4,7 @@ const fetch = require('node-fetch');
 
 let lusyaBot = null;
 let lusyaBotToken = null;
+let lusyaPollingStartedAt = 0;
 
 // Balance monitoring state
 let _adminChatId = null;          // auto-detected from first incoming message
@@ -41,6 +42,7 @@ function initLusya(supabase, aiSettings, patientBot, viberBot, onPollingError) {
     if (lusyaBot) { try { lusyaBot.stopPolling(); } catch(_) {} }
     lusyaBotToken = token;
     lusyaBot = new TelegramBot(token, { polling: true });
+    lusyaPollingStartedAt = Date.now();
     _patientBot = patientBot || null;
     _viberBot   = viberBot   || null;
 
@@ -2159,6 +2161,19 @@ async function stopLusyaPolling() {
     await lusyaBot.stopPolling();
     lusyaBot = null;
     lusyaBotToken = null;
+    lusyaPollingStartedAt = 0;
 }
 
-module.exports = { initLusya, stopLusyaPolling };
+function getLusyaPollingHealth(staleAfterMs = 90 * 1000) {
+    if (!lusyaBot) return { initialized: false, isPolling: false, lastSuccessAt: 0, stale: false };
+    const lastSuccessAt = lusyaBot._polling?._lastUpdate || 0;
+    const referenceTime = lastSuccessAt || lusyaPollingStartedAt;
+    return {
+        initialized: true,
+        isPolling: lusyaBot.isPolling(),
+        lastSuccessAt,
+        stale: !lusyaBot.isPolling() || !referenceTime || Date.now() - referenceTime > staleAfterMs
+    };
+}
+
+module.exports = { initLusya, stopLusyaPolling, getLusyaPollingHealth };
